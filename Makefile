@@ -5,6 +5,9 @@ ps:
 build:
 		docker compose build --no-cache
 
+network: 
+		docker network create -d bridge hontokun
+
 up:
 		docker compose up -d
 
