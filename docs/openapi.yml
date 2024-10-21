@@ -1,0 +1,65 @@
+openapi: 3.0.0
+info:
+  title: ホントくんAPI
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+    description: ローカル開発環境
+  - url: https://hontokun-backend.kouxi.jp
+    description: 本番環境
+components:
+  securitySchemes:
+    firebase:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Firebaseのトークンを指定してください
+paths:
+  /sign_in:
+    post:
+      tags:
+        - auth
+      summary: ログイン
+      description: Firebaseのトークンを受け取り、ユーザーを認証する
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                provider:
+                  type: string
+                  enum: [e-mail, google]
+                e-mail:
+                  type: string
+                password:
+                  type: string
+                token:
+                  type: string
+      responses:
+        "200":
+          description: ログイン成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: string
+                    description: 認証されたユーザーID
+                  token:
+                    type: string
+                    description: ログインに成功した場合に返されるトークン
+        "401":
+          description: 認証失敗
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: エラーメッセージ
+      security: []
