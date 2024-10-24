@@ -42,6 +42,8 @@ paths:
                   type: string
                 birthday:
                   type: string
+                  format: date
+                  description: ユーザの誕生日(YYYY-MM-DD)
       responses:
         "200":
           description: 登録成功
@@ -144,6 +146,89 @@ paths:
                     description: ログアウトに成功した場合に返されるメッセージ
         "401":
           description: ログアウト失敗
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: エラーメッセージ
+      security:
+        - firebase: []
+  /profile:
+    get:
+      tags:
+        - profile
+      summary: ユーザプロフィール取得
+      description: ユーザーのプロフィールを取得する
+      parameters: []
+      responses:
+        "200":
+          description: プロフィール取得成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: string
+                    description: ユーザーID
+                  name:
+                    type: string
+                    description: ユーザー名
+                  birthday:
+                    type: string
+                    format: date
+                    description: ユーザーの誕生日(YYYY-MM-DD)
+        "401":
+          description: プロフィール取得失敗
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: エラーメッセージ
+      security:
+        - firebase: []
+    put:
+      tags:
+        - profile
+      summary: ユーザプロフィール更新
+      description: ユーザーのプロフィールを更新する
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                token:
+                  type: string
+                name:
+                  type: string
+                birthday:
+                  type: string
+                  format: date
+                  description: ユーザの誕生日(YYYY-MM-DD)
+      responses:
+        "200":
+          description: プロフィール更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: プロフィール更新に成功した場合に返されるメッセージ
+        "401":
+          description: プロフィール更新失敗
           content:
             application/json:
               schema:
