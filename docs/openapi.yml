@@ -53,7 +53,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UserId"
+                allOf:
+                  - $ref: "#/components/schemas/UserId"
+                  - $ref: "#/components/schemas/UserProfile"
         "401":
           description: 登録失敗
           content:
@@ -77,7 +79,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UserProfile"
+                allOf:
+                  - $ref: "#/components/schemas/UserId"
+                  - $ref: "#/components/schemas/UserProfile"
+                  - type: object
+                    properties:
+                      message:
+                        type: string
+                        description: プロフィール取得に成功した場合に返されるメッセージ
         "401":
           description: プロフィール取得失敗
           content:
@@ -108,11 +117,14 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    description: プロフィール更新に成功した場合に返されるメッセージ
+                allOf:
+                  - $ref: "#/components/schemas/UserId"
+                  - $ref: "#/components/schemas/UserProfile"
+                  - type: object
+                    properties:
+                      message:
+                        type: string
+                        description: プロフィール更新に成功した場合に返されるメッセージ
         "401":
           description: プロフィール更新失敗
           content:
