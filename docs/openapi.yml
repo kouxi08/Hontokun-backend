@@ -14,6 +14,49 @@ components:
       in: header
       name: Authorization
       description: Firebaseのトークンを指定してください
+  schemas:
+    TokenRequest:
+      type: object
+      properties:
+        token:
+          type: string
+          description: Firebaseのトークン
+        provider:
+          type: string
+          enum: [email, google]
+    UserId:
+      type: object
+      properties:
+        user_id:
+          type: string
+          description: ユーザーID
+    UserEmail:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          description: ユーザーのメールアドレス
+    UserPassword:
+      type: object
+      properties:
+        password:
+          type: string
+          description: ユーザーのパスワード
+    UserProfile:
+      allOf:
+        - $ref: "#/components/schemas/UserId"
+        - type: object
+          properties:
+            name:
+              type: string
+              description: ユーザー名
+            birthday:
+              type: string
+              format: date
+              description: ユーザーの誕生日(YYYY-MM-DD)
+          required:
+            - name
 paths:
   /sign_up:
     post:
@@ -27,37 +70,20 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                provider:
-                  type: string
-                  enum: [email, google]
-                email:
-                  type: string
-                password:
-                  type: string
-                token:
-                  type: string
-                name:
-                  type: string
-                birthday:
-                  type: string
-                  format: date
-                  description: ユーザの誕生日(YYYY-MM-DD)
+              allOf:
+                - $ref: "#/components/schemas/UserId"
+                - $ref: "#/components/schemas/UserPassword"
+                - $ref: "#/components/schemas/TokenRequest"
+                - $ref: "#/components/schemas/UserProfile"
       responses:
         "200":
           description: 登録成功
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  user_id:
-                    type: string
-                    description: 登録されたユーザーID
-                  token:
-                    type: string
-                    description: 登録に成功した場合に返されるトークン
+                allOf:
+                  - $ref: "#/components/schemas/UserId"
+                  - $ref: "#/components/schemas/TokenRequest"
         "401":
           description: 登録失敗
           content:
@@ -80,31 +106,20 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                provider:
-                  type: string
-                  enum: [email, google]
-                email:
-                  type: string
-                password:
-                  type: string
-                token:
-                  type: string
+              allOf:
+                - $ref: "#/components/schemas/TokenRequest"
+                - $ref: "#/components/schemas/UserId"
+                - $ref: "#/components/schemas/UserEmail"
+                - $ref: "#/components/schemas/UserPassword"
       responses:
         "200":
           description: ログイン成功
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  user_id:
-                    type: string
-                    description: 認証されたユーザーID
-                  token:
-                    type: string
-                    description: ログインに成功した場合に返されるトークン
+                allOf:
+                  - $ref: "#/components/schemas/UserId"
+                  - $ref: "#/components/schemas/TokenRequest"
         "401":
           description: 認証失敗
           content:
@@ -127,12 +142,9 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                user_id:
-                  type: string
-                token:
-                  type: string
+              allOf:
+                - $ref: "#/components/schemas/UserId"
+                - $ref: "#/components/schemas/TokenRequest"
       responses:
         "200":
           description: ログアウト成功
@@ -169,18 +181,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  user_id:
-                    type: string
-                    description: ユーザーID
-                  name:
-                    type: string
-                    description: ユーザー名
-                  birthday:
-                    type: string
-                    format: date
-                    description: ユーザーの誕生日(YYYY-MM-DD)
+                $ref: "#/components/schemas/UserProfile"
         "401":
           description: プロフィール取得失敗
           content:
@@ -204,18 +205,9 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                user_id:
-                  type: string
-                token:
-                  type: string
-                name:
-                  type: string
-                birthday:
-                  type: string
-                  format: date
-                  description: ユーザの誕生日(YYYY-MM-DD)
+              allOf:
+                - $ref: "#/components/schemas/TokenRequest"
+                - $ref: "#/components/schemas/UserProfile"
       responses:
         "200":
           description: プロフィール更新成功
