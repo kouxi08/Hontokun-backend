@@ -9,54 +9,30 @@ servers:
     description: 本番環境
 components:
   securitySchemes:
-    firebase:
-      type: apiKey
-      in: header
-      name: Authorization
-      description: Firebaseのトークンを指定してください
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWTを使用した認証を行います。`Authorization`ヘッダーに`Bearer`スキームでトークンを含めてください。
   schemas:
-    TokenRequest:
-      type: object
-      properties:
-        token:
-          type: string
-          description: Firebaseのトークン
-        provider:
-          type: string
-          enum: [email, google]
     UserId:
       type: object
       properties:
         user_id:
           type: string
           description: ユーザーID
-    UserEmail:
-      type: object
-      properties:
-        email:
-          type: string
-          format: email
-          description: ユーザーのメールアドレス
-    UserPassword:
-      type: object
-      properties:
-        password:
-          type: string
-          description: ユーザーのパスワード
     UserProfile:
-      allOf:
-        - $ref: "#/components/schemas/UserId"
-        - type: object
-          properties:
-            name:
-              type: string
-              description: ユーザー名
-            birthday:
-              type: string
-              format: date
-              description: ユーザーの誕生日(YYYY-MM-DD)
-          required:
-            - name
+      type: object
+      properties:
+        nickname:
+          type: string
+          description: ユーザー名
+        birthday:
+          type: string
+          format: date
+          description: ユーザーの誕生日(YYYY-MM-DD)
+      required:
+        - name
 paths:
   /sign_up:
     post:
@@ -70,20 +46,14 @@ paths:
         content:
           application/json:
             schema:
-              allOf:
-                - $ref: "#/components/schemas/UserId"
-                - $ref: "#/components/schemas/UserPassword"
-                - $ref: "#/components/schemas/TokenRequest"
-                - $ref: "#/components/schemas/UserProfile"
+              $ref: "#/components/schemas/UserProfile"
       responses:
         "200":
           description: 登録成功
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: "#/components/schemas/UserId"
-                  - $ref: "#/components/schemas/TokenRequest"
+                $ref: "#/components/schemas/UserId"
         "401":
           description: 登録失敗
           content:
@@ -94,80 +64,6 @@ paths:
                   message:
                     type: string
                     description: エラーメッセージ
-  /sign_in:
-    post:
-      tags:
-        - auth
-      summary: ログイン
-      description: Firebaseのトークンを受け取り、ユーザーを認証する
-      parameters: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              allOf:
-                - $ref: "#/components/schemas/TokenRequest"
-                - $ref: "#/components/schemas/UserId"
-                - $ref: "#/components/schemas/UserEmail"
-                - $ref: "#/components/schemas/UserPassword"
-      responses:
-        "200":
-          description: ログイン成功
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/UserId"
-                  - $ref: "#/components/schemas/TokenRequest"
-        "401":
-          description: 認証失敗
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    description: エラーメッセージ
-  /sign_out:
-    post:
-      tags:
-        - auth
-      summary: ログアウト
-      description: ログアウトする
-      parameters: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              allOf:
-                - $ref: "#/components/schemas/UserId"
-                - $ref: "#/components/schemas/TokenRequest"
-      responses:
-        "200":
-          description: ログアウト成功
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    description: ログアウトに成功した場合に返されるメッセージ
-        "401":
-          description: ログアウト失敗
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    description: エラーメッセージ
-      security:
-        - firebase: []
   /profile:
     get:
       tags:
@@ -193,7 +89,7 @@ paths:
                     type: string
                     description: エラーメッセージ
       security:
-        - firebase: []
+        - bearerAuth: []
     put:
       tags:
         - profile
@@ -205,9 +101,7 @@ paths:
         content:
           application/json:
             schema:
-              allOf:
-                - $ref: "#/components/schemas/TokenRequest"
-                - $ref: "#/components/schemas/UserProfile"
+              $ref: "#/components/schemas/UserProfile"
       responses:
         "200":
           description: プロフィール更新成功
@@ -230,4 +124,4 @@ paths:
                     type: string
                     description: エラーメッセージ
       security:
-        - firebase: []
+        - bearerAuth: []
