@@ -15,6 +15,57 @@ components:
       name: Authorization
       description: Firebaseのトークンを指定してください
 paths:
+  /sign_up:
+    post:
+      tags:
+        - auth
+      summary: 新規登録
+      description: ユーザーを新規登録する
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                provider:
+                  type: string
+                  enum: [email, google]
+                email:
+                  type: string
+                password:
+                  type: string
+                token:
+                  type: string
+                name:
+                  type: string
+                birthday:
+                  type: string
+      responses:
+        "200":
+          description: 登録成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: string
+                    description: 登録されたユーザーID
+                  token:
+                    type: string
+                    description: 登録に成功した場合に返されるトークン
+        "401":
+          description: 登録失敗
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: エラーメッセージ
   /sign_in:
     post:
       tags:
@@ -31,8 +82,8 @@ paths:
               properties:
                 provider:
                   type: string
-                  enum: [e-mail, google]
-                e-mail:
+                  enum: [email, google]
+                email:
                   type: string
                 password:
                   type: string
@@ -62,4 +113,44 @@ paths:
                   message:
                     type: string
                     description: エラーメッセージ
-      security: []
+  /sign_out:
+    post:
+      tags:
+        - auth
+      summary: ログアウト
+      description: ログアウトする
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                token:
+                  type: string
+      responses:
+        "200":
+          description: ログアウト成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: ログアウトに成功した場合に返されるメッセージ
+        "401":
+          description: ログアウト失敗
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: エラーメッセージ
+      security:
+        - firebase: []
