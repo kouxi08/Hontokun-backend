@@ -33,6 +33,35 @@ components:
           description: ユーザーの誕生日(YYYY-MM-DD)
       required:
         - name
+    UserStatus:
+      type: object
+      properties:
+        level:
+          type: integer
+          description: ユーザーのレベル
+        experience:
+          type: integer
+          description: ユーザーの経験値
+    CharacterImage:
+      type: object
+      properties:
+        character_image_id:
+          type: string
+          description: ユーザーの着せ替え画像のID
+    CharacterImages:
+      type: object
+      properties:
+        character_image_id_list:
+          type: array
+          items:
+            type: string
+          description: ユーザーの着せ替え画像のIDの配列
+    CharacterDialogue:
+      type: object
+      properties:
+        character_dialogue:
+          type: string
+          description: キャラクターのセリフ
 paths:
   /sign_up:
     post:
@@ -66,22 +95,80 @@ paths:
                   message:
                     type: string
                     description: エラーメッセージ
-  /profile:
+  /home:
     get:
       tags:
-        - profile
-      summary: ユーザプロフィール取得
-      description: ユーザーのプロフィールを取得する
+        - home
+      summary: ホーム画面でのデータ取得
+      description: ユーザ情報を取得する
       parameters: []
       responses:
         "200":
-          description: プロフィール取得成功
+          description: ホーム画面データ取得成功
           content:
             application/json:
               schema:
                 allOf:
                   - $ref: "#/components/schemas/UserId"
                   - $ref: "#/components/schemas/UserProfile"
+                  - $ref: "#/components/schemas/UserStatus"
+                  - $ref: "#/components/schemas/CharacterImages"
+                  - $ref: "#/components/schemas/CharacterDialogue"
+                  - type: object
+                    properties:
+                      history:
+                        type: object
+                        properties:
+                          total_accuracy:
+                            type: number
+                            format: double
+                            description: ユーザーの総正答率
+                          quiz_set_list:
+                            type: array
+                            description: クイズのセット別の一覧
+                            items:
+                              type: object
+                              properties:
+                                quiz_set_id:
+                                  type: string
+                                  description: クイズセットのID
+                                quiz_set_difficulty:
+                                  type: integer
+                                  description: クイズの難易度
+                                  example: 1
+                                quiz_set_accuracy:
+                                  type: number
+                                  format: double
+                                  description: クイズのセット別の正答率
+                                  example: 0.67
+                                answered_at:
+                                  type: string
+                                  format: date-time
+                                  description: クイズを解いた日時
+                                quiz_set:
+                                  type: array
+                                  description: クイズセットの問題一覧
+                                  items:
+                                    type: object
+                                    properties:
+                                      quiz_id:
+                                        type: string
+                                        description: クイズのID
+                                      quiz_type:
+                                        type: string
+                                        description: クイズの出題形式（バトルかタイムアタックか）
+                                        example: "battle"
+                                      answer_time:
+                                        type: integer
+                                        nullable: true
+                                        description: クイズを解いた時間(タイムアタックの場合・秒)
+                                        example: 30
+                                      is_correct:
+                                        type: boolean
+                                        description: クイズの正誤
+                                      user_answer:
+                                        type: string
+                                        description: ユーザーの解答内容
                   - type: object
                     properties:
                       message:
@@ -99,6 +186,7 @@ paths:
                     description: エラーメッセージ
       security:
         - bearerAuth: []
+  /profile:
     put:
       tags:
         - profile
@@ -110,7 +198,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UserProfile"
+              allOf:
+                - $ref: "#/components/schemas/UserProfile"
+                - $ref: "#/components/schemas/CharacterImage"
       responses:
         "200":
           description: プロフィール更新成功
@@ -120,6 +210,7 @@ paths:
                 allOf:
                   - $ref: "#/components/schemas/UserId"
                   - $ref: "#/components/schemas/UserProfile"
+                  - $ref: "#/components/schemas/CharacterImage"
                   - type: object
                     properties:
                       message:
