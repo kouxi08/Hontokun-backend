@@ -15,7 +15,7 @@ app.get('/', (c) => {
 app.get('/test',  async (c) => {
   try {
     const message = await Request();
-    return c.text(`test: ${JSON.stringify(message)}`);
+    return c.json({message});
   } catch (error) {
     console.error("Error in /test route:", error);
     return c.text("Failed to fetch quiz data");

@@ -4,17 +4,32 @@ import { config } from 'dotenv';
 
 config();
 
-type Quiz = {
+interface Props  {
+    contents: Quiz
+};
+
+interface Quiz  {
     id: string;
-    title: string;
+    createdAt: string;
+    updatedAt: string;
+    publishedAt: string;
+    revisedAt: string;
+    title: number;
     content: string;
-    images: string[];
+    images: Images[];
     question: string;
     explanation: string;
     answer: string;
     level: number;
-    choices: string;
+    choices: string[];
 }
+
+interface Images {
+    url: string;
+    height: number;
+    width: number;
+};
+
 
 const client = createClient({
     serviceDomain: process.env.SERVICE_DOMAIN || "",
@@ -23,11 +38,19 @@ const client = createClient({
 
 export const Request = async () => {
     try {
-        const quiz = await client.get<{ contents: Quiz[] }>({endpoint: "quiz"})
-        return quiz.contents;
-    }catch (err) {
-        return []
+        const quiz = await client.get<Props>({ endpoint: "quiz" });
+        const data: Quiz = await quiz.contents;
+        console.log(data);
+        return {
+            data
+        };
+    } catch (err) {
+        console.error("Failed to fetch quizzes:", err);
+        return {
+            quiz: [],
+        };
     }
-}
+};
+
 
 export default Request
