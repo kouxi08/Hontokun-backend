@@ -42,26 +42,102 @@ components:
         experience:
           type: integer
           description: ユーザーの経験値
-    CharacterImage:
+    CharacterImageId:
       type: object
       properties:
         character_image_id:
           type: string
           description: ユーザーの着せ替え画像のID
-    CharacterImages:
+    CharacterImage:
+      allOf:
+        - $ref: "#/components/schemas/CharacterImageId"
+        - type: object
+          properties:
+            character_image_url:
+              type: string
+              description: ユーザーの着せ替え画像のURL
+    CharacterImageList:
       type: object
       properties:
-        character_image_id_list:
+        character_image_list:
           type: array
           items:
-            type: string
-          description: ユーザーの着せ替え画像のIDの配列
+            $ref: "#/components/schemas/CharacterImage"
+          description: ユーザーが所持する着せ替えの一覧（選択中は除く）
     CharacterDialogue:
       type: object
       properties:
         character_dialogue:
           type: string
           description: キャラクターのセリフ
+    Quiz:
+      type: object
+      properties:
+        quiz_id:
+          type: string
+          description: クイズのID
+        news_title:
+          type: string
+          description: クイズのニュースのタイトル
+        news_content:
+          type: string
+          description: クイズのニュースの内容
+        news_image:
+          type: string
+          description: クイズのニュースの画像
+        question:
+          type: string
+          description: クイズの問題文
+        quiz_type:
+          type: string
+          enum:
+            - "true_or_false"
+            - "multiple_choice"
+          description: クイズの問題タイプ（マルバツか選択式か）
+        quiz_choices:
+          type: array
+          items:
+            type: string
+          description: クイズの選択肢
+          nullable: true
+        correct_answer:
+          type: string
+          description: クイズの正解
+    QuizUserAnswer:
+      type: object
+      properties:
+        answer_time:
+          type: integer
+          nullable: true
+          description: クイズを解いた時間(タイムアタックの場合・秒)
+        is_correct:
+          type: boolean
+          description: クイズの正誤
+        user_answer:
+          type: string
+          description: ユーザーの解答内容
+        explanation:
+          type: string
+          description: クイズの解説
+    QuizSet:
+      type: object
+      properties:
+        quiz_set_id:
+          type: string
+          description: クイズセットのID
+        quiz_set_difficulty:
+          type: integer
+          description: クイズの難易度
+        quiz_set_accuracy:
+          type: number
+          format: double
+          description: クイズのセット別の正答率
+        mode:
+          type: string
+          enum:
+            - "battle"
+            - "time_attack"
+          description: クイズの出題形式（バトルかタイムアタックか）
 paths:
   /sign_up:
     post:
@@ -112,10 +188,13 @@ paths:
                   - $ref: "#/components/schemas/UserId"
                   - $ref: "#/components/schemas/UserProfile"
                   - $ref: "#/components/schemas/UserStatus"
-                  - $ref: "#/components/schemas/CharacterImages"
+                  - $ref: "#/components/schemas/CharacterImageList"
                   - $ref: "#/components/schemas/CharacterDialogue"
                   - type: object
                     properties:
+                      current_character_image:
+                        $ref: "#/components/schemas/CharacterImage"
+                        description: ユーザーが選択中の着せ替え画像
                       history:
                         type: object
                         properties:
@@ -127,83 +206,40 @@ paths:
                             type: array
                             description: クイズのセット別の一覧
                             items:
-                              type: object
-                              properties:
-                                quiz_set_id:
-                                  type: string
-                                  description: クイズセットのID
-                                quiz_set_difficulty:
-                                  type: integer
-                                  description: クイズの難易度
-                                quiz_set_accuracy:
-                                  type: number
-                                  format: double
-                                  description: クイズのセット別の正答率
-                                mode:
-                                  type: string
-                                  enum:
-                                    - "battle"
-                                    - "time_attack"
-                                  description: クイズの出題形式（バトルかタイムアタックか）
-                                answered_at:
-                                  type: string
-                                  format: date-time
-                                  description: クイズを解いた日時
-                                quiz_set:
-                                  type: array
-                                  description: クイズセットの問題一覧
-                                  items:
-                                    type: object
-                                    properties:
-                                      quiz_id:
-                                        type: string
-                                        description: クイズのID
-                                      news_title:
-                                        type: string
-                                        description: クイズのニュースのタイトル
-                                      news_content:
-                                        type: string
-                                        description: クイズのニュースの内容
-                                      news_image:
-                                        type: string
-                                        description: クイズのニュースの画像
-                                      question:
-                                        type: string
-                                        description: クイズの問題文
-                                      quiz_type:
-                                        type: string
-                                        enum:
-                                          - "true_or_false"
-                                          - "multiple_choice"
-                                        description: クイズの問題タイプ（マルバツか選択式か）
-                                      quiz_choices:
-                                        type: array
-                                        items:
-                                          type: string
-                                        description: クイズの選択肢
-                                        nullable: true
-                                      correct_answer:
-                                        type: string
-                                        description: クイズの正解
-                                      answer_time:
-                                        type: integer
-                                        nullable: true
-                                        description: クイズを解いた時間(タイムアタックの場合・秒)
-                                      is_correct:
-                                        type: boolean
-                                        description: クイズの正誤
-                                      user_answer:
-                                        type: string
-                                        description: ユーザーの解答内容
-                                      explanation:
-                                        type: string
-                                        description: クイズの解説
+                              allOf:
+                                - $ref: "#/components/schemas/QuizSet"
+                                - type: object
+                                  properties:
+                                    answered_at:
+                                      type: string
+                                      format: date-time
+                                      description: クイズを解いた日時
+                                    quiz_set:
+                                      type: array
+                                      description: クイズセットの問題一覧
+                                      items:
+                                        allOf:
+                                          - $ref: "#/components/schemas/Quiz"
+                                          - $ref: "#/components/schemas/QuizUserAnswer"
               example:
                 user_id: "1"
                 nickname: "ホントくん"
                 level: 2
                 experience: 4
-                character_image_id_list: ["1", "2"]
+                current_character_image:
+                  character_image_id: "1"
+                  character_image_url: "https://example.com/image1.jpg"
+                character_image_list:
+                  [
+                    {
+                      character_image_id: "2",
+                      character_image_url: "https://example.com/image2.jpg",
+                    },
+                    {
+                      character_image_id: "3",
+                      character_image_url: "https://example.com/image3.jpg",
+                    },
+                  ]
                 character_dialogue: |
                   ようこそ！
                   $USER_NAME  探偵事務所へ
@@ -256,7 +292,7 @@ paths:
             schema:
               allOf:
                 - $ref: "#/components/schemas/UserProfile"
-                - $ref: "#/components/schemas/CharacterImage"
+                - $ref: "#/components/schemas/CharacterImageId"
       responses:
         "200":
           description: プロフィール更新成功
@@ -266,9 +302,10 @@ paths:
                 allOf:
                   - $ref: "#/components/schemas/UserId"
                   - $ref: "#/components/schemas/UserProfile"
-                  - $ref: "#/components/schemas/CharacterImage"
                   - type: object
                     properties:
+                      character_image:
+                        $ref: "#/components/schemas/CharacterImage"
                       message:
                         type: string
                         description: プロフィール更新に成功した場合に返されるメッセージ
@@ -284,3 +321,41 @@ paths:
                     description: エラーメッセージ
       security:
         - bearerAuth: []
+  /quiz/{difficulty}:
+    get:
+      tags:
+        - quiz
+      summary: クイズの問題取得
+      description: クイズの問題を難易度別で取得する
+      parameters:
+        - name: difficulty
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: クイズの難易度
+      responses:
+        "200":
+          description: クイズ取得成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  character_image:
+                    $ref: "#/components/schemas/CharacterImage"
+                    description: ユーザーが選択中の着せ替え画像
+                  quiz_set_list:
+                    type: array
+                    description: クイズのセット別の一覧
+                    items:
+                      allOf:
+                        - $ref: "#/components/schemas/QuizSet"
+                        - type: object
+                          properties:
+                            quiz_set:
+                              type: array
+                              description: クイズセットの問題一覧
+                              items:
+                                allOf:
+                                  - $ref: "#/components/schemas/Quiz"
