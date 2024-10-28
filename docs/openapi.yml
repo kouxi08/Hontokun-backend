@@ -1,0 +1,286 @@
+openapi: 3.0.0
+info:
+  title: ホントくんAPI
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+    description: ローカル開発環境
+  - url: https://hontokun-backend.kouxi.jp
+    description: 本番環境
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWTを使用した認証を行います。`Authorization`ヘッダーに`Bearer`スキームでトークンを含めてください。
+  schemas:
+    UserId:
+      type: object
+      properties:
+        user_id:
+          type: string
+          description: ユーザーID
+    UserProfile:
+      type: object
+      properties:
+        nickname:
+          type: string
+          description: ユーザー名
+        birthday:
+          type: string
+          format: date
+          description: ユーザーの誕生日(YYYY-MM-DD)
+      required:
+        - name
+    UserStatus:
+      type: object
+      properties:
+        level:
+          type: integer
+          description: ユーザーのレベル
+        experience:
+          type: integer
+          description: ユーザーの経験値
+    CharacterImage:
+      type: object
+      properties:
+        character_image_id:
+          type: string
+          description: ユーザーの着せ替え画像のID
+    CharacterImages:
+      type: object
+      properties:
+        character_image_id_list:
+          type: array
+          items:
+            type: string
+          description: ユーザーの着せ替え画像のIDの配列
+    CharacterDialogue:
+      type: object
+      properties:
+        character_dialogue:
+          type: string
+          description: キャラクターのセリフ
+paths:
+  /sign_up:
+    post:
+      tags:
+        - auth
+      summary: 新規登録
+      description: ユーザーを新規登録する
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserProfile"
+      responses:
+        "200":
+          description: 登録成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/UserId"
+                  - $ref: "#/components/schemas/UserProfile"
+        "401":
+          description: 登録失敗
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: エラーメッセージ
+  /home:
+    get:
+      tags:
+        - home
+      summary: ホーム画面でのデータ取得
+      description: ユーザ情報を取得する
+      parameters: []
+      responses:
+        "200":
+          description: ホーム画面データ取得成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/UserId"
+                  - $ref: "#/components/schemas/UserProfile"
+                  - $ref: "#/components/schemas/UserStatus"
+                  - $ref: "#/components/schemas/CharacterImages"
+                  - $ref: "#/components/schemas/CharacterDialogue"
+                  - type: object
+                    properties:
+                      history:
+                        type: object
+                        properties:
+                          total_accuracy:
+                            type: number
+                            format: double
+                            description: ユーザーの総正答率
+                          quiz_set_list:
+                            type: array
+                            description: クイズのセット別の一覧
+                            items:
+                              type: object
+                              properties:
+                                quiz_set_id:
+                                  type: string
+                                  description: クイズセットのID
+                                quiz_set_difficulty:
+                                  type: integer
+                                  description: クイズの難易度
+                                quiz_set_accuracy:
+                                  type: number
+                                  format: double
+                                  description: クイズのセット別の正答率
+                                mode:
+                                  type: string
+                                  enum:
+                                    - "battle"
+                                    - "time_attack"
+                                  description: クイズの出題形式（バトルかタイムアタックか）
+                                answered_at:
+                                  type: string
+                                  format: date-time
+                                  description: クイズを解いた日時
+                                quiz_set:
+                                  type: array
+                                  description: クイズセットの問題一覧
+                                  items:
+                                    type: object
+                                    properties:
+                                      quiz_id:
+                                        type: string
+                                        description: クイズのID
+                                      news_title:
+                                        type: string
+                                        description: クイズのニュースのタイトル
+                                      news_content:
+                                        type: string
+                                        description: クイズのニュースの内容
+                                      news_image:
+                                        type: string
+                                        description: クイズのニュースの画像
+                                      question:
+                                        type: string
+                                        description: クイズの問題文
+                                      quiz_type:
+                                        type: string
+                                        enum:
+                                          - "true_or_false"
+                                          - "multiple_choice"
+                                        description: クイズの問題タイプ（マルバツか選択式か）
+                                      quiz_choices:
+                                        type: array
+                                        items:
+                                          type: string
+                                        description: クイズの選択肢
+                                        nullable: true
+                                      correct_answer:
+                                        type: string
+                                        description: クイズの正解
+                                      answer_time:
+                                        type: integer
+                                        nullable: true
+                                        description: クイズを解いた時間(タイムアタックの場合・秒)
+                                      is_correct:
+                                        type: boolean
+                                        description: クイズの正誤
+                                      user_answer:
+                                        type: string
+                                        description: ユーザーの解答内容
+                                      explanation:
+                                        type: string
+                                        description: クイズの解説
+              example:
+                user_id: "1"
+                nickname: "ホントくん"
+                level: 2
+                experience: 4
+                character_image_id_list: ["1", "2"]
+                character_dialogue: |
+                  ようこそ！
+                  $USER_NAME  探偵事務所へ
+                  僕は助手のホントくん
+                  よろしくね！"
+                history:
+                  total_accuracy: 0.5
+                  quiz_set_list:
+                    - quiz_set_id: "1"
+                      quiz_set_difficulty: 1
+                      quiz_set_accuracy: 0.5
+                      mode: "battle"
+                      answered_at: "2021-01-01T00:00:00Z"
+                      quiz_set:
+                        - quiz_id: "1"
+                          news_title: "台風15号接近 首都圏厳戒態勢"
+                          news_content: "台風15号が関東地方に接近中。気象庁は警戒を呼びかけ、各地で厳重な備えが進む。東京都は午後から公共交通機関の計画運休を発表。スーパーには買い出しの長蛇の列。企業は在宅勤務を推奨し、学校は休校を決定。避難所も開設され始めた。強風と豪雨に備え、住民の緊張が高まる。明日未明に最接近の見込み。"
+                          news_image: "https://example.com/image.jpg"
+                          question: "これはフェイク？"
+                          quiz_type: "true_or_false"
+                          quiz_choices: null
+                          correct_answer: "true"
+                          answer_time: 30
+                          is_correct: true
+                          user_answer: "true"
+                          explanation: "この問題は実際にあったニュースです"
+        "401":
+          description: プロフィール取得失敗
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: エラーメッセージ
+      security:
+        - bearerAuth: []
+  /profile:
+    put:
+      tags:
+        - profile
+      summary: ユーザプロフィール更新
+      description: ユーザーのプロフィールを更新する
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/UserProfile"
+                - $ref: "#/components/schemas/CharacterImage"
+      responses:
+        "200":
+          description: プロフィール更新成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/UserId"
+                  - $ref: "#/components/schemas/UserProfile"
+                  - $ref: "#/components/schemas/CharacterImage"
+                  - type: object
+                    properties:
+                      message:
+                        type: string
+                        description: プロフィール更新に成功した場合に返されるメッセージ
+        "401":
+          description: プロフィール更新失敗
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: エラーメッセージ
+      security:
+        - bearerAuth: []
