@@ -48,14 +48,16 @@ components:
         character_image_id:
           type: string
           description: ユーザーの着せ替え画像のID
+    CharacterImageUrl:
+      type: object
+      properties:
+        character_image_url:
+          type: string
+          description: ユーザーの着せ替え画像のURL
     CharacterImage:
       allOf:
         - $ref: "#/components/schemas/CharacterImageId"
-        - type: object
-          properties:
-            character_image_url:
-              type: string
-              description: ユーザーの着せ替え画像のURL
+        - $ref: "#/components/schemas/CharacterImageUrl"
     CharacterImageList:
       type: object
       properties:
@@ -176,7 +178,7 @@ paths:
       tags:
         - home
       summary: ホーム画面でのデータ取得
-      description: ユーザ情報を取得する
+      description: ユーザのステータスや着せ替えを取得する
       parameters: []
       responses:
         "200":
@@ -188,84 +190,20 @@ paths:
                   - $ref: "#/components/schemas/UserId"
                   - $ref: "#/components/schemas/UserProfile"
                   - $ref: "#/components/schemas/UserStatus"
-                  - $ref: "#/components/schemas/CharacterImageList"
                   - $ref: "#/components/schemas/CharacterDialogue"
-                  - type: object
-                    properties:
-                      current_character_image:
-                        $ref: "#/components/schemas/CharacterImage"
-                        description: ユーザーが選択中の着せ替え画像
-                      history:
-                        type: object
-                        properties:
-                          total_accuracy:
-                            type: number
-                            format: double
-                            description: ユーザーの総正答率
-                          quiz_set_list:
-                            type: array
-                            description: クイズのセット別の一覧
-                            items:
-                              allOf:
-                                - $ref: "#/components/schemas/QuizSet"
-                                - type: object
-                                  properties:
-                                    answered_at:
-                                      type: string
-                                      format: date-time
-                                      description: クイズを解いた日時
-                                    quiz_set:
-                                      type: array
-                                      description: クイズセットの問題一覧
-                                      items:
-                                        allOf:
-                                          - $ref: "#/components/schemas/Quiz"
-                                          - $ref: "#/components/schemas/QuizUserAnswer"
+                  - $ref: "#/components/schemas/CharacterImageUrl"
               example:
                 user_id: "1"
                 nickname: "ホントくん"
+                birthday: "2020-01-01"
                 level: 2
                 experience: 4
-                current_character_image:
-                  character_image_id: "1"
-                  character_image_url: "https://example.com/image1.jpg"
-                character_image_list:
-                  [
-                    {
-                      character_image_id: "2",
-                      character_image_url: "https://example.com/image2.jpg",
-                    },
-                    {
-                      character_image_id: "3",
-                      character_image_url: "https://example.com/image3.jpg",
-                    },
-                  ]
+                character_image_url: "https://example.com/image1.jpg"
                 character_dialogue: |
                   ようこそ！
                   $USER_NAME  探偵事務所へ
                   僕は助手のホントくん
                   よろしくね！"
-                history:
-                  total_accuracy: 0.5
-                  quiz_set_list:
-                    - quiz_set_id: "1"
-                      quiz_set_difficulty: 1
-                      quiz_set_accuracy: 0.5
-                      mode: "battle"
-                      answered_at: "2021-01-01T00:00:00Z"
-                      quiz_set:
-                        - quiz_id: "1"
-                          news_title: "台風15号接近 首都圏厳戒態勢"
-                          news_content: "台風15号が関東地方に接近中。気象庁は警戒を呼びかけ、各地で厳重な備えが進む。東京都は午後から公共交通機関の計画運休を発表。スーパーには買い出しの長蛇の列。企業は在宅勤務を推奨し、学校は休校を決定。避難所も開設され始めた。強風と豪雨に備え、住民の緊張が高まる。明日未明に最接近の見込み。"
-                          news_image: "https://example.com/image.jpg"
-                          question: "これはフェイク？"
-                          quiz_type: "true_or_false"
-                          quiz_choices: null
-                          correct_answer: "true"
-                          answer_time: 30
-                          is_correct: true
-                          user_answer: "true"
-                          explanation: "この問題は実際にあったニュースです"
         "401":
           description: プロフィール取得失敗
           content:
