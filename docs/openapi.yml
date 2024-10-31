@@ -18,7 +18,7 @@ components:
     UserId:
       type: object
       properties:
-        user_id:
+        id:
           type: string
           description: ユーザーID
     UserProfile:
@@ -45,13 +45,13 @@ components:
     CharacterImageId:
       type: object
       properties:
-        character_image_id:
+        id:
           type: string
           description: ユーザーの着せ替え画像のID
     CharacterImageUrl:
       type: object
       properties:
-        character_image_url:
+        url:
           type: string
           description: ユーザーの着せ替え画像のURL
     CharacterImage:
@@ -69,7 +69,7 @@ components:
     CharacterDialogue:
       type: object
       properties:
-        character_dialogue:
+        dialogue:
           type: string
           description: キャラクターのセリフ
     Quiz:
@@ -124,13 +124,13 @@ components:
     QuizSet:
       type: object
       properties:
-        quiz_set_id:
+        id:
           type: string
           description: クイズセットのID
-        quiz_set_difficulty:
+        difficulty:
           type: integer
-          description: クイズの難易度
-        quiz_set_accuracy:
+          description: クイズセットの難易度
+        accuracy:
           type: number
           format: double
           description: クイズのセット別の正答率
@@ -186,24 +186,29 @@ paths:
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: "#/components/schemas/UserId"
-                  - $ref: "#/components/schemas/UserProfile"
-                  - $ref: "#/components/schemas/UserStatus"
-                  - $ref: "#/components/schemas/CharacterDialogue"
-                  - $ref: "#/components/schemas/CharacterImageUrl"
-              example:
-                user_id: "1"
-                nickname: "ホントくん"
-                birthday: "2020-01-01"
-                level: 2
-                experience: 4
-                character_image_url: "https://example.com/image1.jpg"
-                character_dialogue: |
-                  ようこそ！
-                  $USER_NAME  探偵事務所へ
-                  僕は助手のホントくん
-                  よろしくね！"
+                type: object
+                properties:
+                  user:
+                    allOf:
+                      - $ref: "#/components/schemas/UserId"
+                      - $ref: "#/components/schemas/UserProfile"
+                      - $ref: "#/components/schemas/UserStatus"
+                  character:
+                    allOf:
+                      - $ref: "#/components/schemas/CharacterDialogue"
+                      - $ref: "#/components/schemas/CharacterImageUrl"
+              # example:
+              #   user_id: "1"
+              #   nickname: "ホントくん"
+              #   birthday: "2020-01-01"
+              #   level: 2
+              #   experience: 4
+              #   character_image_url: "https://example.com/image1.jpg"
+              #   character_dialogue: |
+              #     ようこそ！
+              #     $USER_NAME  探偵事務所へ
+              #     僕は助手のホントくん
+              #     よろしくね！"
         "401":
           description: プロフィール取得失敗
           content:
@@ -216,6 +221,55 @@ paths:
                     description: エラーメッセージ
       security:
         - bearerAuth: []
+  /history:
+    get:
+      tags:
+        - /history
+      summary: クイズ履歴取得
+      description: ユーザのクイズ履歴を取得する
+      parameters: []
+      responses:
+        "200":
+          description: クイズ履歴取得成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    allOf:
+                      # ユーザのID, name, キャラクター
+                      - $ref: "#/components/schemas/UserId"
+                      - $ref: "#/components/schemas/UserProfile"
+                      - type: object
+                        properties:
+                          character:
+                            $ref: "#/components/schemas/CharacterImage"
+                            description: ユーザの着せ替え画像
+                    description: ユーザのステータス
+                  history:
+                    type: object
+                    properties:
+                      total_accuracy:
+                        type: number
+                        format: double
+                        description: ユーザの総正答率
+                      quiz_set:
+                        type: array
+                        description: クイズのセット別の一覧
+                        items:
+                          $ref: "#/components/schemas/QuizSet"
+
+        "401":
+          description: クイズ履歴取得失敗
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: エラーメッセージ
   /profile:
     put:
       tags:
