@@ -47,13 +47,13 @@ components:
       properties:
         id:
           type: string
-          description: ユーザーの着せ替え画像のID
+          description: キャラクター画像のID
     CharacterImageUrl:
       type: object
       properties:
         url:
           type: string
-          description: ユーザーの着せ替え画像のURL
+          description: キャラクター画像のURL
     CharacterImage:
       allOf:
         - $ref: "#/components/schemas/CharacterImageId"
@@ -72,31 +72,42 @@ components:
         dialogue:
           type: string
           description: キャラクターのセリフ
+    WantedCat:
+      allOf:
+        - $ref: "#/components/schemas/CharacterImageUrl"
+        - type: object
+          properties:
+            name:
+              type: string
+              description: 指名手配猫の名前
     Quiz:
       type: object
       properties:
-        quiz_id:
+        id:
           type: string
           description: クイズのID
-        news_title:
-          type: string
-          description: クイズのニュースのタイトル
-        news_content:
-          type: string
-          description: クイズのニュースの内容
-        news_image:
-          type: string
-          description: クイズのニュースの画像
+        news:
+          type: object
+          properties:
+            title:
+              type: string
+              description: クイズのニュースのタイトル
+            content:
+              type: string
+              description: クイズのニュースの内容
+            image:
+              type: string
+              description: クイズのニュースの画像
         question:
           type: string
           description: クイズの問題文
-        quiz_type:
+        type:
           type: string
           enum:
             - "true_or_false"
             - "multiple_choice"
           description: クイズの問題タイプ（マルバツか選択式か）
-        quiz_choices:
+        choices:
           type: array
           items:
             type: string
@@ -127,19 +138,20 @@ components:
         id:
           type: string
           description: クイズセットのID
-        difficulty:
-          type: integer
-          description: クイズセットの難易度
         accuracy:
           type: number
           format: double
-          description: クイズのセット別の正答率
+          description: クイズセットの正答率
         mode:
           type: string
           enum:
             - "battle"
             - "time_attack"
           description: クイズの出題形式（バトルかタイムアタックか）
+        answered_at:
+          type: string
+          format: date-time
+          description: クイズセットを解いた日時
 paths:
   /sign_up:
     post:
@@ -224,8 +236,8 @@ paths:
   /history:
     get:
       tags:
-        - /history
-      summary: クイズ履歴取得
+        - history
+      summary: クイズ履歴トップ取得
       description: ユーザのクイズ履歴を取得する
       parameters: []
       responses:
@@ -238,7 +250,6 @@ paths:
                 properties:
                   user:
                     allOf:
-                      # ユーザのID, name, キャラクター
                       - $ref: "#/components/schemas/UserId"
                       - $ref: "#/components/schemas/UserProfile"
                       - type: object
@@ -254,12 +265,22 @@ paths:
                         type: number
                         format: double
                         description: ユーザの総正答率
-                      quiz_set:
+                      list:
                         type: array
-                        description: クイズのセット別の一覧
+                        description: 難易度別の一覧
                         items:
-                          $ref: "#/components/schemas/QuizSet"
-
+                          type: object
+                          properties:
+                            tier:
+                              type: integer
+                              description: クイズセットの難易度
+                            accuracy:
+                              type: number
+                              format: double
+                              description: クイズセットの正答率
+                            character:
+                              $ref: "#/components/schemas/WantedCat"
+                              description: クイズセットの指名手配猫
         "401":
           description: クイズ履歴取得失敗
           content:
@@ -270,6 +291,70 @@ paths:
                   message:
                     type: string
                     description: エラーメッセージ
+  /history/tier/{tier}:
+    get:
+      tags:
+        - history
+      summary: クイズ履歴難易度別取得
+      description: ユーザのクイズ履歴のリストを難易度別に取得する
+      parameters:
+        - name: tier
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: クイズセットの難易度
+      responses:
+        "200":
+          description: クイズ履歴難易度別取得成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total_accuracy:
+                    type: number
+                    format: double
+                    description: クイズセットの正答率
+                  quiz_set:
+                    type: array
+                    description: クイズセットの一覧
+                    items:
+                      $ref: "#/components/schemas/QuizSet"
+  /history/quiz-set/{quizSetId}:
+    get:
+      tags:
+        - history
+      summary: クイズ履歴詳細取得
+      description: ユーザのクイズ履歴の詳細を取得する
+      parameters:
+        - name: quizSetId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: クイズセットのID
+      responses:
+        "200":
+          description: クイズ履歴詳細取得成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  character:
+                    $ref: "#/components/schemas/WantedCat"
+                    description: クイズセットの指名手配猫
+                  quiz_set:
+                    $ref: "#/components/schemas/QuizSet"
+                  quizzes:
+                    type: array
+                    description: クイズの問題一覧
+                    items:
+                      allOf:
+                        - $ref: "#/components/schemas/Quiz"
+                        - $ref: "#/components/schemas/QuizUserAnswer"
+
   /profile:
     put:
       tags:
@@ -313,14 +398,14 @@ paths:
                     description: エラーメッセージ
       security:
         - bearerAuth: []
-  /quiz/{difficulty}:
+  /quiz/{tier}:
     get:
       tags:
         - quiz
       summary: クイズの問題取得
       description: クイズの問題を難易度別で取得する
       parameters:
-        - name: difficulty
+        - name: tier
           in: path
           required: true
           schema:
