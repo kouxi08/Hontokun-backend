@@ -61,7 +61,7 @@ components:
     CharacterImageList:
       type: object
       properties:
-        character_image_list:
+        imageList:
           type: array
           items:
             $ref: "#/components/schemas/CharacterImage"
@@ -113,20 +113,20 @@ components:
             type: string
           description: クイズの選択肢
           nullable: true
-        correct_answer:
+        correctAnswer:
           type: string
           description: クイズの正解
-    QuizUserAnswer:
+    QuizAnswer:
       type: object
       properties:
-        answer_time:
+        answerTime:
           type: integer
           nullable: true
           description: クイズを解いた時間(タイムアタックの場合・秒)
-        is_correct:
+        isCorrect:
           type: boolean
           description: クイズの正誤
-        user_answer:
+        userAnswer:
           type: string
           description: ユーザーの解答内容
         explanation:
@@ -148,12 +148,12 @@ components:
             - "battle"
             - "time_attack"
           description: クイズの出題形式（バトルかタイムアタックか）
-        answered_at:
+        answeredAt:
           type: string
           format: date-time
           description: クイズセットを解いた日時
 paths:
-  /sign_up:
+  /sign-up:
     post:
       tags:
         - auth
@@ -231,8 +231,6 @@ paths:
                   message:
                     type: string
                     description: エラーメッセージ
-      security:
-        - bearerAuth: []
   /history:
     get:
       tags:
@@ -261,7 +259,7 @@ paths:
                   history:
                     type: object
                     properties:
-                      total_accuracy:
+                      totalAccuracy:
                         type: number
                         format: double
                         description: ユーザの総正答率
@@ -291,6 +289,8 @@ paths:
                   message:
                     type: string
                     description: エラーメッセージ
+      security:
+        - bearerAuth: []
   /history/tier/{tier}:
     get:
       tags:
@@ -312,15 +312,20 @@ paths:
               schema:
                 type: object
                 properties:
-                  total_accuracy:
+                  character:
+                    $ref: "#/components/schemas/WantedCat"
+                    description: クイズセットの指名手配猫
+                  totalAccuracy:
                     type: number
                     format: double
                     description: クイズセットの正答率
-                  quiz_set:
+                  quizSet:
                     type: array
                     description: クイズセットの一覧
                     items:
                       $ref: "#/components/schemas/QuizSet"
+      security:
+        - bearerAuth: []
   /history/quiz-set/{quizSetId}:
     get:
       tags:
@@ -345,7 +350,7 @@ paths:
                   character:
                     $ref: "#/components/schemas/WantedCat"
                     description: クイズセットの指名手配猫
-                  quiz_set:
+                  quizSet:
                     $ref: "#/components/schemas/QuizSet"
                   quizzes:
                     type: array
@@ -353,8 +358,9 @@ paths:
                     items:
                       allOf:
                         - $ref: "#/components/schemas/Quiz"
-                        - $ref: "#/components/schemas/QuizUserAnswer"
-
+                        - $ref: "#/components/schemas/QuizAnswer"
+      security:
+        - bearerAuth: []
   /profile:
     put:
       tags:
@@ -381,7 +387,7 @@ paths:
                   - $ref: "#/components/schemas/UserProfile"
                   - type: object
                     properties:
-                      character_image:
+                      characterImage:
                         $ref: "#/components/schemas/CharacterImage"
                       message:
                         type: string
