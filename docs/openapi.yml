@@ -625,11 +625,17 @@ paths:
                   characterImage:
                     $ref: "#/components/schemas/CharacterImage"
                     description: クイズセットの指名手配猫
-                  quizSetList:
-                    type: array
-                    description: クイズのセット別の一覧
-                    items:
-                      $ref: "#/components/schemas/QuizSet"
+                  quizSet:
+                    allOf:
+                      - $ref: "#/components/schemas/QuizSet"
+                      - type: object
+                        properties:
+                          quizList:
+                            type: array
+                            description: クイズの問題一覧
+                            items:
+                              $ref: "#/components/schemas/Quiz"
+
         "400":
           description: リクエストエラー
           content:
