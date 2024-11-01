@@ -634,7 +634,13 @@ paths:
                             type: array
                             description: クイズの問題一覧
                             items:
-                              $ref: "#/components/schemas/Quiz"
+                              allOf:
+                                - $ref: "#/components/schemas/Quiz"
+                                - type: object
+                                  properties:
+                                    hint:
+                                      type: string
+                                      description: クイズのヒント
 
         "400":
           description: リクエストエラー
@@ -708,7 +714,6 @@ paths:
                       allOf:
                         - $ref: "#/components/schemas/Quiz"
                         - $ref: "#/components/schemas/QuizAnswer"
-
         "400":
           description: リクエストエラー
           content:
