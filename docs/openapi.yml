@@ -150,6 +150,41 @@ components:
           type: string
           format: date-time
           description: クイズセットを解いた日時
+    BadRequestError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "リクエスト内容が無効です。入力データを確認してください。"
+          description: 入力データが不正である場合のエラーメッセージ
+    UnauthorizedError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "認証に失敗しました。再度ログインしてください。"
+          description: 認証が必要なエンドポイントに未認証のユーザがアクセスした場合のエラーメッセージ
+    ForbiddenError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "アクセスが拒否されました。権限がありません。"
+          description: ユーザがアクセス権限のないリソースにアクセスした場合のエラーメッセージ
+    NotFoundError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "リソースが見つかりません。URLが正しいか確認してください。"
+          description: リクエストされたリソースが見つからない場合のエラーメッセージ
+    InternalServerError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "サーバーエラーが発生しました。しばらくしてから再度お試しください。"
+          description: サーバー側で予期せぬエラーが発生した場合のエラーメッセージ
 paths:
   /sign-up:
     post:
@@ -220,15 +255,29 @@ paths:
               #     僕は助手のホントくん
               #     よろしくね！"
         "401":
-          description: プロフィール取得失敗
+          description: 認証エラー
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    description: エラーメッセージ
+                $ref: "#/components/schemas/UnauthorizedError"
+        "403":
+          description: アクセス拒否
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ForbiddenError"
+        "404":
+          description: リソースが見つかりません
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundError"
+        "500":
+          description: サーバーエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
   /history:
     get:
       tags:
@@ -276,15 +325,29 @@ paths:
                               $ref: "#/components/schemas/CharacterImage"
                               description: クイズセットの指名手配猫
         "401":
-          description: クイズ履歴取得失敗
+          description: 認証エラー
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    description: エラーメッセージ
+                $ref: "#/components/schemas/UnauthorizedError"
+        "403":
+          description: アクセス拒否
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ForbiddenError"
+        "404":
+          description: リソースが見つかりません
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundError"
+        "500":
+          description: サーバーエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
       security:
         - bearerAuth: []
   /history/tier/{tier}:
@@ -319,6 +382,36 @@ paths:
                     description: クイズセットの一覧
                     items:
                       $ref: "#/components/schemas/QuizSet"
+        "400":
+          description: リクエストエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestError"
+        "401":
+          description: 認証エラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
+        "403":
+          description: アクセス拒否
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ForbiddenError"
+        "404":
+          description: リソースが見つかりません
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundError"
+        "500":
+          description: サーバーエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
       security:
         - bearerAuth: []
   /history/quiz-set/{quizSetId}:
@@ -353,6 +446,36 @@ paths:
                       allOf:
                         - $ref: "#/components/schemas/Quiz"
                         - $ref: "#/components/schemas/QuizAnswer"
+        "400":
+          description: リクエストエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestError"
+        "401":
+          description: 認証エラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
+        "403":
+          description: アクセス拒否
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ForbiddenError"
+        "404":
+          description: リソースが見つかりません
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundError"
+        "500":
+          description: サーバーエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
       security:
         - bearerAuth: []
   /profile:
@@ -383,16 +506,36 @@ paths:
                     description: キャラクター画像の一覧
                     items:
                       $ref: "#/components/schemas/CharacterImage"
-        "401":
-          description: プロフィール取得失敗
+        "400":
+          description: リクエストエラー
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    description: エラーメッセージ
+                $ref: "#/components/schemas/BadRequestError"
+        "401":
+          description: 認証エラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
+        "403":
+          description: アクセス拒否
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ForbiddenError"
+        "404":
+          description: リソースが見つかりません
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundError"
+        "500":
+          description: サーバーエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
     put:
       tags:
         - profile
@@ -426,16 +569,36 @@ paths:
                       message:
                         type: string
                         description: プロフィール更新に成功した場合に返されるメッセージ
-        "401":
-          description: プロフィール更新失敗
+        "400":
+          description: リクエストエラー
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    description: エラーメッセージ
+                $ref: "#/components/schemas/BadRequestError"
+        "401":
+          description: 認証エラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
+        "403":
+          description: アクセス拒否
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ForbiddenError"
+        "404":
+          description: リソースが見つかりません
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundError"
+        "500":
+          description: サーバーエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
       security:
         - bearerAuth: []
   /quiz/{tier}:
@@ -467,6 +630,36 @@ paths:
                     description: クイズのセット別の一覧
                     items:
                       $ref: "#/components/schemas/QuizSet"
+        "400":
+          description: リクエストエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestError"
+        "401":
+          description: 認証エラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
+        "403":
+          description: アクセス拒否
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ForbiddenError"
+        "404":
+          description: リソースが見つかりません
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundError"
+        "500":
+          description: サーバーエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
   /quiz/result:
     post:
       tags:
@@ -510,13 +703,33 @@ paths:
                         - $ref: "#/components/schemas/Quiz"
                         - $ref: "#/components/schemas/QuizAnswer"
 
-        "401":
-          description: クイズ解答失敗
+        "400":
+          description: リクエストエラー
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    description: エラーメッセージ
+                $ref: "#/components/schemas/BadRequestError"
+        "401":
+          description: 認証エラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
+        "403":
+          description: アクセス拒否
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ForbiddenError"
+        "404":
+          description: リソースが見つかりません
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundError"
+        "500":
+          description: サーバーエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
