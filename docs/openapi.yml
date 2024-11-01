@@ -32,7 +32,7 @@ components:
           format: date
           description: ユーザーの誕生日(YYYY-MM-DD)
       required:
-        - name
+        - nickname
     UserStatus:
       type: object
       properties:
@@ -54,38 +54,38 @@ components:
         url:
           type: string
           description: キャラクター画像のURL
+    CharacterImageName:
+      type: object
+      properties:
+        name:
+          type: string
+          description: キャラクター画像の名前
     CharacterImage:
       allOf:
         - $ref: "#/components/schemas/CharacterImageId"
+        - $ref: "#/components/schemas/CharacterImageName"
         - $ref: "#/components/schemas/CharacterImageUrl"
-    CharacterImageList:
-      type: object
-      properties:
-        imageList:
-          type: array
-          items:
-            $ref: "#/components/schemas/CharacterImage"
-          description: ユーザーが所持する着せ替えの一覧（選択中は除く）
     CharacterDialogue:
       type: object
       properties:
         dialogue:
           type: string
           description: キャラクターのセリフ
-    WantedCat:
-      allOf:
-        - $ref: "#/components/schemas/CharacterImageUrl"
-        - type: object
-          properties:
-            name:
-              type: string
-              description: 指名手配猫の名前
+    Accuracy:
+      type: number
+      format: double
+      description: クイズセットの正答率
+    QuizId:
+      type: string
+      description: クイズのID
+    QuizSetId:
+      type: string
+      description: クイズセットのID
     Quiz:
       type: object
       properties:
         id:
-          type: string
-          description: クイズのID
+          $ref: "#/components/schemas/QuizId"
         news:
           type: object
           properties:
@@ -136,11 +136,9 @@ components:
       type: object
       properties:
         id:
-          type: string
-          description: クイズセットのID
+          $ref: "#/components/schemas/QuizSetId"
         accuracy:
-          type: number
-          format: double
+          $ref: "#/components/schemas/Accuracy"
           description: クイズセットの正答率
         mode:
           type: string
@@ -205,7 +203,7 @@ paths:
                       - $ref: "#/components/schemas/UserId"
                       - $ref: "#/components/schemas/UserProfile"
                       - $ref: "#/components/schemas/UserStatus"
-                  character:
+                  characterImage:
                     allOf:
                       - $ref: "#/components/schemas/CharacterDialogue"
                       - $ref: "#/components/schemas/CharacterImageUrl"
@@ -260,8 +258,7 @@ paths:
                     type: object
                     properties:
                       totalAccuracy:
-                        type: number
-                        format: double
+                        $ref: "#/components/schemas/Accuracy"
                         description: ユーザの総正答率
                       list:
                         type: array
@@ -273,11 +270,10 @@ paths:
                               type: integer
                               description: クイズセットの難易度
                             accuracy:
-                              type: number
-                              format: double
+                              $ref: "#/components/schemas/Accuracy"
                               description: クイズセットの正答率
-                            character:
-                              $ref: "#/components/schemas/WantedCat"
+                            characterImage:
+                              $ref: "#/components/schemas/CharacterImage"
                               description: クイズセットの指名手配猫
         "401":
           description: クイズ履歴取得失敗
@@ -313,11 +309,10 @@ paths:
                 type: object
                 properties:
                   character:
-                    $ref: "#/components/schemas/WantedCat"
+                    $ref: "#/components/schemas/CharacterImage"
                     description: クイズセットの指名手配猫
                   totalAccuracy:
-                    type: number
-                    format: double
+                    $ref: "#/components/schemas/Accuracy"
                     description: クイズセットの正答率
                   quizSet:
                     type: array
@@ -337,8 +332,7 @@ paths:
           in: path
           required: true
           schema:
-            type: string
-          description: クイズセットのID
+            $ref: "#/components/schemas/QuizSetId"
       responses:
         "200":
           description: クイズ履歴詳細取得成功
@@ -348,11 +342,11 @@ paths:
                 type: object
                 properties:
                   character:
-                    $ref: "#/components/schemas/WantedCat"
+                    $ref: "#/components/schemas/CharacterImage"
                     description: クイズセットの指名手配猫
                   quizSet:
                     $ref: "#/components/schemas/QuizSet"
-                  quizzes:
+                  quizList:
                     type: array
                     description: クイズの問題一覧
                     items:
@@ -362,6 +356,43 @@ paths:
       security:
         - bearerAuth: []
   /profile:
+    get:
+      tags:
+        - profile
+      summary: ユーザプロフィール取得
+      description: ユーザのプロフィールを取得する
+      parameters: []
+      responses:
+        "200":
+          description: プロフィール取得成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  profile:
+                    allOf:
+                      - $ref: "#/components/schemas/UserId"
+                      - $ref: "#/components/schemas/UserProfile"
+                      - type: object
+                        properties:
+                          character:
+                            $ref: "#/components/schemas/CharacterImage"
+                  characterOptions:
+                    type: array
+                    description: キャラクター画像の一覧
+                    items:
+                      $ref: "#/components/schemas/CharacterImage"
+        "401":
+          description: プロフィール取得失敗
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: エラーメッセージ
     put:
       tags:
         - profile
@@ -375,7 +406,10 @@ paths:
             schema:
               allOf:
                 - $ref: "#/components/schemas/UserProfile"
-                - $ref: "#/components/schemas/CharacterImageId"
+                - type: object
+                  properties:
+                    characterId:
+                      $ref: "#/components/schemas/CharacterImageId/properties/id"
       responses:
         "200":
           description: プロフィール更新成功
@@ -425,20 +459,64 @@ paths:
               schema:
                 type: object
                 properties:
-                  character_image:
+                  characterImage:
                     $ref: "#/components/schemas/CharacterImage"
-                    description: ユーザーが選択中の着せ替え画像
-                  quiz_set_list:
+                    description: クイズセットの指名手配猫
+                  quizSetList:
                     type: array
                     description: クイズのセット別の一覧
                     items:
+                      $ref: "#/components/schemas/QuizSet"
+  /quiz/result:
+    post:
+      tags:
+        - quiz
+      summary: クイズの解答結果送信
+      description: クイズの解答結果を送信する
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quizId:
+                  $ref: "#/components/schemas/QuizId"
+                answer:
+                  type: string
+                  description: ユーザーの解答
+                answerTime:
+                  type: integer
+                  nullable: true
+                  description: クイズを解いた時間(タイムアタックの場合・秒)
+      responses:
+        "200":
+          description: クイズ解答成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  quizSetId:
+                    $ref: "#/components/schemas/QuizSetId"
+                  accuracy:
+                    $ref: "#/components/schemas/Accuracy"
+                    description: クイズセットの正答率
+                  quizList:
+                    type: array
+                    items:
                       allOf:
-                        - $ref: "#/components/schemas/QuizSet"
-                        - type: object
-                          properties:
-                            quiz_set:
-                              type: array
-                              description: クイズセットの問題一覧
-                              items:
-                                allOf:
-                                  - $ref: "#/components/schemas/Quiz"
+                        - $ref: "#/components/schemas/Quiz"
+                        - $ref: "#/components/schemas/QuizAnswer"
+
+        "401":
+          description: クイズ解答失敗
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: エラーメッセージ
