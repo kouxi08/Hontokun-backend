@@ -18,7 +18,7 @@ components:
     UserId:
       type: object
       properties:
-        user_id:
+        id:
           type: string
           description: ユーザーID
     UserProfile:
@@ -32,7 +32,7 @@ components:
           format: date
           description: ユーザーの誕生日(YYYY-MM-DD)
       required:
-        - name
+        - nickname
     UserStatus:
       type: object
       properties:
@@ -42,28 +42,151 @@ components:
         experience:
           type: integer
           description: ユーザーの経験値
-    CharacterImage:
+    ImageId:
       type: object
       properties:
-        character_image_id:
+        id:
           type: string
-          description: ユーザーの着せ替え画像のID
-    CharacterImages:
+          description: キャラクター画像のID
+    ImageName:
       type: object
       properties:
-        character_image_id_list:
-          type: array
-          items:
-            type: string
-          description: ユーザーの着せ替え画像のIDの配列
+        name:
+          type: string
+          description: キャラクター画像の名前
+    ImageUrl:
+      type: object
+      properties:
+        url:
+          type: string
+          description: キャラクター画像のURL
+    Images:
+      allOf:
+        - $ref: "#/components/schemas/ImageId"
+        - $ref: "#/components/schemas/ImageName"
+        - $ref: "#/components/schemas/ImageUrl"
     CharacterDialogue:
       type: object
       properties:
-        character_dialogue:
+        dialogue:
           type: string
           description: キャラクターのセリフ
+    Accuracy:
+      type: number
+      format: double
+      description: クイズセットの正答率
+    QuizId:
+      type: string
+      description: クイズのID
+    QuizSetId:
+      type: string
+      description: クイズセットのID
+    Quiz:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/QuizId"
+        news:
+          type: object
+          properties:
+            title:
+              type: string
+              description: クイズのニュースのタイトル
+            content:
+              type: string
+              description: クイズのニュースの内容
+            image:
+              type: string
+              description: クイズのニュースの画像
+        question:
+          type: string
+          description: クイズの問題文
+        type:
+          type: string
+          enum:
+            - "true_or_false"
+            - "multiple_choice"
+          description: クイズの問題タイプ（マルバツか選択式か）
+        choices:
+          type: array
+          items:
+            type: string
+          description: クイズの選択肢
+          nullable: true
+        correctAnswer:
+          type: string
+          description: クイズの正解
+    QuizAnswer:
+      type: object
+      properties:
+        answerTime:
+          type: integer
+          nullable: true
+          description: クイズを解いた時間(タイムアタックの場合・秒)
+        isCorrect:
+          type: boolean
+          description: クイズの正誤
+        userAnswer:
+          type: string
+          description: ユーザーの解答内容
+        explanation:
+          type: string
+          description: クイズの解説
+    QuizSet:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/QuizSetId"
+        accuracy:
+          $ref: "#/components/schemas/Accuracy"
+          description: クイズセットの正答率
+        mode:
+          type: string
+          enum:
+            - "battle"
+            - "time_attack"
+          description: クイズの出題形式（バトルかタイムアタックか）
+        answeredAt:
+          type: string
+          format: date-time
+          description: クイズセットを解いた日時
+    BadRequestError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "リクエスト内容が無効です。入力データを確認してください。"
+          description: 入力データが不正である場合のエラーメッセージ
+    UnauthorizedError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "認証に失敗しました。再度ログインしてください。"
+          description: 認証が必要なエンドポイントに未認証のユーザがアクセスした場合のエラーメッセージ
+    ForbiddenError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "アクセスが拒否されました。権限がありません。"
+          description: ユーザがアクセス権限のないリソースにアクセスした場合のエラーメッセージ
+    NotFoundError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "リソースが見つかりません。URLが正しいか確認してください。"
+          description: リクエストされたリソースが見つからない場合のエラーメッセージ
+    InternalServerError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "サーバーエラーが発生しました。しばらくしてから再度お試しください。"
+          description: サーバー側で予期せぬエラーが発生した場合のエラーメッセージ
 paths:
-  /sign_up:
+  /sign-up:
     post:
       tags:
         - auth
@@ -95,154 +218,275 @@ paths:
                   message:
                     type: string
                     description: エラーメッセージ
-  /home:
+  /main:
     get:
       tags:
-        - home
-      summary: ホーム画面でのデータ取得
-      description: ユーザ情報を取得する
+        - main
+      summary: メイン画面でのデータ取得
+      description: ユーザのステータスや着せ替えを取得する
       parameters: []
       responses:
         "200":
-          description: ホーム画面データ取得成功
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/UserId"
-                  - $ref: "#/components/schemas/UserProfile"
-                  - $ref: "#/components/schemas/UserStatus"
-                  - $ref: "#/components/schemas/CharacterImages"
-                  - $ref: "#/components/schemas/CharacterDialogue"
-                  - type: object
-                    properties:
-                      history:
-                        type: object
-                        properties:
-                          total_accuracy:
-                            type: number
-                            format: double
-                            description: ユーザーの総正答率
-                          quiz_set_list:
-                            type: array
-                            description: クイズのセット別の一覧
-                            items:
-                              type: object
-                              properties:
-                                quiz_set_id:
-                                  type: string
-                                  description: クイズセットのID
-                                quiz_set_difficulty:
-                                  type: integer
-                                  description: クイズの難易度
-                                quiz_set_accuracy:
-                                  type: number
-                                  format: double
-                                  description: クイズのセット別の正答率
-                                mode:
-                                  type: string
-                                  enum:
-                                    - "battle"
-                                    - "time_attack"
-                                  description: クイズの出題形式（バトルかタイムアタックか）
-                                answered_at:
-                                  type: string
-                                  format: date-time
-                                  description: クイズを解いた日時
-                                quiz_set:
-                                  type: array
-                                  description: クイズセットの問題一覧
-                                  items:
-                                    type: object
-                                    properties:
-                                      quiz_id:
-                                        type: string
-                                        description: クイズのID
-                                      news_title:
-                                        type: string
-                                        description: クイズのニュースのタイトル
-                                      news_content:
-                                        type: string
-                                        description: クイズのニュースの内容
-                                      news_image:
-                                        type: string
-                                        description: クイズのニュースの画像
-                                      question:
-                                        type: string
-                                        description: クイズの問題文
-                                      quiz_type:
-                                        type: string
-                                        enum:
-                                          - "true_or_false"
-                                          - "multiple_choice"
-                                        description: クイズの問題タイプ（マルバツか選択式か）
-                                      quiz_choices:
-                                        type: array
-                                        items:
-                                          type: string
-                                        description: クイズの選択肢
-                                        nullable: true
-                                      correct_answer:
-                                        type: string
-                                        description: クイズの正解
-                                      answer_time:
-                                        type: integer
-                                        nullable: true
-                                        description: クイズを解いた時間(タイムアタックの場合・秒)
-                                      is_correct:
-                                        type: boolean
-                                        description: クイズの正誤
-                                      user_answer:
-                                        type: string
-                                        description: ユーザーの解答内容
-                                      explanation:
-                                        type: string
-                                        description: クイズの解説
-              example:
-                user_id: "1"
-                nickname: "ホントくん"
-                level: 2
-                experience: 4
-                character_image_id_list: ["1", "2"]
-                character_dialogue: |
-                  ようこそ！
-                  $USER_NAME  探偵事務所へ
-                  僕は助手のホントくん
-                  よろしくね！"
-                history:
-                  total_accuracy: 0.5
-                  quiz_set_list:
-                    - quiz_set_id: "1"
-                      quiz_set_difficulty: 1
-                      quiz_set_accuracy: 0.5
-                      mode: "battle"
-                      answered_at: "2021-01-01T00:00:00Z"
-                      quiz_set:
-                        - quiz_id: "1"
-                          news_title: "台風15号接近 首都圏厳戒態勢"
-                          news_content: "台風15号が関東地方に接近中。気象庁は警戒を呼びかけ、各地で厳重な備えが進む。東京都は午後から公共交通機関の計画運休を発表。スーパーには買い出しの長蛇の列。企業は在宅勤務を推奨し、学校は休校を決定。避難所も開設され始めた。強風と豪雨に備え、住民の緊張が高まる。明日未明に最接近の見込み。"
-                          news_image: "https://example.com/image.jpg"
-                          question: "これはフェイク？"
-                          quiz_type: "true_or_false"
-                          quiz_choices: null
-                          correct_answer: "true"
-                          answer_time: 30
-                          is_correct: true
-                          user_answer: "true"
-                          explanation: "この問題は実際にあったニュースです"
-        "401":
-          description: プロフィール取得失敗
+          description: メイン画面データ取得成功
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  message:
-                    type: string
-                    description: エラーメッセージ
+                  user:
+                    allOf:
+                      - $ref: "#/components/schemas/UserId"
+                      - $ref: "#/components/schemas/UserProfile"
+                      - $ref: "#/components/schemas/UserStatus"
+                  character:
+                    allOf:
+                      - $ref: "#/components/schemas/CharacterDialogue"
+                      - $ref: "#/components/schemas/ImageUrl"
+              # example:
+              #   user_id: "1"
+              #   nickname: "ホントくん"
+              #   birthday: "2020-01-01"
+              #   level: 2
+              #   experience: 4
+              #   character_image_url: "https://example.com/image1.jpg"
+              #   character_dialogue: |
+              #     ようこそ！
+              #     $USER_NAME  探偵事務所へ
+              #     僕は助手のホントくん
+              #     よろしくね！"
+        "401":
+          description: 認証エラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
+        "403":
+          description: アクセス拒否
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ForbiddenError"
+        "404":
+          description: リソースが見つかりません
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundError"
+        "500":
+          description: サーバーエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+  /history:
+    get:
+      tags:
+        - history
+      summary: クイズ履歴トップ取得
+      description: ユーザのクイズ履歴を取得する
+      parameters: []
+      responses:
+        "200":
+          description: クイズ履歴取得成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    allOf:
+                      - $ref: "#/components/schemas/UserId"
+                      - $ref: "#/components/schemas/UserProfile"
+                      - type: object
+                        properties:
+                          costume:
+                            $ref: "#/components/schemas/Images"
+                            description: ユーザの着せ替え画像
+                    description: ユーザのステータス
+                  history:
+                    type: object
+                    properties:
+                      totalAccuracy:
+                        $ref: "#/components/schemas/Accuracy"
+                        description: ユーザの総正答率
+                      tierList:
+                        type: array
+                        description: 難易度別の一覧
+                        items:
+                          type: object
+                          properties:
+                            tier:
+                              type: integer
+                              description: クイズセットの難易度
+                            accuracy:
+                              $ref: "#/components/schemas/Accuracy"
+                              description: クイズセットの正答率
+                            character:
+                              $ref: "#/components/schemas/Images"
+                              description: クイズセットの指名手配猫
+                            quizSetList:
+                              type: array
+                              description: クイズセットの一覧
+                              items:
+                                $ref: "#/components/schemas/QuizSet"
+        "401":
+          description: 認証エラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
+        "403":
+          description: アクセス拒否
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ForbiddenError"
+        "404":
+          description: リソースが見つかりません
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundError"
+        "500":
+          description: サーバーエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+      security:
+        - bearerAuth: []
+  /history/quiz-set/{quizSetId}:
+    get:
+      tags:
+        - history
+      summary: クイズ履歴詳細取得
+      description: ユーザのクイズ履歴の詳細を取得する
+      parameters:
+        - name: quizSetId
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/QuizSetId"
+      responses:
+        "200":
+          description: クイズ履歴詳細取得成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  character:
+                    $ref: "#/components/schemas/Images"
+                    description: クイズセットの指名手配猫
+                  quizSet:
+                    $ref: "#/components/schemas/QuizSet"
+                  quizList:
+                    type: array
+                    description: クイズの問題一覧
+                    items:
+                      allOf:
+                        - $ref: "#/components/schemas/Quiz"
+                        - $ref: "#/components/schemas/QuizAnswer"
+        "400":
+          description: リクエストエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestError"
+        "401":
+          description: 認証エラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
+        "403":
+          description: アクセス拒否
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ForbiddenError"
+        "404":
+          description: リソースが見つかりません
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundError"
+        "500":
+          description: サーバーエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
       security:
         - bearerAuth: []
   /profile:
+    get:
+      tags:
+        - profile
+      summary: ユーザプロフィール取得
+      description: ユーザのプロフィールを取得する
+      parameters: []
+      responses:
+        "200":
+          description: プロフィール取得成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  profile:
+                    allOf:
+                      - $ref: "#/components/schemas/UserId"
+                      - $ref: "#/components/schemas/UserProfile"
+                      # - type: object
+                      #   properties:
+                      #     character:
+                      #       $ref: "#/components/schemas/CharacterImage"
+                  costumeList:
+                    type: array
+                    description: キャラクター画像の一覧
+                    items:
+                      allOf:
+                        - $ref: "#/components/schemas/Images"
+                        - type: object
+                          properties:
+                            # 持ってるかどうか
+                            isOwn:
+                              type: boolean
+                              description: ユーザが所持しているかどうか
+                            isSelected:
+                              type: boolean
+                              description: ユーザが選択しているかどうか
+        "400":
+          description: リクエストエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestError"
+        "401":
+          description: 認証エラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
+        "403":
+          description: アクセス拒否
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ForbiddenError"
+        "404":
+          description: リソースが見つかりません
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundError"
+        "500":
+          description: サーバーエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
     put:
       tags:
         - profile
@@ -256,7 +500,10 @@ paths:
             schema:
               allOf:
                 - $ref: "#/components/schemas/UserProfile"
-                - $ref: "#/components/schemas/CharacterImage"
+                - type: object
+                  properties:
+                    costumeId:
+                      $ref: "#/components/schemas/ImageId/properties/id"
       responses:
         "200":
           description: プロフィール更新成功
@@ -266,21 +513,188 @@ paths:
                 allOf:
                   - $ref: "#/components/schemas/UserId"
                   - $ref: "#/components/schemas/UserProfile"
-                  - $ref: "#/components/schemas/CharacterImage"
                   - type: object
                     properties:
-                      message:
-                        type: string
-                        description: プロフィール更新に成功した場合に返されるメッセージ
+                      costume:
+                        $ref: "#/components/schemas/Images"
+        "400":
+          description: リクエストエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestError"
         "401":
-          description: プロフィール更新失敗
+          description: 認証エラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
+        "403":
+          description: アクセス拒否
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ForbiddenError"
+        "404":
+          description: リソースが見つかりません
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundError"
+        "500":
+          description: サーバーエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+      security:
+        - bearerAuth: []
+  /quiz/{tier}:
+    get:
+      tags:
+        - quiz
+      summary: クイズの問題取得
+      description: クイズの問題を難易度別で取得する
+      parameters:
+        - name: tier
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: クイズの難易度
+      responses:
+        "200":
+          description: クイズ取得成功
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  message:
-                    type: string
-                    description: エラーメッセージ
-      security:
-        - bearerAuth: []
+                  character:
+                    $ref: "#/components/schemas/Images"
+                    description: クイズセットの指名手配猫
+                  costume:
+                    $ref: "#/components/schemas/Images"
+                    description: ユーザの着せ替え画像
+                  quizSet:
+                    allOf:
+                      - $ref: "#/components/schemas/QuizSet"
+                      - type: object
+                        properties:
+                          quizList:
+                            type: array
+                            description: クイズの問題一覧
+                            items:
+                              allOf:
+                                - $ref: "#/components/schemas/Quiz"
+                                - type: object
+                                  properties:
+                                    hint:
+                                      type: string
+                                      description: クイズのヒント
+
+        "400":
+          description: リクエストエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestError"
+        "401":
+          description: 認証エラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
+        "403":
+          description: アクセス拒否
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ForbiddenError"
+        "404":
+          description: リソースが見つかりません
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundError"
+        "500":
+          description: サーバーエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+  /quiz/result:
+    post:
+      tags:
+        - quiz
+      summary: クイズの解答結果送信
+      description: クイズの解答結果を送信する
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quizId:
+                  $ref: "#/components/schemas/QuizId"
+                answer:
+                  type: string
+                  description: ユーザーの解答
+                answerTime:
+                  type: integer
+                  nullable: true
+                  description: クイズを解いた時間(タイムアタックの場合・秒)
+      responses:
+        "200":
+          description: クイズ解答成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  quizSetId:
+                    $ref: "#/components/schemas/QuizSetId"
+                  accuracy:
+                    $ref: "#/components/schemas/Accuracy"
+                    description: クイズセットの正答率
+                  quizList:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: "#/components/schemas/Quiz"
+                        - $ref: "#/components/schemas/QuizAnswer"
+                  costume:
+                    $ref: "#/components/schemas/Images"
+                    description: ユーザの着せ替え画像
+        "400":
+          description: リクエストエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestError"
+        "401":
+          description: 認証エラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
+        "403":
+          description: アクセス拒否
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ForbiddenError"
+        "404":
+          description: リソースが見つかりません
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundError"
+        "500":
+          description: サーバーエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
