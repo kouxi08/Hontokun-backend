@@ -11,3 +11,6 @@ ignorePaths:
   - "../.github/CODEOWNERS"
   - "../README.md"
   - "../package.json"
+  - "../tsconfig.json"
+  - "../Dockerfile*"
+  - "../docker-compose.yaml"

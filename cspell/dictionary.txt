@@ -2,4 +2,4 @@ hontokun
 buildx
 kouxi
 Avenir
-vuex
+hono
