@@ -309,7 +309,7 @@ paths:
                       totalAccuracy:
                         $ref: "#/components/schemas/Accuracy"
                         description: ユーザの総正答率
-                      list:
+                      tierList:
                         type: array
                         description: 難易度別の一覧
                         items:
@@ -324,70 +324,11 @@ paths:
                             character:
                               $ref: "#/components/schemas/Images"
                               description: クイズセットの指名手配猫
-        "401":
-          description: 認証エラー
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UnauthorizedError"
-        "403":
-          description: アクセス拒否
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ForbiddenError"
-        "404":
-          description: リソースが見つかりません
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/NotFoundError"
-        "500":
-          description: サーバーエラー
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/InternalServerError"
-      security:
-        - bearerAuth: []
-  /history/tier/{tier}:
-    get:
-      tags:
-        - history
-      summary: クイズ履歴難易度別取得
-      description: ユーザのクイズ履歴のリストを難易度別に取得する
-      parameters:
-        - name: tier
-          in: path
-          required: true
-          schema:
-            type: integer
-          description: クイズセットの難易度
-      responses:
-        "200":
-          description: クイズ履歴難易度別取得成功
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  character:
-                    $ref: "#/components/schemas/Images"
-                    description: クイズセットの指名手配猫
-                  totalAccuracy:
-                    $ref: "#/components/schemas/Accuracy"
-                    description: クイズセットの正答率
-                  quizSet:
-                    type: array
-                    description: クイズセットの一覧
-                    items:
-                      $ref: "#/components/schemas/QuizSet"
-        "400":
-          description: リクエストエラー
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/BadRequestError"
+                            quizSetList:
+                              type: array
+                              description: クイズセットの一覧
+                              items:
+                                $ref: "#/components/schemas/QuizSet"
         "401":
           description: 認証エラー
           content:
