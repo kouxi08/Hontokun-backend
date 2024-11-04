@@ -42,29 +42,29 @@ components:
         experience:
           type: integer
           description: ユーザーの経験値
-    CharacterImageId:
+    ImageId:
       type: object
       properties:
         id:
           type: string
           description: キャラクター画像のID
-    CharacterImageUrl:
-      type: object
-      properties:
-        url:
-          type: string
-          description: キャラクター画像のURL
-    CharacterImageName:
+    ImageName:
       type: object
       properties:
         name:
           type: string
           description: キャラクター画像の名前
-    CharacterImage:
+    ImageUrl:
+      type: object
+      properties:
+        url:
+          type: string
+          description: キャラクター画像のURL
+    Images:
       allOf:
-        - $ref: "#/components/schemas/CharacterImageId"
-        - $ref: "#/components/schemas/CharacterImageName"
-        - $ref: "#/components/schemas/CharacterImageUrl"
+        - $ref: "#/components/schemas/ImageId"
+        - $ref: "#/components/schemas/ImageName"
+        - $ref: "#/components/schemas/ImageUrl"
     CharacterDialogue:
       type: object
       properties:
@@ -218,16 +218,16 @@ paths:
                   message:
                     type: string
                     description: エラーメッセージ
-  /home:
+  /main:
     get:
       tags:
-        - home
-      summary: ホーム画面でのデータ取得
+        - main
+      summary: メイン画面でのデータ取得
       description: ユーザのステータスや着せ替えを取得する
       parameters: []
       responses:
         "200":
-          description: ホーム画面データ取得成功
+          description: メイン画面データ取得成功
           content:
             application/json:
               schema:
@@ -238,10 +238,10 @@ paths:
                       - $ref: "#/components/schemas/UserId"
                       - $ref: "#/components/schemas/UserProfile"
                       - $ref: "#/components/schemas/UserStatus"
-                  characterImage:
+                  character:
                     allOf:
                       - $ref: "#/components/schemas/CharacterDialogue"
-                      - $ref: "#/components/schemas/CharacterImageUrl"
+                      - $ref: "#/components/schemas/ImageUrl"
               # example:
               #   user_id: "1"
               #   nickname: "ホントくん"
@@ -299,8 +299,8 @@ paths:
                       - $ref: "#/components/schemas/UserProfile"
                       - type: object
                         properties:
-                          character:
-                            $ref: "#/components/schemas/CharacterImage"
+                          costume:
+                            $ref: "#/components/schemas/Images"
                             description: ユーザの着せ替え画像
                     description: ユーザのステータス
                   history:
@@ -321,8 +321,8 @@ paths:
                             accuracy:
                               $ref: "#/components/schemas/Accuracy"
                               description: クイズセットの正答率
-                            characterImage:
-                              $ref: "#/components/schemas/CharacterImage"
+                            character:
+                              $ref: "#/components/schemas/Images"
                               description: クイズセットの指名手配猫
         "401":
           description: 認証エラー
@@ -372,7 +372,7 @@ paths:
                 type: object
                 properties:
                   character:
-                    $ref: "#/components/schemas/CharacterImage"
+                    $ref: "#/components/schemas/Images"
                     description: クイズセットの指名手配猫
                   totalAccuracy:
                     $ref: "#/components/schemas/Accuracy"
@@ -435,7 +435,7 @@ paths:
                 type: object
                 properties:
                   character:
-                    $ref: "#/components/schemas/CharacterImage"
+                    $ref: "#/components/schemas/Images"
                     description: クイズセットの指名手配猫
                   quizSet:
                     $ref: "#/components/schemas/QuizSet"
@@ -497,15 +497,25 @@ paths:
                     allOf:
                       - $ref: "#/components/schemas/UserId"
                       - $ref: "#/components/schemas/UserProfile"
-                      - type: object
-                        properties:
-                          character:
-                            $ref: "#/components/schemas/CharacterImage"
-                  characterOptions:
+                      # - type: object
+                      #   properties:
+                      #     character:
+                      #       $ref: "#/components/schemas/CharacterImage"
+                  costumeList:
                     type: array
                     description: キャラクター画像の一覧
                     items:
-                      $ref: "#/components/schemas/CharacterImage"
+                      allOf:
+                        - $ref: "#/components/schemas/Images"
+                        - type: object
+                          properties:
+                            # 持ってるかどうか
+                            isOwn:
+                              type: boolean
+                              description: ユーザが所持しているかどうか
+                            isSelected:
+                              type: boolean
+                              description: ユーザが選択しているかどうか
         "400":
           description: リクエストエラー
           content:
@@ -551,8 +561,8 @@ paths:
                 - $ref: "#/components/schemas/UserProfile"
                 - type: object
                   properties:
-                    characterId:
-                      $ref: "#/components/schemas/CharacterImageId/properties/id"
+                    costumeId:
+                      $ref: "#/components/schemas/ImageId/properties/id"
       responses:
         "200":
           description: プロフィール更新成功
@@ -564,11 +574,8 @@ paths:
                   - $ref: "#/components/schemas/UserProfile"
                   - type: object
                     properties:
-                      characterImage:
-                        $ref: "#/components/schemas/CharacterImage"
-                      message:
-                        type: string
-                        description: プロフィール更新に成功した場合に返されるメッセージ
+                      costume:
+                        $ref: "#/components/schemas/Images"
         "400":
           description: リクエストエラー
           content:
@@ -622,9 +629,12 @@ paths:
               schema:
                 type: object
                 properties:
-                  characterImage:
-                    $ref: "#/components/schemas/CharacterImage"
+                  character:
+                    $ref: "#/components/schemas/Images"
                     description: クイズセットの指名手配猫
+                  costume:
+                    $ref: "#/components/schemas/Images"
+                    description: ユーザの着せ替え画像
                   quizSet:
                     allOf:
                       - $ref: "#/components/schemas/QuizSet"
@@ -714,6 +724,9 @@ paths:
                       allOf:
                         - $ref: "#/components/schemas/Quiz"
                         - $ref: "#/components/schemas/QuizAnswer"
+                  costume:
+                    $ref: "#/components/schemas/Images"
+                    description: ユーザの着せ替え画像
         "400":
           description: リクエストエラー
           content:
