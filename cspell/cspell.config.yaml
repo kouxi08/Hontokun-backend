@@ -14,4 +14,4 @@ ignorePaths:
   - "../tsconfig.json"
   - "../Dockerfile*"
   - "../docker-compose.yaml"
-  - "../docs/db.drawio"
+  - "../docs/db.drawio.svg"
