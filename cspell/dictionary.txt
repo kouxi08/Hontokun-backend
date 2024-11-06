@@ -3,3 +3,4 @@ buildx
 kouxi
 Avenir
 hono
+VARCHAR
