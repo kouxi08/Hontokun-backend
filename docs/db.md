@@ -14,6 +14,7 @@
 | birthday     | 生年月日                       |     |     | DATE        |          |       |         |                |        |
 | level        | レベル                         |     |     | INT         | ◯        |       | 0       |                |        |
 | experience   | 経験値                         |     |     | INT         | ◯        |       | 0       |                |        |
+| costume_id   | 着せ替え ID                    |     |     | VARCHAR(36) | ◯        |       |         |                |        |
 | created_at   | 作成日時                       |     |     | DATETIME    | ◯        |       |         |                |        |
 | updated_at   | 更新日時                       |     |     | DATETIME    | ◯        |       |         |                |        |
 
@@ -36,7 +37,7 @@
 | カラム名        | 説明                | PK  | FK  | 型          | NOT NULL | INDEX | default | AUTO INCREMENT | Unique |
 | --------------- | ------------------- | --- | --- | ----------- | -------- | ----- | ------- | -------------- | ------ |
 | id              | クイズログ ID       | ◯   |     | VARCHAR(36) | ◯        | ◯     |         |                | ◯      |
-| quiz_id         | クイズ ID           |     |     | VARCHAR(36) |          |       |         |                |        |
+| quiz_id         | クイズ ID           |     |     | VARCHAR(36) | ◯        |       |         |                |        |
 | quiz_set_log_id | クイズセットログ ID |     | ◯   | VARCHAR(36) | ◯        | ◯     |         |                |        |
 | user_answer     | ユーザの解答        |     |     | TEXT        | ◯        |       |         |                |        |
 | time            | 解答タイム          |     |     | INT         |          |       |         |                |        |
@@ -46,13 +47,12 @@
 
 ### mode
 
-問題モード
-
 | カラム名   | 説明          | PK  | FK  | 型          | NOT NULL | INDEX | default | AUTO INCREMENT | Unique |
 | ---------- | ------------- | --- | --- | ----------- | -------- | ----- | ------- | -------------- | ------ |
-| id         | 問題モード ID | ◯   |     | VARCHAR(36) | ◯        | ◯     |         |                |        |
+| id         | 問題モード ID | ◯   |     | VARCHAR(36) | ◯        | ◯     |         |                | ◯      |
 | name       | 問題モード名  |     |     | VARCHAR(50) | ◯        |       |         |                |        |
 | created_at | 作成日時      |     |     | DATETIME    | ◯        |       |         |                |        |
+| updated_at | 更新日時      |     |     | DATETIME    | ◯        |       |         |                |        |
 
 ### user_costumes
 
@@ -87,7 +87,7 @@
 | createdAt     | 作成日時      |     |     | DATETIME                           |          |         |        |
 | updatedAt     | 更新日時      |     |     | DATETIME                           |          |         |        |
 
-### ネコ
+### キャラクター
 
 | フィールド ID | 表示名        | PK  | FK  | 型                        | NOT NULL | default | Unique |
 | ------------- | ------------- | --- | --- | ------------------------- | -------- | ------- | ------ |
