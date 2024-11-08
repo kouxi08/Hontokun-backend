@@ -70,22 +70,24 @@
 
 ### クイズ
 
-| フィールド ID | 表示名        | PK  | FK  | 型                                 | NOT NULL | default | Unique |
-| ------------- | ------------- | --- | --- | ---------------------------------- | -------- | ------- | ------ |
-|               | コンテンツ ID | ◯   |     | VARCHAR(36)                        |          |         | ◯      |
-| title         | タイトル      |     |     | VARCHAR(100)                       |          |         |        |
-| content       | 本文          |     |     | TEXT                               |          |         |        |
-| tier          | 難易度        |     |     | INT                                |          |         |        |
-| images        | 画像          |     |     | VARCHAR(255)                       |          |         |        |
-| question      | 質問文        |     |     | TEXT                               |          |         |        |
-| choices       | 選択肢        |     |     | TEXT[]                             |          |         |        |
-| type          | クイズタイプ  |     |     | ENUM(’TRUE_OR_FALSE’, ‘SELECTION’) |          |         |        |
-| answer        | 解答          |     |     | TEXT                               |          |         |        |
-| explanation   | 解説          |     |     | TEXT                               |          |         |        |
-| hint          | ヒント        |     |     | TEXT                               |          |         |        |
-| isDeleted     | 削除フラグ    |     |     | BOOLEAN                            |          | False   |        |
-| createdAt     | 作成日時      |     |     | DATETIME                           |          |         |        |
-| updatedAt     | 更新日時      |     |     | DATETIME                           |          |         |        |
+| フィールド ID | 表示名           | PK  | FK  | 型                                 | NOT NULL | default | Unique |
+| ------------- | ---------------- | --- | --- | ---------------------------------- | -------- | ------- | ------ |
+|               | コンテンツ ID    | ◯   |     | VARCHAR(36)                        |          |         | ◯      |
+| title         | タイトル         |     |     | VARCHAR(100)                       |          |         |        |
+| content       | 本文             |     |     | TEXT                               |          |         |        |
+| tier          | 難易度           |     |     | INT                                |          |         |        |
+| images        | 画像             |     |     | VARCHAR(255)                       |          |         |        |
+| question      | 質問文           |     |     | TEXT                               |          |         |        |
+| news_url      | 元ニュースの URL |     |     | TEXT                               |          |         |        |
+| choices       | 選択肢           |     |     | TEXT[]                             |          |         |        |
+| type          | クイズタイプ     |     |     | ENUM(’TRUE_OR_FALSE’, ‘SELECTION’) |          |         |        |
+| answer        | 解答             |     |     | TEXT                               |          |         |        |
+| explanation   | 解説             |     |     | TEXT                               |          |         |        |
+| hint          | ヒント           |     |     | TEXT                               |          |         |        |
+| keyword       | キーワード       |     |     | TEXT                               |          |         |        |
+| isDeleted     | 削除フラグ       |     |     | BOOLEAN                            |          | False   |        |
+| createdAt     | 作成日時         |     |     | DATETIME                           |          |         |        |
+| updatedAt     | 更新日時         |     |     | DATETIME                           |          |         |        |
 
 ### キャラクター
 
