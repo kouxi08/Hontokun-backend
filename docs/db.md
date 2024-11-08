@@ -87,7 +87,7 @@
 | explanation   | 解説             |     |     | TEXT                               |          |         |        |
 | hint          | ヒント           |     |     | TEXT                               |          |         |        |
 | keyword       | キーワード       |     |     | TEXT                               |          |         |        |
-| isDeleted     | 削除フラグ       |     |     | BOOLEAN                            |          | False   |        |
+| is_deleted    | 削除フラグ       |     |     | BOOLEAN                            |          | False   |        |
 | createdAt     | 作成日時         |     |     | DATETIME                           |          |         |        |
 | updatedAt     | 更新日時         |     |     | DATETIME                           |          |         |        |
 
@@ -100,5 +100,5 @@
 | name          | 名前          |     |     | VARCHAR(50)               |          |         |        |
 | lines         | セリフ        |     |     | TEXT[]                    |          |         |        |
 | category      | カテゴリ      |     |     | ENUM(’COSTUME’, ‘WANTED’) |          |         |        |
-| createdAt     | 作成日時      |     |     | DATETIME                  |          |         |        |
-| updatedAt     | 更新日時      |     |     | DATETIME                  |          |         |        |
+| created_at    | 作成日時      |     |     | DATETIME                  |          |         |        |
+| updated_at    | 更新日時      |     |     | DATETIME                  |          |         |        |
