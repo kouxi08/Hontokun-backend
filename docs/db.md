@@ -47,12 +47,14 @@
 
 ### mode
 
-| カラム名   | 説明          | PK  | FK  | 型          | NOT NULL | INDEX | default | AUTO INCREMENT | Unique |
-| ---------- | ------------- | --- | --- | ----------- | -------- | ----- | ------- | -------------- | ------ |
-| id         | 問題モード ID | ◯   |     | VARCHAR(36) | ◯        | ◯     |         |                | ◯      |
-| name       | 問題モード名  |     |     | VARCHAR(50) | ◯        |       |         |                |        |
-| created_at | 作成日時      |     |     | DATETIME    | ◯        |       |         |                |        |
-| updated_at | 更新日時      |     |     | DATETIME    | ◯        |       |         |                |        |
+| カラム名    | 説明          | PK  | FK  | 型           | NOT NULL | INDEX | default | AUTO INCREMENT | Unique |
+| ----------- | ------------- | --- | --- | ------------ | -------- | ----- | ------- | -------------- | ------ |
+| id          | 問題モード ID | ◯   |     | VARCHAR(36)  | ◯        | ◯     |         |                | ◯      |
+| name        | 名前          |     |     | VARCHAR(50)  | ◯        |       |         |                |        |
+| description | 説明          |     |     | VARCHAR(100) | ◯        |       |         |                |        |
+| is_public   | 公開フラグ    |     |     | BOOLEAN      | ◯        |       |         |                |        |
+| created_at  | 作成日時      |     |     | DATETIME     | ◯        |       |         |                |        |
+| updated_at  | 更新日時      |     |     | DATETIME     | ◯        |       |         |                |        |
 
 ### user_costumes
 
