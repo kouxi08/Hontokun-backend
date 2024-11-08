@@ -47,12 +47,14 @@
 
 ### mode
 
-| カラム名   | 説明          | PK  | FK  | 型          | NOT NULL | INDEX | default | AUTO INCREMENT | Unique |
-| ---------- | ------------- | --- | --- | ----------- | -------- | ----- | ------- | -------------- | ------ |
-| id         | 問題モード ID | ◯   |     | VARCHAR(36) | ◯        | ◯     |         |                | ◯      |
-| name       | 問題モード名  |     |     | VARCHAR(50) | ◯        |       |         |                |        |
-| created_at | 作成日時      |     |     | DATETIME    | ◯        |       |         |                |        |
-| updated_at | 更新日時      |     |     | DATETIME    | ◯        |       |         |                |        |
+| カラム名    | 説明          | PK  | FK  | 型           | NOT NULL | INDEX | default | AUTO INCREMENT | Unique |
+| ----------- | ------------- | --- | --- | ------------ | -------- | ----- | ------- | -------------- | ------ |
+| id          | 問題モード ID | ◯   |     | VARCHAR(36)  | ◯        | ◯     |         |                | ◯      |
+| name        | 名前          |     |     | VARCHAR(50)  | ◯        |       |         |                |        |
+| description | 説明          |     |     | VARCHAR(100) | ◯        |       |         |                |        |
+| is_public   | 公開フラグ    |     |     | BOOLEAN      | ◯        |       |         |                |        |
+| created_at  | 作成日時      |     |     | DATETIME     | ◯        |       |         |                |        |
+| updated_at  | 更新日時      |     |     | DATETIME     | ◯        |       |         |                |        |
 
 ### user_costumes
 
@@ -70,22 +72,24 @@
 
 ### クイズ
 
-| フィールド ID | 表示名        | PK  | FK  | 型                                 | NOT NULL | default | Unique |
-| ------------- | ------------- | --- | --- | ---------------------------------- | -------- | ------- | ------ |
-|               | コンテンツ ID | ◯   |     | VARCHAR(36)                        |          |         | ◯      |
-| title         | タイトル      |     |     | VARCHAR(100)                       |          |         |        |
-| content       | 本文          |     |     | TEXT                               |          |         |        |
-| tier          | 難易度        |     |     | INT                                |          |         |        |
-| images        | 画像          |     |     | VARCHAR(255)                       |          |         |        |
-| question      | 質問文        |     |     | TEXT                               |          |         |        |
-| choices       | 選択肢        |     |     | TEXT[]                             |          |         |        |
-| type          | クイズタイプ  |     |     | ENUM(’TRUE_OR_FALSE’, ‘SELECTION’) |          |         |        |
-| answer        | 解答          |     |     | TEXT                               |          |         |        |
-| explanation   | 解説          |     |     | TEXT                               |          |         |        |
-| hint          | ヒント        |     |     | TEXT                               |          |         |        |
-| isDeleted     | 削除フラグ    |     |     | BOOLEAN                            |          | False   |        |
-| createdAt     | 作成日時      |     |     | DATETIME                           |          |         |        |
-| updatedAt     | 更新日時      |     |     | DATETIME                           |          |         |        |
+| フィールド ID | 表示名           | PK  | FK  | 型                                 | NOT NULL | default | Unique |
+| ------------- | ---------------- | --- | --- | ---------------------------------- | -------- | ------- | ------ |
+|               | コンテンツ ID    | ◯   |     | VARCHAR(36)                        |          |         | ◯      |
+| title         | タイトル         |     |     | VARCHAR(100)                       |          |         |        |
+| content       | 本文             |     |     | TEXT                               |          |         |        |
+| tier          | 難易度           |     |     | INT                                |          |         |        |
+| images        | 画像             |     |     | VARCHAR(255)                       |          |         |        |
+| question      | 質問文           |     |     | TEXT                               |          |         |        |
+| news_url      | 元ニュースの URL |     |     | TEXT                               |          |         |        |
+| choices       | 選択肢           |     |     | TEXT[]                             |          |         |        |
+| type          | クイズタイプ     |     |     | ENUM(’TRUE_OR_FALSE’, ‘SELECTION’) |          |         |        |
+| answer        | 解答             |     |     | TEXT                               |          |         |        |
+| explanation   | 解説             |     |     | TEXT                               |          |         |        |
+| hint          | ヒント           |     |     | TEXT                               |          |         |        |
+| keyword       | キーワード       |     |     | TEXT                               |          |         |        |
+| is_deleted    | 削除フラグ       |     |     | BOOLEAN                            |          | False   |        |
+| createdAt     | 作成日時         |     |     | DATETIME                           |          |         |        |
+| updatedAt     | 更新日時         |     |     | DATETIME                           |          |         |        |
 
 ### キャラクター
 
@@ -96,5 +100,5 @@
 | name          | 名前          |     |     | VARCHAR(50)               |          |         |        |
 | lines         | セリフ        |     |     | TEXT[]                    |          |         |        |
 | category      | カテゴリ      |     |     | ENUM(’COSTUME’, ‘WANTED’) |          |         |        |
-| createdAt     | 作成日時      |     |     | DATETIME                  |          |         |        |
-| updatedAt     | 更新日時      |     |     | DATETIME                  |          |         |        |
+| created_at    | 作成日時      |     |     | DATETIME                  |          |         |        |
+| updated_at    | 更新日時      |     |     | DATETIME                  |          |         |        |
