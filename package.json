@@ -7,7 +7,9 @@
     "@hono/node-server": "^1.13.1",
     "@hono/swagger-ui": "^0.4.1",
     "@hono/zod-openapi": "^0.16.4",
-    "hono": "^4.6.3"
+    "dotenv": "^16.4.5",
+    "hono": "^4.6.3",
+    "microcms-js-sdk": "^3.1.2"
   },
   "devDependencies": {
     "@types/node": "^20.11.17",
