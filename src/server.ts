@@ -11,7 +11,7 @@ export const db = drizzle(DATABASE_URL);
 
 app.use(logger());
 
-app.get('/healthcheck', (c: Context) => {
-  console.info('Healthcheck endpoint is called.');
+app.get('/health-check', (c: Context) => {
+  console.info('Health-check endpoint is called.');
   return c.json('🌱 Hello Hontokun!', 200);
 });
