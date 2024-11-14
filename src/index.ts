@@ -1,16 +1,14 @@
 import { serve } from '@hono/node-server';
-import { Hono } from 'hono';
+import { app } from './server';
 
-const app = new Hono();
+async function main() {
+  serve(app)
+    .listen(3000)
+    .once('listening', () => {
+      console.log('🚀 Server started on port 3000');
+    });
+}
 
-app.get('/', (c) => {
-  return c.text('Hello Hono!');
-});
-
-const port = 3000;
-console.log(`Server is running on port ${port}`);
-
-serve({
-  fetch: app.fetch,
-  port,
+main().catch((err) => {
+  console.error(err);
 });
