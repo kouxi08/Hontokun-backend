@@ -4,13 +4,18 @@
     "dev": "tsx watch src/index.ts"
   },
   "dependencies": {
+    "@hono/eslint-config": "^1.0.2",
     "@hono/node-server": "^1.13.1",
     "@hono/swagger-ui": "^0.4.1",
     "@hono/zod-openapi": "^0.16.4",
+    "eslint": "^8.57.1",
     "hono": "^4.6.3"
   },
   "devDependencies": {
     "@types/node": "^20.11.17",
+    "eslint-config-prettier": "^8.10.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "prettier": "^3.3.3",
     "tsx": "^4.19.1"
   }
 }
