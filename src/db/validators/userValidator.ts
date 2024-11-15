@@ -1,6 +1,6 @@
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
-import { usersTable } from '../schema/users';
+import { usersTable } from '../schema/schema';
 
 export const insertUserSchema = createInsertSchema(usersTable, {
   firebase_uid: z.string().min(1).max(128),
