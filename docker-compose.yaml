@@ -1,5 +1,5 @@
 services:
-  hontokun-backend:
+  backend:
     build:
       context: .
       dockerfile: Dockerfile.dev
