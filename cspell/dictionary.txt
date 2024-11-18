@@ -4,3 +4,4 @@ kouxi
 Avenir
 hono
 VARCHAR
+autoincrement
