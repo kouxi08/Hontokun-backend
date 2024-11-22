@@ -11,6 +11,10 @@ const createAuthMiddleware = (firebaseApp: app.App) => {
     }
 
     const token = authHeader.split('Bearer ')[1];
+    if (!token) {
+      throw new AuthError('Bearer token is missing');
+    }
+
     try {
       const decodedToken = await firebaseApp.auth().verifyIdToken(token);
       c.set('firebaseUserId', decodedToken.uid);
