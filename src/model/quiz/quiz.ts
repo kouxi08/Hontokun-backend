@@ -2,7 +2,7 @@ import { QuizId } from './quizId';
 
 export class Quiz {
   private constructor(
-    private readonly _id: string,
+    private readonly _id: QuizId,
     private _news: {
       title: string;
       content: string;

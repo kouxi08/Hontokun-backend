@@ -2,7 +2,7 @@
   "name": "hontokun",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "gen:cms": "npx microcms-typescript ./src/cms/schema ./src/cms/types/response.ts"
+    "gen:cms": "npx microcms-typescript ./src/database/cms/schema ./src/database/cms/types/response.ts"
   },
   "dependencies": {
     "@hono/eslint-config": "^1.0.2",
