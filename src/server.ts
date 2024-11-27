@@ -3,8 +3,8 @@ import { drizzle } from 'drizzle-orm/mysql2';
 import type { Context } from 'hono';
 import { Hono } from 'hono';
 import { logger } from 'hono/logger';
-import { DATABASE_URL } from './env';
-import { firebaseApp } from './firebase';
+import { DATABASE_URL } from './config/env';
+import { firebaseApp } from './config/firebase';
 import { createAuthMiddleware } from './middleware/auth';
 
 export const app = new Hono();

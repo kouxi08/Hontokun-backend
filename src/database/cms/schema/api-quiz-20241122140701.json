@@ -1,0 +1,91 @@
+{
+  "apiFields": [
+    {
+      "idValue": "g19-8fntKo",
+      "fieldId": "title",
+      "name": "タイトル",
+      "kind": "text",
+      "description": "50文字以内で入力してください",
+      "required": true,
+      "textSizeLimitValidation": { "textSize": { "min": null, "max": 50 } },
+      "isUnique": false
+    },
+    {
+      "fieldId": "content",
+      "name": "本文",
+      "kind": "textArea",
+      "description": "",
+      "required": true
+    },
+    {
+      "fieldId": "tier",
+      "name": "難易度",
+      "kind": "number",
+      "description": "1〜5の数字を入力してください",
+      "required": true,
+      "numberSizeLimitValidation": { "numberSize": { "min": 1, "max": 5 } }
+    },
+    { "fieldId": "image", "name": "画像", "kind": "media", "description": "" },
+    {
+      "fieldId": "question",
+      "name": "質問文",
+      "kind": "textArea",
+      "description": "",
+      "required": true
+    },
+    {
+      "fieldId": "news_url",
+      "name": "元ニュースURL",
+      "kind": "text",
+      "description": "",
+      "isUnique": false
+    },
+    {
+      "fieldId": "choices",
+      "name": "選択肢",
+      "kind": "textArea",
+      "description": "選択肢ごとに改行して入力して下さい"
+    },
+    {
+      "fieldId": "type",
+      "name": "出題タイプ",
+      "kind": "select",
+      "description": "マルバツ選択式：TRUE_OR_FALSE、選択式：SELECTION",
+      "required": true,
+      "selectItems": [
+        { "id": "AZ_uOIzVjM", "value": "TRUE_OR_FALSE" },
+        { "id": "86i4wU3Sd9", "value": "SELECTION" }
+      ],
+      "selectInitialValue": [],
+      "multipleSelect": false
+    },
+    {
+      "fieldId": "answer",
+      "name": "解答",
+      "kind": "text",
+      "description": "マルバツ式：true / false, 選択式：答えの選択肢を入力してください",
+      "required": true,
+      "isUnique": false
+    },
+    {
+      "fieldId": "explanation",
+      "name": "解説",
+      "kind": "text",
+      "required": true,
+      "isUnique": false
+    },
+    {
+      "fieldId": "hint",
+      "name": "ヒント",
+      "kind": "textArea",
+      "required": true
+    },
+    {
+      "fieldId": "is_deleted",
+      "name": "削除フラグ",
+      "kind": "boolean",
+      "required": true
+    }
+  ],
+  "customFields": []
+}
