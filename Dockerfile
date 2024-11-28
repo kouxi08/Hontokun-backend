@@ -2,6 +2,17 @@ FROM node:20-alpine AS base
 
 FROM base AS builder
 
+ARG domain
+ARG api_key
+ARG database_url
+ARG app_credentials
+
+
+ENV SERVICE_DOMAIN=${domain}
+ENV API_KEY=${api_key}
+ENV DATABASE_URL=${database_url}
+ENV GOOGLE_APPLICATION_CREDENTIALS=${app_credentials}
+
 RUN apk add --no-cache gcompat
 WORKDIR /app
 
