@@ -14,6 +14,18 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
+secretName: hontokun-backend-sercret
+
+env:
+  - name: MICROCMS_SERVICE_DOMAIN
+    key: service_domain
+  - name: MICROCMS_API_KEY
+    key: api_key
+  - name: DATABASE_URL
+    key: database_url
+  - name: GOOGLE_APPLICATION_CREDENTIALS
+    key: application_credentials
+
 podAnnotations: {}
 podLabels: {}
 
@@ -64,12 +76,12 @@ resources:
 
 livenessProbe:
   httpGet:
-    path: /
-    port: http
+    path: /health-check
+    port: 3000
 readinessProbe:
   httpGet:
-    path: /
-    port: http
+    path: /health-check
+    port: 3000
 
 autoscaling:
   enabled: true
