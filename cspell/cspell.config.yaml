@@ -15,3 +15,4 @@ ignorePaths:
   - "../Dockerfile*"
   - "../docker-compose.yaml"
   - "../docs/db.drawio.svg"
+  - "../charts"
