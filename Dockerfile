@@ -2,14 +2,14 @@ FROM node:20-alpine AS base
 
 FROM base AS builder
 
-ARG domain
-ARG api_key
+ARG cms_domain
+ARG cms_api_key
 ARG database_url
 ARG app_credentials
 
 
-ENV SERVICE_DOMAIN=${domain}
-ENV API_KEY=${api_key}
+ENV CMS_SERVICE_DOMAIN=${domain}
+ENV CMS_API_KEY=${api_key}
 ENV DATABASE_URL=${database_url}
 ENV GOOGLE_APPLICATION_CREDENTIALS=${app_credentials}
 
