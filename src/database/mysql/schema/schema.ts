@@ -34,6 +34,25 @@ export const usersTable = mysqlTable(
   }
 );
 
+export const quizTable = mysqlTable('quiz', {
+  id: char({ length: 36 }).primaryKey(),
+  title: varchar({ length: 50 }).notNull(),
+  content: text().notNull(),
+  tier: int().notNull(),
+  image_url: varchar({ length: 500 }),
+  image_height: int(),
+  image_width: int(),
+  question: text().notNull(),
+  news_url: text().notNull(),
+  type: varchar({ length: 20 }).notNull(),
+  answer: text().notNull(),
+  explanation: text().notNull(),
+  hint: text().notNull(),
+  keyword: text().notNull(),
+  is_deleted: boolean().default(false).notNull(),
+  ...timestamps,
+});
+
 export const quizSetLogTable = mysqlTable('quiz_set_log', {
   id: char({ length: 36 }).primaryKey(),
   user_id: char({ length: 36 })
@@ -49,7 +68,9 @@ export const quizLogTable = mysqlTable(
   'quiz_log',
   {
     id: char({ length: 36 }).primaryKey(),
-    quiz_id: char({ length: 36 }).notNull(),
+    quiz_id: char({ length: 36 })
+      .notNull()
+      .references(() => quizTable.id),
     quiz_set_log_id: char({ length: 36 })
       .notNull()
       .references(() => quizSetLogTable.id),
@@ -71,6 +92,15 @@ export const quizModeTable = mysqlTable('quiz_mode', {
   ...timestamps,
 });
 
+export const quizChoiceTable = mysqlTable('quiz_choice', {
+  id: int().primaryKey().autoincrement(),
+  quiz_id: char({ length: 36 })
+    .notNull()
+    .references(() => quizTable.id),
+  name: varchar({ length: 50 }).notNull(),
+  ...timestamps,
+});
+
 export const userCostumesTable = mysqlTable('user_costumes', {
   user_id: char({ length: 36 })
     .notNull()
@@ -87,6 +117,11 @@ export const userRelations = relations(usersTable, ({ many }) => ({
   userCostumes: many(userCostumesTable),
 }));
 
+export const quizRelations = relations(quizTable, ({ many }) => ({
+  quizLog: many(quizLogTable),
+  quizChoices: many(quizChoiceTable),
+}));
+
 export const quizSetLogRelations = relations(
   quizSetLogTable,
   ({ one, many }) => ({
@@ -98,10 +133,15 @@ export const quizSetLogRelations = relations(
 
 export const quizLogRelations = relations(quizLogTable, ({ one }) => ({
   quizSetLog: one(quizSetLogTable),
+  quiz: one(quizTable),
 }));
 
 export const quizModeRelations = relations(quizModeTable, ({ many }) => ({
   quizSetLogs: many(quizSetLogTable),
+}));
+
+export const quizChoiceRelations = relations(quizChoiceTable, ({ one }) => ({
+  quiz: one(quizTable),
 }));
 
 export const userCostumesRelations = relations(
