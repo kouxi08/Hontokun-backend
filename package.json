@@ -1,6 +1,8 @@
 {
   "name": "hontokun",
+  "type": "module",
   "scripts": {
+    "build": "tsc",
     "dev": "tsx watch src/index.ts",
     "gen:cms": "npx microcms-typescript ./src/database/cms/schema ./src/database/cms/types/response.ts",
     "drizzle:generate": "npx drizzle-kit generate",
