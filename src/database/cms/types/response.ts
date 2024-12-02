@@ -43,7 +43,7 @@ T,
   /**
    * 元ニュースURL
    */
-  news_url?: string
+  newsUrl?: string
   /**
    * 選択肢
    */
@@ -67,7 +67,7 @@ T,
   /**
    * 削除フラグ
    */
-  is_deleted: boolean
+  isDeleted: boolean
 }>
 
 export type characters<T='get'> = Structure<

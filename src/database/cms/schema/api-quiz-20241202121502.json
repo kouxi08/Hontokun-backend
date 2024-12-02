@@ -34,7 +34,7 @@
       "required": true
     },
     {
-      "fieldId": "news_url",
+      "fieldId": "newsUrl",
       "name": "元ニュースURL",
       "kind": "text",
       "description": "",
@@ -81,7 +81,7 @@
       "required": true
     },
     {
-      "fieldId": "is_deleted",
+      "fieldId": "isDeleted",
       "name": "削除フラグ",
       "kind": "boolean",
       "required": true

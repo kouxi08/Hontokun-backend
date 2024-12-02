@@ -4,7 +4,10 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsx watch src/index.ts",
-    "gen:cms": "npx microcms-typescript ./src/database/cms/schema ./src/database/cms/types/response.ts"
+    "gen:cms": "npx microcms-typescript ./src/database/cms/schema ./src/database/cms/types/response.ts",
+    "drizzle:generate": "npx drizzle-kit generate",
+    "drizzle:push": "npx drizzle-kit push",
+    "drizzle:migrate": "npx drizzle-kit migrate"
   },
   "dependencies": {
     "@hono/eslint-config": "^1.0.2",
