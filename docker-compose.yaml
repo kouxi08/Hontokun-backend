@@ -1,34 +1,6 @@
 services:
   backend:
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
-    volumes:
-      - .:/app
-      - front_node_modules:/app/node_modules
+    image: kouxi00/hontokun-backend:${IMAGE_VERSION}
     ports:
       - "3000:3000"
     tty: true
-    networks:
-      - hontokun
-
-  db:
-    image: mysql:8.0
-    environment:
-      MYSQL_ROOT_PASSWORD: mysql
-      MYSQL_DATABASE: hontokun
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
-    ports:
-      - 3306:3306
-    volumes:
-      - ./db-data:/var/lib/mysql
-    networks:
-        - hontokun
-
-volumes:
-  front_node_modules:
-
-networks:
-    hontokun:
-     external: true

@@ -9,22 +9,26 @@ MYSQL_DATABASE=hontokun
 ps:
 		docker compose ps
 
+images:
+		docker images
+
 build:
-		docker compose build --no-cache
+		docker compose -f docker-compose.yaml -f docker-compose.dev.yaml build --no-cache
+
+prod-build:
+		docker compose -f docker-compose.yaml -f docker-compose.prod.yaml build --push
 
 network:
 		docker network create -d bridge hontokun
 
 up:
-		docker compose up -d
+		docker compose -f docker-compose.yaml -f docker-compose.dev.yaml up -d
 
 down:
-		docker compose down
-
-# docker push
+		docker compose -f docker-compose.yaml -f docker-compose.dev.yaml down
 
 push:
-		docker buildx  build --platform linux/amd64,linux/arm64 -t kouxi00/1000yen:latest --push .
+		docker compose -f docker-compose.yaml -f docker-compose.prod.yaml  push
 
 db-shell:
 		docker exec -it $(DB_NAME) mysql -u$(MYSQL_USER) -p$(MYSQL_PASSWORD) $(MYSQL_DATABASE)
