@@ -5,3 +5,4 @@ Avenir
 hono
 VARCHAR
 autoincrement
+usecase
