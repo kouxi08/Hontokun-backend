@@ -1,10 +1,10 @@
-import { credential, initializeApp } from 'firebase-admin';
+import admin from 'firebase-admin';
 import { GOOGLE_APPLICATION_CREDENTIALS } from './env';
 
 const serviceAccount = GOOGLE_APPLICATION_CREDENTIALS;
 
-const firebaseApp = initializeApp({
-  credential: credential.cert(serviceAccount),
+const firebaseApp = admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
 });
 
 export { firebaseApp };
