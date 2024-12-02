@@ -1,3 +1,3 @@
 export type Variables = {
-  firebaseUserId: string;
+  firebaseUid: string;
 };
