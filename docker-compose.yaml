@@ -1,6 +1,0 @@
-services:
-  backend:
-    image: kouxi00/hontokun-backend:${IMAGE_VERSION}
-    ports:
-      - "3000:3000"
-    tty: true

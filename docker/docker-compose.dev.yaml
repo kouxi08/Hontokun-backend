@@ -1,16 +1,17 @@
 services:
   backend:
     build:
-      context: .
-      dockerfile: Dockerfile.dev
+      context: ..
+      dockerfile: docker/Dockerfile.dev
     volumes:
-       - .:/app
+       - ../:/app
        - front_node_modules:/app/node_modules
     networks:
       - hontokun
 
   db:
     image: mysql:8.0
+    container_name: hontokun-db
     environment:
       MYSQL_ROOT_PASSWORD: mysql
       MYSQL_DATABASE: hontokun
@@ -19,7 +20,7 @@ services:
     ports:
       - 3306:3306
     volumes:
-      - ./db-data:/var/lib/mysql
+      - ../db-data:/var/lib/mysql
     networks:
         - hontokun
 
