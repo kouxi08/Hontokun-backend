@@ -12,6 +12,7 @@ export const db = drizzle(DATABASE_URL);
 const authMiddleware = createAuthMiddleware(firebaseApp);
 
 app.use(logger());
+app.use('/webhook/quiz', corsMiddleware());
 app.use('/sign-up', authMiddleware);
 
 app.get('/health-check', (c: Context) => {
