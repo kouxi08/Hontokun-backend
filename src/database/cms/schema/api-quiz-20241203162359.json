@@ -38,6 +38,7 @@
       "name": "元ニュースURL",
       "kind": "text",
       "description": "",
+      "required": true,
       "isUnique": false
     },
     {
@@ -77,6 +78,12 @@
     {
       "fieldId": "hint",
       "name": "ヒント",
+      "kind": "textArea",
+      "required": true
+    },
+    {
+      "fieldId": "keyword",
+      "name": "キーワード",
       "kind": "textArea",
       "required": true
     },

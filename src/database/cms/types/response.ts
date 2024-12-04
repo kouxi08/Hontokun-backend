@@ -43,7 +43,7 @@ T,
   /**
    * 元ニュースURL
    */
-  newsUrl?: string
+  newsUrl: string
   /**
    * 選択肢
    */
@@ -64,6 +64,10 @@ T,
    * ヒント
    */
   hint: string
+  /**
+   * キーワード
+   */
+  keyword: string
   /**
    * 削除フラグ
    */
