@@ -21,6 +21,8 @@ const quizFields = {
   is_deleted: z.boolean().default(false),
   created_at: z.date(),
   updated_at: z.date(),
+  published_at: z.date(),
+  revised_at: z.date(),
 };
 
 export const insertQuizSchema = createInsertSchema(quizTable, {

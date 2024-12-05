@@ -19,6 +19,8 @@ type QuizParams = {
   isDeleted: boolean;
   createdAt: Date;
   updatedAt: Date;
+  publishedAt: Date;
+  revisedAt: Date;
 };
 
 export class Quiz {
@@ -45,10 +47,13 @@ export class Quiz {
   public toDatabaseObject(): InsertQuizType {
     return {
       ...this.params,
-      news_url: this.params.newsUrl,
       type: this.params.type[0],
+      news_url: this.params.newsUrl,
+      is_deleted: this.params.isDeleted,
       created_at: this.params.createdAt,
       updated_at: this.params.updatedAt,
+      published_at: this.params.publishedAt,
+      revised_at: this.params.revisedAt,
     };
   }
 }

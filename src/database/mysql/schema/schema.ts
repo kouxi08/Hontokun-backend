@@ -51,6 +51,8 @@ export const quizTable = mysqlTable('quiz', {
   keyword: text().notNull(),
   is_deleted: boolean().default(false).notNull(),
   ...timestamps,
+  published_at: date().notNull(),
+  revised_at: date().notNull(),
 });
 
 export const quizSetLogTable = mysqlTable('quiz_set_log', {

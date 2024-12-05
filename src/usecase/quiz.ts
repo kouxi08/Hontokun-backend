@@ -26,6 +26,8 @@ export const createQuiz = async (
     isDeleted: quiz.isDeleted,
     createdAt: new Date(quiz.createdAt),
     updatedAt: new Date(quiz.updatedAt),
+    publishedAt: new Date(quiz.publishedAt),
+    revisedAt: new Date(quiz.revisedAt),
   });
 
   await Repository.createQuiz(db, quizData);
