@@ -19,34 +19,31 @@ app.use(prettyJSON());
 app.use('/webhook/quiz', corsMiddleware());
 app.use('/sign-up', authMiddleware);
 
+app.onError((err, c) => {
+  console.error(`${err}`);
+  return c.json({ error: err.message }, 500);
+});
+
 app.get('/health-check', (c: Context) => {
   console.info('Health-check endpoint is called.');
   return c.json('🌱 Hello Hontokun!', 200);
 });
 
 app.post('/webhook/quiz', async (c: Context) => {
-  try {
-    const req = await c.req.json();
-    if (!req) {
-      throw new Error('Invalid request body');
-    }
-
-    const quizData = req['contents']['new']['publishValue'];
-
-    if (req['type'] === 'new') {
-      await QuizUsecase.createQuiz(db, quizData);
-    } else if (req['type'] === 'edit') {
-      // await QuizUsecase.updateQuiz(db, quizData);
-    } else {
-      throw new Error('Invalid request type');
-    }
-
-    return c.json({ message: 'Success' }, 200);
-  } catch (error) {
-    // console.error('Failed to create quiz:', error);
-    return c.json(
-      { error: 'Failed to fetch quiz data', message: (error as Error).message },
-      500
-    );
+  const req = await c.req.json();
+  if (!req) {
+    throw new Error('Invalid request body');
   }
+
+  const quizData = req['contents']['new']['publishValue'];
+
+  if (req['type'] === 'new') {
+    await QuizUsecase.createQuiz(db, quizData);
+  } else if (req['type'] === 'edit') {
+    // await QuizUsecase.updateQuiz(db, quizData);
+  } else {
+    throw new Error('Invalid request type');
+  }
+
+  return c.json({ message: 'Success' }, 200);
 });
