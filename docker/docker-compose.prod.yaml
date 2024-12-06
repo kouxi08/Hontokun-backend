@@ -1,0 +1,8 @@
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.prod
+      platforms:
+        - linux/amd64
+        - linux/arm64
