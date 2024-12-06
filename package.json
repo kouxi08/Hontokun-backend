@@ -7,7 +7,8 @@
     "gen:cms": "npx microcms-typescript ./src/database/cms/schema ./src/database/cms/types/response.ts",
     "drizzle:generate": "npx drizzle-kit generate",
     "drizzle:push": "npx drizzle-kit push",
-    "drizzle:migrate": "npx drizzle-kit migrate"
+    "drizzle:migrate": "npx drizzle-kit migrate",
+    "drizzle:studio": "npx drizzle-kit studio"
   },
   "dependencies": {
     "@hono/eslint-config": "^1.0.2",

@@ -7,7 +7,22 @@ export const createQuiz = async (
   db: MySql2Database,
   quiz: quiz<'get'>
 ): Promise<void> => {
-  const quizData = Quiz.create({
+  const quizData = mapQuizData(quiz);
+  return await Repository.createQuiz(db, quizData);
+};
+
+export const updateQuiz = async (
+  db: MySql2Database,
+  quiz: quiz<'get'>
+): Promise<void> => {
+  const quizData = mapQuizData(quiz);
+  console.log(quizData);
+  return await Repository.updateQuiz(db, quizData);
+};
+
+// 共通のデータ変換関数
+const mapQuizData = (quiz: quiz<'get'>): Quiz => {
+  return Quiz.create({
     id: quiz.id,
     title: quiz.title,
     content: quiz.content,
@@ -29,8 +44,4 @@ export const createQuiz = async (
     publishedAt: new Date(quiz.publishedAt),
     revisedAt: new Date(quiz.revisedAt),
   });
-
-  await Repository.createQuiz(db, quizData);
-
-  // TODO: 選択肢テーブルへの保存処理を追加する
 };
