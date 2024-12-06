@@ -1,44 +1,59 @@
-import { QuizId } from './quizId';
+import { InsertQuizType } from '../../database/mysql/validators/quizValidator';
+
+type QuizParams = {
+  id: string;
+  title: string;
+  content: string;
+  tier: number;
+  imageUrl: string | null;
+  imageHeight: number | null;
+  imageWidth: number | null;
+  question: string;
+  newsUrl: string;
+  type: ['TRUE_OR_FALSE' | 'SELECTION'];
+  choices: string | null;
+  answer: string;
+  explanation: string;
+  hint: string;
+  keyword: string;
+  isDeleted: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt: Date;
+  revisedAt: Date;
+};
 
 export class Quiz {
-  private constructor(
-    private readonly _id: QuizId,
-    private _news: {
-      title: string;
-      content: string;
-      image: string;
-    },
-    private _question: string,
-    private _type: 'true_or_false' | 'multiple_choice',
-    private _choices: string[] | null,
-    private _correctAnswer: string
-  ) {}
+  private readonly choicesArray: string[];
 
-  get id(): QuizId {
-    return this._id;
+  private constructor(private params: QuizParams) {
+    // 改行区切りの文字列を配列に変換
+    this.choicesArray =
+      typeof params.choices == 'string' ? params.choices.split('\n') : [];
   }
 
-  get news(): {
-    title: string;
-    content: string;
-    image: string;
-  } {
-    return this._news;
+  public static create(params: QuizParams): Quiz {
+    return new Quiz(params);
   }
 
-  get question(): string {
-    return this._question;
+  public get<K extends keyof QuizParams>(key: K): QuizParams[K] {
+    return this.params[key];
   }
 
-  get type(): 'true_or_false' | 'multiple_choice' {
-    return this._type;
+  public getChoices(): string[] {
+    return this.choicesArray;
   }
 
-  get choices(): string[] | null {
-    return this._choices;
-  }
-
-  get correctAnswer(): string {
-    return this._correctAnswer;
+  public toDatabaseObject(): InsertQuizType {
+    return {
+      ...this.params,
+      type: this.params.type[0],
+      news_url: this.params.newsUrl,
+      is_deleted: this.params.isDeleted,
+      created_at: this.params.createdAt,
+      updated_at: this.params.updatedAt,
+      published_at: this.params.publishedAt,
+      revised_at: this.params.revisedAt,
+    };
   }
 }

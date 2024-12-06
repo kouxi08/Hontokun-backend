@@ -57,6 +57,8 @@ CREATE TABLE `quiz` (
 	`is_deleted` boolean NOT NULL DEFAULT false,
 	`created_at` timestamp NOT NULL DEFAULT (now()),
 	`updated_at` timestamp DEFAULT (now()),
+	`published_at` date NOT NULL,
+	`revised_at` date NOT NULL,
 	CONSTRAINT `quiz_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint

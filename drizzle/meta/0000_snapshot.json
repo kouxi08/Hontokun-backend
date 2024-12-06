@@ -1,7 +1,7 @@
 {
-  "version": "0",
+  "version": "5",
   "dialect": "mysql",
-  "id": "2489d79c-5021-40d9-8840-3f3e53fdc8b4",
+  "id": "70b9c32a-c707-46e7-846d-e6dbdd9b3af3",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "quiz_choice": {
@@ -51,8 +51,12 @@
           "name": "quiz_choice_quiz_id_quiz_id_fk",
           "tableFrom": "quiz_choice",
           "tableTo": "quiz",
-          "columnsFrom": ["quiz_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "quiz_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -60,7 +64,9 @@
       "compositePrimaryKeys": {
         "quiz_choice_id": {
           "name": "quiz_choice_id",
-          "columns": ["id"]
+          "columns": [
+            "id"
+          ]
         }
       },
       "uniqueConstraints": {},
@@ -134,8 +140,12 @@
           "name": "quiz_log_quiz_id_quiz_id_fk",
           "tableFrom": "quiz_log",
           "tableTo": "quiz",
-          "columnsFrom": ["quiz_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "quiz_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -143,8 +153,12 @@
           "name": "quiz_log_quiz_set_log_id_quiz_set_log_id_fk",
           "tableFrom": "quiz_log",
           "tableTo": "quiz_set_log",
-          "columnsFrom": ["quiz_set_log_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "quiz_set_log_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -152,7 +166,9 @@
       "compositePrimaryKeys": {
         "quiz_log_id": {
           "name": "quiz_log_id",
-          "columns": ["id"]
+          "columns": [
+            "id"
+          ]
         }
       },
       "uniqueConstraints": {},
@@ -216,7 +232,9 @@
       "compositePrimaryKeys": {
         "quiz_mode_id": {
           "name": "quiz_mode_id",
-          "columns": ["id"]
+          "columns": [
+            "id"
+          ]
         }
       },
       "uniqueConstraints": {},
@@ -269,8 +287,12 @@
           "name": "quiz_set_log_user_id_users_id_fk",
           "tableFrom": "quiz_set_log",
           "tableTo": "users",
-          "columnsFrom": ["user_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -278,8 +300,12 @@
           "name": "quiz_set_log_quiz_mode_id_quiz_mode_id_fk",
           "tableFrom": "quiz_set_log",
           "tableTo": "quiz_mode",
-          "columnsFrom": ["quiz_mode_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "quiz_mode_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -287,7 +313,9 @@
       "compositePrimaryKeys": {
         "quiz_set_log_id": {
           "name": "quiz_set_log_id",
-          "columns": ["id"]
+          "columns": [
+            "id"
+          ]
         }
       },
       "uniqueConstraints": {},
@@ -417,6 +445,20 @@
           "notNull": false,
           "autoincrement": false,
           "default": "(now())"
+        },
+        "published_at": {
+          "name": "published_at",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "revised_at": {
+          "name": "revised_at",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
         }
       },
       "indexes": {},
@@ -424,7 +466,9 @@
       "compositePrimaryKeys": {
         "quiz_id": {
           "name": "quiz_id",
-          "columns": ["id"]
+          "columns": [
+            "id"
+          ]
         }
       },
       "uniqueConstraints": {},
@@ -470,8 +514,12 @@
           "name": "user_costumes_user_id_users_id_fk",
           "tableFrom": "user_costumes",
           "tableTo": "users",
-          "columnsFrom": ["user_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -554,7 +602,9 @@
       "indexes": {
         "firebase_uid": {
           "name": "firebase_uid",
-          "columns": ["firebase_uid"],
+          "columns": [
+            "firebase_uid"
+          ],
           "isUnique": false
         }
       },
@@ -562,13 +612,17 @@
       "compositePrimaryKeys": {
         "users_id": {
           "name": "users_id",
-          "columns": ["id"]
+          "columns": [
+            "id"
+          ]
         }
       },
       "uniqueConstraints": {
         "users_firebase_uid_unique": {
           "name": "users_firebase_uid_unique",
-          "columns": ["firebase_uid"]
+          "columns": [
+            "firebase_uid"
+          ]
         }
       },
       "checkConstraint": {}
