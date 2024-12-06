@@ -17,7 +17,7 @@ const createAuthMiddleware = (firebaseApp: app.App) => {
 
     try {
       const decodedToken = await firebaseApp.auth().verifyIdToken(token);
-      c.set('firebaseUserId', decodedToken.uid);
+      c.set('firebaseUid', decodedToken.uid);
     } catch (error) {
       throw new AuthError();
     } finally {

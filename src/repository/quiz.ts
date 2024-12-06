@@ -4,7 +4,8 @@ import {
   insertQuizChoiceSchema,
   insertQuizSchema,
 } from '../database/mysql/validators/quizValidator';
-import { z } from 'zod';
+import { QuizSet } from '../model/quiz/quizSet';
+import { sql } from 'drizzle-orm';
 import { Quiz } from '../model/quiz/quiz';
 import { eq } from 'drizzle-orm';
 
@@ -36,6 +37,18 @@ export const createQuiz = async (
   });
   
   return;
+};
+
+export const getQuizzesByTier = async (
+  db: MySql2Database,
+  tier: QuizSet['tier']
+): Promise<QuizSet> => {
+  // const quizzes = await db.select().from(quizTable).orderBy().limit(3).execute();
+  const quizzes: QuizSet = await db.execute(sql`
+    SELECT * FROM ${quizTable} WHERE tier = ${tier} ORDER BY RAND() LIMIT 3
+  `);
+
+  return quizzes;
 };
 
 export const updateQuiz = async (
