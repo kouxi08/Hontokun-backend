@@ -40,7 +40,7 @@ app.post('/webhook/quiz', async (c: Context) => {
   if (req['type'] === 'new') {
     await QuizUsecase.createQuiz(db, quizData);
   } else if (req['type'] === 'edit') {
-    // await QuizUsecase.updateQuiz(db, quizData);
+    await QuizUsecase.updateQuiz(db, quizData);
   } else {
     throw new Error('Invalid request type');
   }
