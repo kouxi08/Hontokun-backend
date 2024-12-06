@@ -30,7 +30,5 @@ export const createQuiz = async (
     revisedAt: new Date(quiz.revisedAt),
   });
 
-  await Repository.createQuiz(db, quizData);
-
-  // TODO: 選択肢テーブルへの保存処理を追加する
+  return await Repository.createQuiz(db, quizData);
 };
