@@ -121,21 +121,37 @@ export const userRelations = relations(usersTable, ({ many }) => ({
 
 export const quizRelations = relations(quizTable, ({ many }) => ({
   quizLog: many(quizLogTable),
-  quizChoices: many(quizChoiceTable),
+  quizChoice: many(quizChoiceTable),
 }));
 
 export const quizSetLogRelations = relations(
   quizSetLogTable,
   ({ one, many }) => ({
-    user: one(usersTable),
-    quizMode: one(quizModeTable),
+    user: one(usersTable, {
+      fields: [quizSetLogTable.user_id],
+      references: [usersTable.id],
+      relationName: 'quiz_set_logs',
+    }),
+    quizMode: one(quizModeTable, {
+      fields: [quizSetLogTable.quiz_mode_id],
+      references: [quizModeTable.id],
+      relationName: 'quiz_set_logs',
+    }),
     quizLogs: many(quizLogTable),
   })
 );
 
 export const quizLogRelations = relations(quizLogTable, ({ one }) => ({
-  quizSetLog: one(quizSetLogTable),
-  quiz: one(quizTable),
+  quizSetLog: one(quizSetLogTable, {
+    fields: [quizLogTable.quiz_set_log_id],
+    references: [quizSetLogTable.id],
+    relationName: 'quiz_logs',
+  }),
+  quiz: one(quizTable, {
+    fields: [quizLogTable.quiz_id],
+    references: [quizTable.id],
+    relationName: 'quiz_logs',
+  }),
 }));
 
 export const quizModeRelations = relations(quizModeTable, ({ many }) => ({
@@ -143,12 +159,20 @@ export const quizModeRelations = relations(quizModeTable, ({ many }) => ({
 }));
 
 export const quizChoiceRelations = relations(quizChoiceTable, ({ one }) => ({
-  quiz: one(quizTable),
+  quiz: one(quizTable, {
+    fields: [quizChoiceTable.quiz_id],
+    references: [quizTable.id],
+    relationName: 'quiz_choices',
+  }),
 }));
 
 export const userCostumesRelations = relations(
   userCostumesTable,
   ({ one }) => ({
-    user: one(usersTable),
+    user: one(usersTable, {
+      fields: [userCostumesTable.user_id],
+      references: [usersTable.id],
+      relationName: 'user_costumes',
+    }),
   })
 );
