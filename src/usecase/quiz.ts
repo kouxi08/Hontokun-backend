@@ -1,4 +1,5 @@
 import { MySql2Database } from 'drizzle-orm/mysql2';
+import { QuizSet } from '../model/quiz/quizSet';
 import { quiz } from '../database/cms/types/response';
 import { Quiz } from '../model/quiz/quiz';
 import * as Repository from '../repository/quiz';
@@ -45,3 +46,9 @@ const mapQuizData = (quiz: quiz<'get'>): Quiz => {
     revisedAt: new Date(quiz.revisedAt),
   });
 };
+
+export const getQuizSetByTier = async (
+  db: MySql2Database,
+  userId: string,
+  tier: QuizSet['tier']
+): Promise<QuizSet> => {};
