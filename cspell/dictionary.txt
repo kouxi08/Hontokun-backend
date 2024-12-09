@@ -6,3 +6,4 @@ hono
 VARCHAR
 autoincrement
 usecase
+mysqld
