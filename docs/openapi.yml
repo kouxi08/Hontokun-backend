@@ -104,8 +104,8 @@ components:
         type:
           type: string
           enum:
-            - 'true_or_false'
-            - 'multiple_choice'
+            - 'TRUE_OR_FALSE'
+            - 'SELECTION'
           description: クイズの問題タイプ（マルバツか選択式か）
         choices:
           type: array
@@ -127,6 +127,12 @@ components:
         keyword:
           type: string
           description: クイズのキーワード
+      required:
+        - id
+        - news
+        - question
+        - type
+        - correctAnswer
     QuizAnswer:
       type: object
       properties:
