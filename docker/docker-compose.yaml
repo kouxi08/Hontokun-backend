@@ -4,6 +4,6 @@ services:
     container_name: hontokun-backend
     ports:
       - "3000:3000"
-    env_file:
-      - ../.env
+    # env_file:
+    #   - ../.env
     tty: true
