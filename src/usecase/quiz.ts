@@ -1,15 +1,16 @@
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { QuizSet } from '../model/quiz/quizSet';
 import { quiz } from '../database/cms/types/response';
+import * as QuizRepository from '../repository/quiz';
+import * as QuizLogRepository from '../repository/quizLog';
+import { Choice } from '../model/quiz/choice';
 import { Quiz } from '../model/quiz/quiz';
-import * as Repository from '../repository/quiz';
 
 export const createQuiz = async (
   db: MySql2Database,
   quiz: quiz<'get'>
 ): Promise<void> => {
   const quizData = mapQuizData(quiz);
-  return await Repository.createQuiz(db, quizData);
+  return await QuizRepository.createQuiz(db, quizData);
 };
 
 export const updateQuiz = async (
@@ -17,12 +18,20 @@ export const updateQuiz = async (
   quiz: quiz<'get'>
 ): Promise<void> => {
   const quizData = mapQuizData(quiz);
-  console.log(quizData);
-  return await Repository.updateQuiz(db, quizData);
+  return await QuizRepository.updateQuiz(db, quizData);
 };
 
 // 共通のデータ変換関数
 const mapQuizData = (quiz: quiz<'get'>): Quiz => {
+  const choices = quiz.choices.split('\n').map((choice) => {
+    return Choice.create({
+      id: null,
+      name: choice,
+      createdAt: new Date(quiz.createdAt),
+      updatedAt: new Date(quiz.updatedAt),
+    });
+  });
+
   return Quiz.create({
     id: quiz.id,
     title: quiz.title,
@@ -33,8 +42,8 @@ const mapQuizData = (quiz: quiz<'get'>): Quiz => {
     imageWidth: quiz.image?.width ?? null,
     question: quiz.question,
     newsUrl: quiz.newsUrl,
-    type: quiz.type,
-    choices: quiz.choices ?? [],
+    type: quiz.type[0],
+    choices,
     answer: quiz.answer,
     explanation: quiz.explanation,
     hint: quiz.hint,
@@ -47,8 +56,13 @@ const mapQuizData = (quiz: quiz<'get'>): Quiz => {
   });
 };
 
-export const getQuizSetByTier = async (
+export const getQuizzes = async (
   db: MySql2Database,
   userId: string,
-  tier: QuizSet['tier']
-): Promise<QuizSet> => {};
+  tier: number
+): Promise<Quiz[]> => {
+  // クイズを取得
+  const solvedQuizIds = await QuizLogRepository.getSolvedQuizIds(db, userId);
+  const quizzes = await QuizRepository.getQuizzesByTier(db, tier, solvedQuizIds);
+  return quizzes;
+};

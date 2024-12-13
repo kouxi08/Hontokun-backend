@@ -8,48 +8,44 @@ const quizFields = {
   title: z.string().min(1).max(50),
   content: z.string().min(1),
   tier: z.number().int().min(1).max(5),
-  image_url: z.string().nullable(),
-  image_height: z.number().int().nullable(),
-  image_width: z.number().int().nullable(),
+  imageUrl: z.string().nullable(),
+  imageHeight: z.number().int().nullable(),
+  imageWidth: z.number().int().nullable(),
   question: z.string().min(1),
-  news_url: z.string().min(1),
+  newsUrl: z.string().min(1),
   type: z.enum(['TRUE_OR_FALSE', 'SELECTION']),
   answer: z.string().min(1),
   explanation: z.string().min(1),
   hint: z.string().min(1),
   keyword: z.string().min(1),
-  is_deleted: z.boolean().default(false),
-  created_at: z.date(),
-  updated_at: z.date(),
-  published_at: z.date(),
-  revised_at: z.date(),
+  isDeleted: z.boolean().default(false),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  publishedAt: z.date(),
+  revisedAt: z.date(),
 };
 
 const choiceFields = {
   id: z.number().int(),
-  quiz_id: z.string().regex(idRegex),
+  quizId: z.string().regex(idRegex),
   name: z.string().min(1),
-  created_at: z.date(),
-  updated_at: z.date(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
 };
 
 export const insertQuizSchema = createInsertSchema(quizTable, {
   ...quizFields,
 });
 
-export const selectQuizLogSchema = createSelectSchema(quizTable, {
+export const selectQuizSchema = createSelectSchema(quizTable, {
   ...quizFields,
+  type: z.string().min(1),
 });
 
 export const insertQuizChoiceSchema = createInsertSchema(quizChoiceTable, {
   ...choiceFields,
-});
+}).omit({ id: true });
 
 export const selectQuizChoiceSchema = createSelectSchema(quizChoiceTable, {
   ...choiceFields,
 });
-
-export type InsertQuizType = z.infer<typeof insertQuizSchema>;
-export type SelectQuizLogType = z.infer<typeof selectQuizLogSchema>;
-export type InsertQuizChoiceType = z.infer<typeof insertQuizChoiceSchema>;
-export type SelectQuizChoiceType = z.infer<typeof selectQuizChoiceSchema>;
