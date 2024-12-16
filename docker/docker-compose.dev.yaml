@@ -20,6 +20,7 @@ services:
     ports:
       - 3306:3306
     volumes:
+      - ../my.cnf:/etc/mysql/conf.d/my.cnf
       - ../db-data:/var/lib/mysql
     networks:
         - hontokun
