@@ -2,8 +2,7 @@ name: 'image build_push'
 on:
   push:
     branches:
-      - feature/#24_build-push
-
+      - main
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -13,9 +12,6 @@ jobs:
     steps:
     - name: "set up checkout"
       uses: actions/checkout@v4
-      with:
-        ref: feature/#24_build-push
-
     - name: "set up docker buildx"
       uses: docker/setup-buildx-action@v3
     - name: "docker-login"
