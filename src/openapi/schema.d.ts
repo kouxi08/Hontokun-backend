@@ -528,13 +528,8 @@ export interface paths {
                             character?: components["schemas"]["Images"];
                             /** @description ユーザの着せ替え画像 */
                             costume?: components["schemas"]["Images"];
-                            quizSet?: components["schemas"]["QuizSet"] & {
-                                /** @description クイズの問題一覧 */
-                                quizList?: (components["schemas"]["Quiz"] & {
-                                    /** @description クイズのヒント */
-                                    hint?: string;
-                                })[];
-                            };
+                            /** @description クイズの問題一覧 */
+                            quizList?: components["schemas"]["Quiz"][];
                         };
                     };
                 };
@@ -744,8 +739,8 @@ export interface components {
         /** @description クイズセットのID */
         QuizSetId: string;
         Quiz: {
-            id?: components["schemas"]["QuizId"];
-            news?: {
+            id: components["schemas"]["QuizId"];
+            news: {
                 /** @description クイズのニュースのタイトル */
                 title?: string;
                 /** @description クイズのニュースの内容 */
@@ -754,16 +749,23 @@ export interface components {
                 image?: string;
             };
             /** @description クイズの問題文 */
-            question?: string;
+            question: string;
             /**
              * @description クイズの問題タイプ（マルバツか選択式か）
              * @enum {string}
              */
-            type?: "true_or_false" | "multiple_choice";
+            type: "TRUE_OR_FALSE" | "SELECTION";
             /** @description クイズの選択肢 */
-            choices?: string[] | null;
+            choices?: {
+                choiceId?: number;
+                choice?: string;
+            }[] | null;
             /** @description クイズの正解 */
-            correctAnswer?: string;
+            correctAnswer: string;
+            /** @description クイズのヒント */
+            hint?: string;
+            /** @description クイズのキーワード */
+            keyword?: string;
         };
         QuizAnswer: {
             /** @description クイズを解いた時間(タイムアタックの場合・秒) */

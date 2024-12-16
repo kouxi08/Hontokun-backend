@@ -5,6 +5,7 @@ import { DATABASE_URL } from './src/config/env';
 export default defineConfig({
   out: './drizzle',
   schema: './src/database/mysql/schema/schema.ts',
+  casing: "snake_case",
   dialect: 'mysql',
   dbCredentials: {
     url: DATABASE_URL,

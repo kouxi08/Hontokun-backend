@@ -1,8 +1,8 @@
 import { timestamp } from 'drizzle-orm/mysql-core';
 
 export const timestamps = {
-  created_at: timestamp().defaultNow().notNull(),
-  updated_at: timestamp()
+  createdAt: timestamp().defaultNow().notNull(),
+  updatedAt: timestamp()
     .defaultNow()
-    .$onUpdate(() => new Date()),
+    .$onUpdate(() => new Date()).notNull(),
 };
