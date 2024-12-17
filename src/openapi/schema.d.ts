@@ -621,7 +621,7 @@ export interface paths {
                         answer?: string;
                         /** @description クイズを解いた時間(タイムアタックの場合・秒) */
                         answerTime?: number | null;
-                    };
+                    }[];
                 };
             };
             responses: {
