@@ -599,6 +599,7 @@ paths:
                     items:
                       $ref: '#/components/schemas/Quiz'
 
+
         '400':
           description: リクエストエラー
           content:
@@ -641,17 +642,19 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                quizId:
-                  $ref: '#/components/schemas/QuizId'
-                answer:
-                  type: string
-                  description: ユーザーの解答
-                answerTime:
-                  type: integer
-                  nullable: true
-                  description: クイズを解いた時間(タイムアタックの場合・秒)
+              type: array
+              items:
+                type: object
+                properties:
+                  quizId:
+                    $ref: '#/components/schemas/QuizId'
+                  answer:
+                    type: string
+                    description: ユーザーの解答
+                  answerTime:
+                    type: integer
+                    nullable: true
+                    description: クイズを解いた時間(タイムアタックの場合・秒)
       responses:
         '200':
           description: クイズ解答成功

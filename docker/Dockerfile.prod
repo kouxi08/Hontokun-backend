@@ -4,20 +4,17 @@ FROM base AS builder
 
 ARG cms_domain
 ARG cms_api_key
-ARG database_url
-ARG app_credentials
+
 
 
 ENV CMS_SERVICE_DOMAIN=${domain}
 ENV CMS_API_KEY=${api_key}
-ENV DATABASE_URL=${database_url}
-ENV GOOGLE_APPLICATION_CREDENTIALS=${app_credentials}
 ENV NODE_ENV=production
 
 
 WORKDIR /app
 
-COPY package*json tsconfig.json src drizzle service-account-file.json ./
+COPY package*json tsconfig.json src drizzle ./
 
 RUN npm ci && \
     npm run build && \
