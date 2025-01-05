@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "70b9c32a-c707-46e7-846d-e6dbdd9b3af3",
+  "id": "0012919b-8829-4f5d-9b26-ea35f426292d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "quiz_choice": {
@@ -40,7 +40,7 @@
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false,
           "default": "(now())"
         }
@@ -72,8 +72,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "quiz_log": {
-      "name": "quiz_log",
+    "quizLog": {
+      "name": "quizLog",
       "columns": {
         "id": {
           "name": "id",
@@ -129,16 +129,16 @@
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false,
           "default": "(now())"
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "quiz_log_quiz_id_quiz_id_fk": {
-          "name": "quiz_log_quiz_id_quiz_id_fk",
-          "tableFrom": "quiz_log",
+        "quizLog_quiz_id_quiz_id_fk": {
+          "name": "quizLog_quiz_id_quiz_id_fk",
+          "tableFrom": "quizLog",
           "tableTo": "quiz",
           "columnsFrom": [
             "quiz_id"
@@ -149,9 +149,9 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "quiz_log_quiz_set_log_id_quiz_set_log_id_fk": {
-          "name": "quiz_log_quiz_set_log_id_quiz_set_log_id_fk",
-          "tableFrom": "quiz_log",
+        "quizLog_quiz_set_log_id_quiz_set_log_id_fk": {
+          "name": "quizLog_quiz_set_log_id_quiz_set_log_id_fk",
+          "tableFrom": "quizLog",
           "tableTo": "quiz_set_log",
           "columnsFrom": [
             "quiz_set_log_id"
@@ -164,8 +164,8 @@
         }
       },
       "compositePrimaryKeys": {
-        "quiz_log_id": {
-          "name": "quiz_log_id",
+        "quizLog_id": {
+          "name": "quizLog_id",
           "columns": [
             "id"
           ]
@@ -173,9 +173,9 @@
       },
       "uniqueConstraints": {},
       "checkConstraint": {
-        "time_check": {
-          "name": "time_check",
-          "value": "`quiz_log`.`time` >= 0"
+        "timeCheck": {
+          "name": "timeCheck",
+          "value": "`quizLog`.`time` >= 0"
         }
       }
     },
@@ -222,7 +222,7 @@
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false,
           "default": "(now())"
         }
@@ -276,7 +276,7 @@
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false,
           "default": "(now())"
         }
@@ -442,7 +442,7 @@
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false,
           "default": "(now())"
         },
@@ -503,7 +503,7 @@
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false,
           "default": "(now())"
         }
@@ -594,7 +594,7 @@
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false,
           "default": "(now())"
         }
@@ -618,8 +618,8 @@
         }
       },
       "uniqueConstraints": {
-        "users_firebase_uid_unique": {
-          "name": "users_firebase_uid_unique",
+        "users_firebaseUid_unique": {
+          "name": "users_firebaseUid_unique",
           "columns": [
             "firebase_uid"
           ]

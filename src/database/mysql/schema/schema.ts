@@ -19,17 +19,17 @@ export const usersTable = mysqlTable(
   'users',
   {
     id: char({ length: 36 }).primaryKey(),
-    firebase_uid: varchar({ length: 128 }).notNull().unique(),
+    firebaseUid: varchar({ length: 128 }).notNull().unique(),
     nickname: varchar({ length: 20 }).notNull(),
     birthday: date(),
     level: int().default(1).notNull(),
     experience: int().default(0).notNull(),
-    costume_id: char({ length: 36 }),
+    costumeId: char({ length: 36 }),
     ...timestamps,
   },
   (table) => {
     return {
-      firebaseIdIdx: index('firebase_uid').on(table.firebase_uid),
+      firebaseIdIdx: index('firebase_uid').on(table.firebaseUid),
     };
   }
 );
@@ -39,50 +39,50 @@ export const quizTable = mysqlTable('quiz', {
   title: varchar({ length: 50 }).notNull(),
   content: text().notNull(),
   tier: int().notNull(),
-  image_url: varchar({ length: 500 }),
-  image_height: int(),
-  image_width: int(),
+  imageUrl: varchar({ length: 500 }),
+  imageHeight: int(),
+  imageWidth: int(),
   question: text().notNull(),
-  news_url: text().notNull(),
+  newsUrl: text().notNull(),
   type: varchar({ length: 20 }).notNull(),
   answer: text().notNull(),
   explanation: text().notNull(),
   hint: text().notNull(),
   keyword: text().notNull(),
-  is_deleted: boolean().default(false).notNull(),
+  isDeleted: boolean().default(false).notNull(),
   ...timestamps,
-  published_at: date().notNull(),
-  revised_at: date().notNull(),
+  publishedAt: date().notNull(),
+  revisedAt: date().notNull(),
 });
 
 export const quizSetLogTable = mysqlTable('quiz_set_log', {
   id: char({ length: 36 }).primaryKey(),
-  user_id: char({ length: 36 })
+  userId: char({ length: 36 })
     .notNull()
     .references(() => usersTable.id),
-  quiz_mode_id: char({ length: 36 })
+  quizModeId: char({ length: 36 })
     .notNull()
     .references(() => quizModeTable.id),
   ...timestamps,
 });
 
 export const quizLogTable = mysqlTable(
-  'quiz_log',
+  'quizLog',
   {
     id: char({ length: 36 }).primaryKey(),
-    quiz_id: char({ length: 36 })
+    quizId: char({ length: 36 })
       .notNull()
       .references(() => quizTable.id),
-    quiz_set_log_id: char({ length: 36 })
+    quizSetLogId: char({ length: 36 })
       .notNull()
       .references(() => quizSetLogTable.id),
-    user_answer: text().notNull(),
+    userAnswer: text().notNull(),
     time: int(),
-    is_correct: boolean().notNull(),
+    isCorrect: boolean().notNull(),
     ...timestamps,
   },
   (table) => ({
-    timeCheck: check('time_check', sql`${table.time} >= 0`),
+    timeCheck: check('timeCheck', sql`${table.time} >= 0`),
   })
 );
 
@@ -90,13 +90,13 @@ export const quizModeTable = mysqlTable('quiz_mode', {
   id: char({ length: 36 }).primaryKey(),
   name: varchar({ length: 20 }).notNull(),
   description: varchar({ length: 100 }).notNull(),
-  is_public: boolean().notNull(),
+  isPublic: boolean().notNull(),
   ...timestamps,
 });
 
 export const quizChoiceTable = mysqlTable('quiz_choice', {
   id: int().primaryKey().autoincrement(),
-  quiz_id: char({ length: 36 })
+  quizId: char({ length: 36 })
     .notNull()
     .references(() => quizTable.id),
   name: varchar({ length: 50 }).notNull(),
@@ -104,10 +104,10 @@ export const quizChoiceTable = mysqlTable('quiz_choice', {
 });
 
 export const userCostumesTable = mysqlTable('user_costumes', {
-  user_id: char({ length: 36 })
+  userId: char({ length: 36 })
     .notNull()
     .references(() => usersTable.id),
-  costume_id: char({ length: 36 }).notNull(),
+  costumeId: char({ length: 36 }).notNull(),
   ...timestamps,
 });
 
@@ -128,14 +128,14 @@ export const quizSetLogRelations = relations(
   quizSetLogTable,
   ({ one, many }) => ({
     user: one(usersTable, {
-      fields: [quizSetLogTable.user_id],
+      fields: [quizSetLogTable.userId],
       references: [usersTable.id],
-      relationName: 'quiz_set_logs',
+      relationName: 'quizSetLogs',
     }),
     quizMode: one(quizModeTable, {
-      fields: [quizSetLogTable.quiz_mode_id],
+      fields: [quizSetLogTable.quizModeId],
       references: [quizModeTable.id],
-      relationName: 'quiz_set_logs',
+      relationName: 'quizSetLogs',
     }),
     quizLogs: many(quizLogTable),
   })
@@ -143,14 +143,14 @@ export const quizSetLogRelations = relations(
 
 export const quizLogRelations = relations(quizLogTable, ({ one }) => ({
   quizSetLog: one(quizSetLogTable, {
-    fields: [quizLogTable.quiz_set_log_id],
+    fields: [quizLogTable.quizSetLogId],
     references: [quizSetLogTable.id],
-    relationName: 'quiz_logs',
+    relationName: 'quizLogs',
   }),
   quiz: one(quizTable, {
-    fields: [quizLogTable.quiz_id],
+    fields: [quizLogTable.quizId],
     references: [quizTable.id],
-    relationName: 'quiz_logs',
+    relationName: 'quizLogs',
   }),
 }));
 
@@ -160,9 +160,9 @@ export const quizModeRelations = relations(quizModeTable, ({ many }) => ({
 
 export const quizChoiceRelations = relations(quizChoiceTable, ({ one }) => ({
   quiz: one(quizTable, {
-    fields: [quizChoiceTable.quiz_id],
+    fields: [quizChoiceTable.quizId],
     references: [quizTable.id],
-    relationName: 'quiz_choices',
+    relationName: 'quizChoices',
   }),
 }));
 
@@ -170,9 +170,9 @@ export const userCostumesRelations = relations(
   userCostumesTable,
   ({ one }) => ({
     user: one(usersTable, {
-      fields: [userCostumesTable.user_id],
+      fields: [userCostumesTable.userId],
       references: [usersTable.id],
-      relationName: 'user_costumes',
+      relationName: 'userCostumes',
     }),
   })
 );

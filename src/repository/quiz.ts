@@ -4,63 +4,93 @@ import {
   insertQuizChoiceSchema,
   insertQuizSchema,
 } from '../database/mysql/validators/quizValidator';
-import { z } from 'zod';
+import { InferInsertModel, sql } from 'drizzle-orm';
 import { Quiz } from '../model/quiz/quiz';
 import { eq } from 'drizzle-orm';
+import { convertDatabaseToQuiz } from '../core/converter/database/quizMapper';
 
 export const createQuiz = async (
   db: MySql2Database,
   quiz: Quiz
 ): Promise<void> => {
-  const validatedQuiz = insertQuizSchema.parse(quiz.toDatabaseObject());
-
-  const choices = quiz.getChoices().map((choice) => {
-    return {
-      quiz_id: validatedQuiz.id,
-      name: choice,
-      created_at: validatedQuiz.created_at,
-      updated_at: validatedQuiz.updated_at,
-    };
+  const validatedQuiz = insertQuizSchema.parse(quiz.toJSON());
+  const validatedChoice: InferInsertModel<typeof quizChoiceTable>[] = quiz.choices.map((choice) => {
+    return insertQuizChoiceSchema.parse({
+      ...choice.toJSON(),
+      quizId: quiz.id,
+    });
   });
-  const validatedChoice = choices.map((choice) => insertQuizChoiceSchema.parse(choice));
 
-  if (!validatedQuiz || !validatedChoice) {
-    throw new Error();
+  if (!validatedQuiz || (quiz.choices && !validatedChoice)) {
+    throw new Error('Invalid quiz data');
   }
 
   await db.transaction(async (trx) => {
     await trx.insert(quizTable).values([validatedQuiz]);
-    await Promise.all(
-      validatedChoice.map((choice) => trx.insert(quizChoiceTable).values([choice]))
-    );
+    if (validatedChoice) {
+      await Promise.all(
+        validatedChoice.map((choice) => trx.insert(quizChoiceTable).values([choice]))
+      );
+    }
   });
-  
+
   return;
+};
+
+export const getQuizzesByTier = async (
+  db: MySql2Database,
+  tier: number,
+  solvedQuizIds: string[],
+): Promise<Quiz[]> => {
+
+  let whereCondition = eq(quizTable.tier, tier);
+  if (solvedQuizIds.length > 0) {
+    whereCondition = sql`${quizTable.id} NOT IN (${sql.join(solvedQuizIds)})`;
+  }
+
+  // ランダムで３件のクイズのquiz_id取得
+  const quizzes = await db
+    .select({ id: quizTable.id })
+    .from(quizTable)
+    .where(whereCondition)
+    .orderBy(sql`RAND()`)
+    .limit(3);
+
+  // クイズの詳細取得
+  const quizList = await Promise.all(
+    quizzes.map(async (quiz) => {
+      return await db
+        .select({ quiz: quizTable, choice: quizChoiceTable })
+        .from(quizTable)
+        .leftJoin(quizChoiceTable, eq(quizTable.id, quizChoiceTable.quizId))
+        .where(eq(quizTable.id, quiz.id));
+    })
+  );
+  const result = convertDatabaseToQuiz(quizList);
+  return result;
+
 };
 
 export const updateQuiz = async (
   db: MySql2Database,
   quiz: Quiz
 ): Promise<void> => {
-  const validatedQuiz = insertQuizSchema.parse(quiz.toDatabaseObject());
-
-  const choices = quiz.getChoices().map((choice) => {
-    return {
-      quiz_id: validatedQuiz.id,
-      name: choice,
-      created_at: validatedQuiz.created_at,
-      updated_at: validatedQuiz.updated_at,
-    };
-  });
-  const validatedChoice = choices.map((choice) => insertQuizChoiceSchema.parse(choice));
+  const validatedQuiz = insertQuizSchema.parse(quiz.toJSON());
+  const validatedChoice = quiz.choices.map((choice) => insertQuizChoiceSchema.parse({
+    ...choice.toJSON(),
+    quizId: quiz.id,
+  }));
 
   await db.transaction(async (trx) => {
-    await trx.update(quizTable).set(validatedQuiz).where(eq(quizTable.id, validatedQuiz.id));
-    await trx.delete(quizChoiceTable).where(eq(quizChoiceTable.quiz_id, validatedQuiz.id));
+    await trx
+      .insert(quizTable)
+      .values([validatedQuiz])
+      .onDuplicateKeyUpdate({ set: validatedQuiz });
+    await trx.delete(quizChoiceTable).where(eq(quizChoiceTable.quizId, validatedQuiz.id));
     await Promise.all(
       validatedChoice.map((choice) => trx.insert(quizChoiceTable).values([choice]))
     );
   });
-  
+
   return;
 }

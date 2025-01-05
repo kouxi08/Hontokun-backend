@@ -104,18 +104,35 @@ components:
         type:
           type: string
           enum:
-            - 'true_or_false'
-            - 'multiple_choice'
+            - 'TRUE_OR_FALSE'
+            - 'SELECTION'
           description: クイズの問題タイプ（マルバツか選択式か）
         choices:
           type: array
           items:
-            type: string
+            type: object
+            properties:
+              choiceId:
+                type: number
+              choice:
+                type: string
           description: クイズの選択肢
           nullable: true
         correctAnswer:
           type: string
           description: クイズの正解
+        hint:
+          type: string
+          description: クイズのヒント
+        keyword:
+          type: string
+          description: クイズのキーワード
+      required:
+        - id
+        - news
+        - question
+        - type
+        - correctAnswer
     QuizAnswer:
       type: object
       properties:
@@ -576,22 +593,12 @@ paths:
                   costume:
                     $ref: '#/components/schemas/Images'
                     description: ユーザの着せ替え画像
-                  quizSet:
-                    allOf:
-                      - $ref: '#/components/schemas/QuizSet'
-                      - type: object
-                        properties:
-                          quizList:
-                            type: array
-                            description: クイズの問題一覧
-                            items:
-                              allOf:
-                                - $ref: '#/components/schemas/Quiz'
-                                - type: object
-                                  properties:
-                                    hint:
-                                      type: string
-                                      description: クイズのヒント
+                  quizList:
+                    type: array
+                    description: クイズの問題一覧
+                    items:
+                      $ref: '#/components/schemas/Quiz'
+
 
         '400':
           description: リクエストエラー

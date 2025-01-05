@@ -4,6 +4,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsx watch src/index.ts",
+    "gen:openapi": "npx openapi-typescript docs/openapi.yml --output src/openapi/schema.d.ts",
     "gen:cms": "npx microcms-typescript ./src/database/cms/schema ./src/database/cms/types/response.ts",
     "gen:openapi": "npx openapi-typescript ./docs/openapi.yml -o ./src/openapi/schema.d.ts",
     "drizzle:generate": "npx drizzle-kit generate",
