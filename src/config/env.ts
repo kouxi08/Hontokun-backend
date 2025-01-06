@@ -8,3 +8,11 @@ export const { DATABASE_URL } = parseEnv(process.env, {
 export const { GOOGLE_APPLICATION_CREDENTIALS } = parseEnv(process.env, {
   GOOGLE_APPLICATION_CREDENTIALS: z.string().min(1),
 });
+
+export const { MICROCMS_SERVICE_DOMAIN } = parseEnv(process.env, {
+  MICROCMS_SERVICE_DOMAIN: z.string().min(1),
+});
+
+export const { MICROCMS_API_KEY } = parseEnv(process.env, {
+  MICROCMS_API_KEY: z.string().min(1),
+});
