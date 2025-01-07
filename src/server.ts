@@ -60,7 +60,7 @@ app.get('/quiz/:tier', async (c: Context) => {
     costume: {
       id: costume.id,
       name: costume.name,
-      url: costume.images.url,
+      url: costume.image.url,
     },
     quizList,
   }, 200);

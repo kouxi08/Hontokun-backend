@@ -17,10 +17,10 @@ export const getCostume = async (db: MySql2Database, userId: string): Promise<Co
   return Costume.create({
     ...costume,
     category: costume.category[0],
-    images: {
-      url: costume.images.url,
-      height: costume.images.height,
-      width: costume.images.width,
+    image: {
+      url: costume.image.url,
+      height: costume.image.height,
+      width: costume.image.width,
     },
     createdAt: new Date(costume.createdAt),
     updatedAt: new Date(costume.updatedAt),

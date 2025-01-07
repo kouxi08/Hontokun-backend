@@ -2,7 +2,7 @@ type CostumeParams = {
   id: string;
   category: string;
   name: string;
-  images: {
+  image: {
     url: string;
     height: number;
     width: number;
@@ -33,12 +33,12 @@ export class Costume {
     return this.params.name;
   }
 
-  get images(): {
+  get image(): {
     url: string;
     height: number;
     width: number;
   } {
-    return this.params.images;
+    return this.params.image;
   }
 
   get lines(): string {
@@ -66,7 +66,7 @@ export class Costume {
       id: this.params.id,
       category: this.params.category,
       name: this.params.name,
-      images: this.params.images,
+      image: this.params.image,
       lines: this.params.lines,
       createdAt: this.params.createdAt,
       updatedAt: this.params.updatedAt,
