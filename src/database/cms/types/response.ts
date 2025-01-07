@@ -80,11 +80,11 @@ T,
   /**
    * カテゴリ
    */
-  category?: ['指名手配' | '着せ替え']
+  category: ['enemy' | 'costume']
   /**
    * 画像
    */
-  images?: { url: string, width: number, height: number }
+  image: { url: string, width: number, height: number }
   /**
    * セリフ
    */
@@ -92,7 +92,11 @@ T,
   /**
    * 名前
    */
-  name?: string
+  name: string
+  /**
+   * 難易度
+   */
+  tier?: number
 }>
 
 
