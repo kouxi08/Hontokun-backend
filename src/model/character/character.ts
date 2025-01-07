@@ -1,4 +1,4 @@
-type CostumeParams = {
+export type CharacterParams = {
   id: string;
   category: string;
   name: string;
@@ -7,20 +7,14 @@ type CostumeParams = {
     height: number;
     width: number;
   };
-  lines: string;
-  tier: number;
   createdAt: Date;
   updatedAt: Date;
   publishedAt: Date;
   revisedAt: Date;
-}
+};
 
-export class Costume {
-  private constructor(private params: CostumeParams) { }
-
-  public static create(params: CostumeParams): Costume {
-    return new Costume(params);
-  }
+export abstract class Character {
+  protected constructor(protected params: CharacterParams) { }
 
   get id(): string {
     return this.params.id;
@@ -42,14 +36,6 @@ export class Costume {
     return this.params.image;
   }
 
-  get lines(): string {
-    return this.params.lines;
-  }
-
-  get tier(): number {
-    return this.params.tier;
-  }
-
   get createdAt(): Date {
     return this.params.createdAt;
   }
@@ -66,8 +52,7 @@ export class Costume {
     return this.params.revisedAt;
   }
 
-  public toJSON(): CostumeParams {
+  public toJSON(): CharacterParams {
     return { ...this.params };
   }
-
 }

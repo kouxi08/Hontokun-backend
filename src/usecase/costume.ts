@@ -1,7 +1,7 @@
 import { MySql2Database } from "drizzle-orm/mysql2";
 import * as CostumeRepository from "../repository/costume";
 import { fetchMicroCMSData } from "../core/converter/api/microcms";
-import { Costume } from "../model/user/costume";
+import { Costume } from "../model/character/costume";
 import { characters } from "../database/cms/types/response";
 
 /**
