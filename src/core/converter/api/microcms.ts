@@ -1,9 +1,9 @@
 import { createClient } from 'microcms-js-sdk';
-import { MICRO_CMS_API_KEY, MICRO_CMS_SERVICE_DOMAIN } from '../../../config/env';
+import { MICROCMS_API_KEY, MICROCMS_SERVICE_DOMAIN } from '../../../config/env';
 
 const client = createClient({
-  serviceDomain: MICRO_CMS_SERVICE_DOMAIN,
-  apiKey: MICRO_CMS_API_KEY
+  serviceDomain: MICROCMS_SERVICE_DOMAIN,
+  apiKey: MICROCMS_API_KEY
 });
 
 /**
