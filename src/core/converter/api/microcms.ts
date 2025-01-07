@@ -18,7 +18,6 @@ export const fetchMicroCMSData = async<T>(
 ): Promise<T> => {
   try {
     const data = await client.get({ endpoint, queries });
-    console.log(`Data fetched from ${endpoint}:`, data['contents']);
     return data.contents;
   } catch (error) {
     console.error('Error fetching data from microCMS:', error);

@@ -12,19 +12,22 @@ import { characters } from "../database/cms/types/response";
  */
 export const getCostume = async (db: MySql2Database, userId: string): Promise<Costume> => {
   const costumeId = await CostumeRepository.getCostumeId(db, userId);
-  const costume = await fetchMicroCMSData<characters<'get'>>('characters', { ids: costumeId });
+  const data = await fetchMicroCMSData<characters<'get'>[]>('characters', { ids: costumeId });
+  if (!data || data.length === 0) {
+    throw new Error('costume data is not found');
+  }
+
+  const costume = data[0]!;
 
   return Costume.create({
     ...costume,
     category: costume.category[0],
     image: {
-      url: costume.image.url,
-      height: costume.image.height,
-      width: costume.image.width,
+      ...costume.image,
     },
     createdAt: new Date(costume.createdAt),
     updatedAt: new Date(costume.updatedAt),
     publishedAt: new Date(costume.publishedAt),
-    revisedAt: new Date(costume.revisedAt),
+    revisedAt: new Date(costume.revisedAt)
   });
 }

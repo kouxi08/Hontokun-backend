@@ -8,6 +8,7 @@ type CostumeParams = {
     width: number;
   };
   lines: string;
+  tier: number;
   createdAt: Date;
   updatedAt: Date;
   publishedAt: Date;
@@ -45,6 +46,10 @@ export class Costume {
     return this.params.lines;
   }
 
+  get tier(): number {
+    return this.params.tier;
+  }
+
   get createdAt(): Date {
     return this.params.createdAt;
   }
@@ -62,17 +67,7 @@ export class Costume {
   }
 
   public toJSON(): CostumeParams {
-    return {
-      id: this.params.id,
-      category: this.params.category,
-      name: this.params.name,
-      image: this.params.image,
-      lines: this.params.lines,
-      createdAt: this.params.createdAt,
-      updatedAt: this.params.updatedAt,
-      publishedAt: this.params.publishedAt,
-      revisedAt: this.params.revisedAt,
-    };
+    return { ...this.params };
   }
 
 }
