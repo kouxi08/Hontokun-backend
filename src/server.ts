@@ -12,9 +12,9 @@ import { prettyJSON } from 'hono/pretty-json';
 import { ZodError } from 'zod';
 import { Quiz } from './model/quiz/quiz';
 import { convertQuizToAPI } from './core/converter/api/quiz';
-import { characters, quiz } from './database/cms/types/response';
+import { quiz } from './database/cms/types/response';
 import * as CostumeUsecase from './usecase/costume';
-import { fetchMicroCMSData } from './core/converter/api/microcms';
+import * as EnemyUsecase from './usecase/enemy';
 
 export const app = new Hono();
 export const db = drizzle({ connection: DATABASE_URL, casing: 'snake_case' });
@@ -47,15 +47,16 @@ app.get('/quiz/:tier', async (c: Context) => {
   // 着せ替え取得
   const costume = await CostumeUsecase.getCostume(db, userId);
   // 指名手配猫画像取得
-  // TODO: 難易度によって取得するキャラクターを変更する
-  const character = await fetchMicroCMSData<characters<'get'>>('characters', { filters: { category: 'enemy' } });
+  const character = await EnemyUsecase.getQuizEnemy(db, tier);
 
   // クイズ取得
   const quizzes: Quiz[] = await QuizUsecase.getQuizzes(db, userId, tier);
   const quizList = quizzes.map((quiz) => convertQuizToAPI(quiz));
   return c.json({
     character: {
-
+      id: character.id,
+      name: character.name,
+      url: character.image.url,
     },
     costume: {
       id: costume.id,
