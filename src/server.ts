@@ -18,6 +18,8 @@ import * as EnemyUsecase from './usecase/enemy';
 import { paths } from './openapi/schema';
 import { quizResultSchema } from './core/validator/quizResultValidators';
 import * as QuizLogUsecase from './usecase/quizLog';
+import * as UserUsecase from './usecase/user';
+import { createUserSchema } from './core/validator/createUserValidator';
 
 export const app = new Hono();
 export const db = drizzle({ connection: DATABASE_URL, casing: 'snake_case' });
@@ -43,9 +45,17 @@ app.get('/health-check', (c: Context) => {
   return c.json('🌱 Hello Hontokun!', 200);
 });
 
+app.post('sign-up', async (c: Context) => {
+  const userId = c.get('firebaseUId');
+  const body: paths['/sign-up']['post']['requestBody']['content']['application/json'] = await c.req.json();
+  const { nickname, birthday } = createUserSchema.parse(body);
+  const user = await UserUsecase.createUser(db, userId, nickname, birthday);
+
+  return c.json(user, 200);
+})
 
 app.post('/quiz/result', async (c: Context) => {
-  const userId = c.get('firebaseUId');
+  const userId = c.get('firebaseUid');
   const body: paths['/quiz/result']['post']['requestBody']['content']['application/json'] = await c.req.json();
   const answers = body.map((data) => quizResultSchema.parse(data));
   const quizData = answers.map((data) => {
