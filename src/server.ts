@@ -16,6 +16,8 @@ import { quiz } from './database/cms/types/response';
 import * as CostumeUsecase from './usecase/costume';
 import * as EnemyUsecase from './usecase/enemy';
 import { paths } from './openapi/schema';
+import { quizResultSchema } from './core/validator/quizResultValidators';
+import * as QuizLogUsecase from './usecase/quizLog';
 
 export const app = new Hono();
 export const db = drizzle({ connection: DATABASE_URL, casing: 'snake_case' });
@@ -39,6 +41,27 @@ app.onError((err, c) => {
 app.get('/health-check', (c: Context) => {
   console.info('Health-check endpoint is called.');
   return c.json('🌱 Hello Hontokun!', 200);
+});
+
+
+app.post('/quiz/result', async (c: Context) => {
+  const userId = c.get('firebaseUId');
+  const body: paths['/quiz/result']['post']['requestBody']['content']['application/json'] = await c.req.json();
+  const answers = body.map((data) => quizResultSchema.parse(data));
+  const quizData = answers.map((data) => {
+    const { quizId, answer, answerTime } = data;
+    return { quizId, answer, answerTime };
+  })
+  const quizList = QuizLogUsecase.createQuizLog(db, userId, quizData);
+  const costume = await CostumeUsecase.getCostume(db, userId);
+
+  return c.json({
+    costume: {
+      id: costume.id,
+      name: costume.name,
+      url: costume.image.url,
+    }, quizList
+  }, 200);
 });
 
 app.get('/quiz/:tier', async (c: Context) => {

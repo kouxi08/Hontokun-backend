@@ -94,3 +94,25 @@ export const updateQuiz = async (
 
   return;
 }
+
+/**
+ * クイズデータをIDから取得
+ * @param db データベースのインスタンス
+ * @param quizId クイズID
+ * @returns Quiz クイズデータ
+ */
+export const getQuizById = async (
+  db: MySql2Database,
+  quizId: string
+): Promise<Quiz | undefined> => {
+  const quiz = await db
+    .select({ quiz: quizTable, choice: quizChoiceTable })
+    .from(quizTable)
+    .leftJoin(quizChoiceTable, eq(quizTable.id, quizChoiceTable.quizId))
+    .where(eq(quizTable.id, quizId));
+  if (!quiz) {
+    return undefined;
+  }
+  const convertedData = convertDatabaseToQuiz([quiz]);
+  return convertedData[0];
+}
