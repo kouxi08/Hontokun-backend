@@ -1,0 +1,34 @@
+{
+  "apiFields": [
+    {
+      "idValue": "1VS2wbEwd6",
+      "fieldId": "category",
+      "name": "カテゴリ",
+      "kind": "select",
+      "description": "enemy：敵キャラクター、costume：着せ替えを選んでください",
+      "required": true,
+      "selectItems": [
+        { "id": "OAeKYzz3PH", "value": "enemy" },
+        { "id": "QFYtW-RNSa", "value": "costume" }
+      ],
+      "selectInitialValue": [],
+      "multipleSelect": false
+    },
+    { "fieldId": "image", "name": "画像", "kind": "media", "required": true },
+    {
+      "fieldId": "lines",
+      "name": "セリフ",
+      "kind": "textArea",
+      "description": "着せ替えキャラクターの台詞を入力してください"
+    },
+    { "fieldId": "name", "name": "名前", "kind": "textArea", "required": true },
+    {
+      "fieldId": "tier",
+      "name": "難易度",
+      "kind": "number",
+      "description": "※敵キャラクターのみ",
+      "numberSizeLimitValidation": { "numberSize": { "min": 1, "max": 5 } }
+    }
+  ],
+  "customFields": []
+}

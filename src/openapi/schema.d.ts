@@ -87,7 +87,7 @@ export interface paths {
                     content: {
                         "application/json": {
                             user?: components["schemas"]["UserId"] & components["schemas"]["UserProfile"] & components["schemas"]["UserStatus"];
-                            character?: components["schemas"]["CharacterDialogue"] & components["schemas"]["ImageUrl"];
+                            costume?: components["schemas"]["Images"] & components["schemas"]["CharacterDialogue"];
                         };
                     };
                 };
@@ -179,7 +179,7 @@ export interface paths {
                                     /** @description クイズセットの正答率 */
                                     accuracy?: components["schemas"]["Accuracy"];
                                     /** @description クイズセットの指名手配猫 */
-                                    character?: components["schemas"]["Images"];
+                                    enemy?: components["schemas"]["Images"];
                                     /** @description クイズセットの一覧 */
                                     quizSetList?: components["schemas"]["QuizSet"][];
                                 }[];
@@ -263,7 +263,7 @@ export interface paths {
                     content: {
                         "application/json": {
                             /** @description クイズセットの指名手配猫 */
-                            character?: components["schemas"]["Images"];
+                            enemy?: components["schemas"]["Images"];
                             quizSet?: components["schemas"]["QuizSet"];
                             /** @description クイズの問題一覧 */
                             quizList?: (components["schemas"]["Quiz"] & components["schemas"]["QuizAnswer"])[];
@@ -525,7 +525,7 @@ export interface paths {
                     content: {
                         "application/json": {
                             /** @description クイズセットの指名手配猫 */
-                            character?: components["schemas"]["Images"];
+                            enemy?: components["schemas"]["Images"];
                             /** @description ユーザの着せ替え画像 */
                             costume?: components["schemas"]["Images"];
                             /** @description クイズの問題一覧 */
@@ -631,6 +631,8 @@ export interface paths {
                             /** @description クイズセットの正答率 */
                             accuracy?: components["schemas"]["Accuracy"];
                             quizList?: (components["schemas"]["Quiz"] & components["schemas"]["QuizAnswer"])[];
+                            /** @description クイズの敵キャラクター */
+                            enemy?: components["schemas"]["Images"];
                             /** @description ユーザの着せ替え画像 */
                             costume?: components["schemas"]["Images"];
                         };

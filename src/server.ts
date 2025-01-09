@@ -13,6 +13,9 @@ import { ZodError } from 'zod';
 import { Quiz } from './model/quiz/quiz';
 import { convertQuizToAPI } from './core/converter/api/quiz';
 import { quiz } from './database/cms/types/response';
+import * as CostumeUsecase from './usecase/costume';
+import * as EnemyUsecase from './usecase/enemy';
+import { paths } from './openapi/schema';
 
 export const app = new Hono();
 export const db = drizzle({ connection: DATABASE_URL, casing: 'snake_case' });
@@ -41,14 +44,31 @@ app.get('/health-check', (c: Context) => {
 app.get('/quiz/:tier', async (c: Context) => {
   const tier = Number(c.req.param('tier'));
   const userId = c.get('firebaseUId');
+
+  // 着せ替え取得
+  const costume = await CostumeUsecase.getCostume(db, userId);
+  // 指名手配猫画像取得
+  const enemy = await EnemyUsecase.getQuizEnemy(db, tier);
+
+  // クイズ取得
   const quizzes: Quiz[] = await QuizUsecase.getQuizzes(db, userId, tier);
   const quizList = quizzes.map((quiz) => convertQuizToAPI(quiz));
-  return c.json({
-    // TODO: ネコ画像と着せ替えデータを返す
-    // character: 
-    // costume:
+
+  const response: paths['/quiz/{tier}']['get']['responses']['200']['content']['application/json'] = {
+    enemy: {
+      id: enemy.id,
+      name: enemy.name,
+      url: enemy.image.url,
+    },
+    costume: {
+      id: costume.id,
+      name: costume.name,
+      url: costume.image.url,
+    },
     quizList,
-  }, 200);
+  }
+
+  return c.json(response, 200);
 });
 
 app.post('/webhook/quiz', async (c: Context) => {
