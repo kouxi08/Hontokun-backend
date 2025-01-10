@@ -46,7 +46,7 @@ app.get('/health-check', (c: Context) => {
 });
 
 app.post('sign-up', async (c: Context) => {
-  const userId = c.get('firebaseUId');
+  const userId = c.get('firebaseUid');
   const body: paths['/sign-up']['post']['requestBody']['content']['application/json'] = await c.req.json();
   const { nickname, birthday } = createUserSchema.parse(body);
   const user = await UserUsecase.createUser(db, userId, nickname, birthday);
@@ -76,7 +76,7 @@ app.post('/quiz/result', async (c: Context) => {
 
 app.get('/quiz/:tier', async (c: Context) => {
   const tier = Number(c.req.param('tier'));
-  const userId = c.get('firebaseUId');
+  const userId = c.get('firebaseUid');
 
   // 着せ替え取得
   const costume = await CostumeUsecase.getCostume(db, userId);
