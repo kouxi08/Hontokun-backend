@@ -92,13 +92,13 @@ autoscaling:
 volumes:
   - name: firebase-volume
     secret:
-      secretName: firebase-secret
+      secretName: hontokun-secret
 
 # Additional volumeMounts on the output Deployment definition.
 volumeMounts:
   - name: firebase-volume
-    mountPath: /app/firebase.json
-    subPath: firebase.json
+    mountPath: /app/service-account-file.json
+    subPath: service-account-file.json
 
 nodeSelector: {}
 
