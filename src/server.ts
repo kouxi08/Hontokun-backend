@@ -20,6 +20,7 @@ import { quizResultSchema } from './core/validator/quizResultValidators';
 import * as QuizLogUsecase from './usecase/quizLog';
 import * as UserUsecase from './usecase/user';
 import { createUserSchema } from './core/validator/createUserValidator';
+import { AuthError } from './core/error';
 
 export const app = new Hono();
 export const db = drizzle({ connection: DATABASE_URL, casing: 'snake_case' });
@@ -32,12 +33,15 @@ app.use('/webhook/quiz', corsMiddleware());
 app.use('/sign-up', authMiddleware);
 // app.use('/quiz/:tier', authMiddleware);
 
-app.onError((err, c) => {
-  console.error(err);
-  if (err instanceof ZodError) {
-    return c.json({ message: 'Zod Validation Error', error: err.issues }, 500);
+app.onError((error, c) => {
+  console.error(error);
+  const errorResponse = (status: number, message: string) => {
+    return c.json({ error: { name: error.name, message: error.message } }, { status });
   }
-  return c.json({ error: err.message }, 500);
+  if (error instanceof AuthError) return errorResponse(401, error.message);
+  if (error instanceof ZodError) return errorResponse(500, error.message);
+
+  return errorResponse(500, 'Something unexpected happened');
 });
 
 app.get('/health-check', (c: Context) => {

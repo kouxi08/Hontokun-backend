@@ -18,10 +18,21 @@ const createAuthMiddleware = (firebaseApp: app.App) => {
     try {
       const decodedToken = await firebaseApp.auth().verifyIdToken(token);
       c.set('firebaseUid', decodedToken.uid);
-    } catch (error) {
-      throw new AuthError();
-    } finally {
       await next();
+    } catch (error) {
+      console.log(error);
+      if (error instanceof Error) {
+        if (error.name === 'auth/argument-error') {
+          throw new AuthError('Token is malformed');
+        } else if (error.name === 'auth/id-token-expired') {
+          throw new AuthError('Token has expired');
+        } else if (error.name === 'auth/id-token-revoked') {
+          throw new AuthError('Token has been revoked');
+        } else {
+          throw new AuthError('Failed to verify token');
+        }
+      }
+      throw new AuthError('An unknown error occurred');
     }
   });
 };
