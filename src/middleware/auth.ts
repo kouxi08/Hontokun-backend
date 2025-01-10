@@ -20,7 +20,6 @@ const createAuthMiddleware = (firebaseApp: app.App) => {
       c.set('firebaseUid', decodedToken.uid);
       await next();
     } catch (error) {
-      console.log(error);
       if (error instanceof Error) {
         if (error.name === 'auth/argument-error') {
           throw new AuthError('Token is malformed');
