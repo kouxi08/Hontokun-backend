@@ -23,8 +23,6 @@ env:
     key: api_key
   - name: DATABASE_URL
     key: database_url
-  - name: GOOGLE_APPLICATION_CREDENTIALS
-    key: application_credentials
 
 podAnnotations: {}
 podLabels: {}
@@ -91,17 +89,16 @@ autoscaling:
   # targetMemoryUtilizationPercentage: 80
 
 # Additional volumes on the output Deployment definition.
-volumes: []
-# - name: foo
-#   secret:
-#     secretName: mysecret
-#     optional: false
+volumes:
+  - name: firebase-volume
+    secret:
+      secretName: firebase-secret
 
 # Additional volumeMounts on the output Deployment definition.
-volumeMounts: []
-# - name: foo
-#   mountPath: "/etc/foo"
-#   readOnly: true
+volumeMounts:
+  - name: firebase-volume
+    mountPath: /app/firebase.json
+    subPath: firebase.json
 
 nodeSelector: {}
 
