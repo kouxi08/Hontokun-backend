@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: kouxi00/hontokun-backend:v1.0.0
+  repository: kouxi00/hontokun-backend
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
@@ -45,7 +45,7 @@ service:
 
 ingress:
   enabled: true
-  className: ""
+  className: "nginx"
   annotations: {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
