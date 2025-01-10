@@ -6,3 +6,5 @@ export const quizResultSchema = z.object({
   answer: z.string().min(1, { message: "answer is required" }),
   answerTime: z.number().int().nonnegative({ message: "answerTime must be a non-negative integer" }),
 });
+
+export const quizModeSchema = z.string().min(1, { message: "mode is required" });
