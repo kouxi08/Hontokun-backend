@@ -1,0 +1,1 @@
+export const defaultCostumeName = '探偵ネコ';

@@ -16,6 +16,11 @@ import { quiz } from './database/cms/types/response';
 import * as CostumeUsecase from './usecase/costume';
 import * as EnemyUsecase from './usecase/enemy';
 import { paths } from './openapi/schema';
+import { quizResultSchema } from './core/validator/quizResultValidators';
+import * as QuizLogUsecase from './usecase/quizLog';
+import * as UserUsecase from './usecase/user';
+import { createUserSchema } from './core/validator/createUserValidator';
+import { AuthError } from './core/error';
 
 export const app = new Hono();
 export const db = drizzle({ connection: DATABASE_URL, casing: 'snake_case' });
@@ -28,12 +33,15 @@ app.use('/webhook/quiz', corsMiddleware());
 app.use('/sign-up', authMiddleware);
 // app.use('/quiz/:tier', authMiddleware);
 
-app.onError((err, c) => {
-  console.error(err);
-  if (err instanceof ZodError) {
-    return c.json({ message: 'Zod Validation Error', error: err.issues }, 500);
+app.onError((error, c) => {
+  console.error(error);
+  const errorResponse = (status: number, message: string) => {
+    return c.json({ error: { name: error.name, message: error.message } }, { status });
   }
-  return c.json({ error: err.message }, 500);
+  if (error instanceof AuthError) return errorResponse(401, error.message);
+  if (error instanceof ZodError) return errorResponse(500, error.message);
+
+  return errorResponse(500, 'Something unexpected happened');
 });
 
 app.get('/health-check', (c: Context) => {
@@ -41,9 +49,38 @@ app.get('/health-check', (c: Context) => {
   return c.json('🌱 Hello Hontokun!', 200);
 });
 
+app.post('sign-up', async (c: Context) => {
+  const userId = c.get('firebaseUid');
+  const body: paths['/sign-up']['post']['requestBody']['content']['application/json'] = await c.req.json();
+  const { nickname, birthday } = createUserSchema.parse(body);
+  const user = await UserUsecase.createUser(db, userId, nickname, birthday);
+
+  return c.json(user, 200);
+})
+
+app.post('/quiz/result', async (c: Context) => {
+  const userId = c.get('firebaseUid');
+  const body: paths['/quiz/result']['post']['requestBody']['content']['application/json'] = await c.req.json();
+  const answers = body.map((data) => quizResultSchema.parse(data));
+  const quizData = answers.map((data) => {
+    const { quizId, answer, answerTime } = data;
+    return { quizId, answer, answerTime };
+  })
+  const quizList = QuizLogUsecase.createQuizLog(db, userId, quizData);
+  const costume = await CostumeUsecase.getCostume(db, userId);
+
+  return c.json({
+    costume: {
+      id: costume.id,
+      name: costume.name,
+      url: costume.image.url,
+    }, quizList
+  }, 200);
+});
+
 app.get('/quiz/:tier', async (c: Context) => {
   const tier = Number(c.req.param('tier'));
-  const userId = c.get('firebaseUId');
+  const userId = c.get('firebaseUid');
 
   // 着せ替え取得
   const costume = await CostumeUsecase.getCostume(db, userId);

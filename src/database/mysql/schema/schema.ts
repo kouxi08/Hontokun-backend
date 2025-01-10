@@ -24,7 +24,7 @@ export const usersTable = mysqlTable(
     birthday: date(),
     level: int().default(1).notNull(),
     experience: int().default(0).notNull(),
-    costumeId: char({ length: 36 }),
+    costumeId: char({ length: 36 }).notNull(),
     ...timestamps,
   },
   (table) => {

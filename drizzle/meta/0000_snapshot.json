@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "0012919b-8829-4f5d-9b26-ea35f426292d",
+  "id": "677adcc1-4b9d-45f6-96b8-2dd383199bb8",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "quiz_choice": {
@@ -579,7 +579,7 @@
           "name": "costume_id",
           "type": "char(36)",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "created_at": {
