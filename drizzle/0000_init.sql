@@ -76,7 +76,7 @@ CREATE TABLE `users` (
 	`birthday` date,
 	`level` int NOT NULL DEFAULT 1,
 	`experience` int NOT NULL DEFAULT 0,
-	`costume_id` char(36),
+	`costume_id` char(36) NOT NULL,
 	`created_at` timestamp NOT NULL DEFAULT (now()),
 	`updated_at` timestamp NOT NULL DEFAULT (now()),
 	CONSTRAINT `users_id` PRIMARY KEY(`id`),
