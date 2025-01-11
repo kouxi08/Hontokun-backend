@@ -28,3 +28,21 @@ export const createUser = async (
   }
   return await UserRepository.createUser(db, user);
 }
+
+/**
+ * FirebaseUidからユーザを取得する
+ * @param db データベースのインスタンス
+ * @param firebaseUid FirebaseのユーザID
+ * @returns User
+ */
+export const getUserByFirebaseUid = async (
+  db: MySql2Database,
+  firebaseUid: string,
+): Promise<User> => {
+  const user = await UserRepository.getUserByFirebaseUid(db, firebaseUid);
+  if (!user) {
+    throw new Error('user not found');
+  }
+
+  return user;
+}

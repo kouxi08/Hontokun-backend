@@ -1,5 +1,5 @@
 export type User = {
-  id?: string;
+  id: string;
   firebaseUid: string;
   nickname: string;
   birthday?: Date | null;

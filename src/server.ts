@@ -60,7 +60,8 @@ app.post('sign-up', async (c: Context) => {
 })
 
 app.post('/quiz/result', async (c: Context) => {
-  const userId = c.get('firebaseUid');
+  const firebaseUid = c.get('firebaseUid');
+  const user = await UserUsecase.getUserByFirebaseUid(db, firebaseUid);
   const body: paths['/quiz/result']['post']['requestBody']['content']['application/json'] = await c.req.json();
   const quizMode = quizModeSchema.parse(body.quizMode);
   const answers = body.answers!.map((data) => quizResultSchema.parse(data));

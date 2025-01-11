@@ -24,3 +24,21 @@ export const createUser = async (
 
   return validatedUser;
 }
+
+/**
+ * FirebaseUidからユーザデータを取得する
+ * @param db データベースのインスタンス
+ * @param firebaseUid FirebaseのID
+ * @returns ユーザデータ
+ */
+export const getUserByFirebaseUid = async (
+  db: MySql2Database,
+  firebaseUid: string
+): Promise<User | null> => {
+  const [user] = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.firebaseUid, firebaseUid));
+
+  return user ?? null;
+};
