@@ -1,6 +1,6 @@
 import { Choice } from './choice';
 
-type QuizParams = {
+export type QuizParams = {
   id: string;
   title: string;
   content: string;

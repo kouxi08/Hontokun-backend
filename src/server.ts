@@ -69,15 +69,20 @@ app.post('/quiz/result', async (c: Context) => {
     const { quizId, answer, answerTime } = data;
     return { quizId, answer, answerTime };
   })
-  const quizList = QuizLogUsecase.createQuizLog(db, userId, quizMode, quizData);
-  const costume = await CostumeUsecase.getCostume(db, userId);
+  const { quizSetId, accuracy, quizList } = await QuizLogUsecase.createQuizLog(db, user.id, quizMode, quizData);
+  const costume = await CostumeUsecase.getCostume(db, user.id);
+
+  // TODO: 指名手配猫画像返却
 
   return c.json({
+    quizSetId,
+    accuracy,
+    quizList,
     costume: {
       id: costume.id,
       name: costume.name,
       url: costume.image.url,
-    }, quizList
+    },
   }, 200);
 });
 
