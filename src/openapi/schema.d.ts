@@ -611,12 +611,16 @@ export interface paths {
             requestBody: {
                 content: {
                     "application/json": {
-                        quizId?: components["schemas"]["QuizId"];
-                        /** @description ユーザーの解答 */
-                        answer?: string;
-                        /** @description クイズを解いた時間(タイムアタックの場合・秒) */
-                        answerTime?: number | null;
-                    }[];
+                        /** @description バトルモード */
+                        quizMode?: string;
+                        answers?: {
+                            quizId?: components["schemas"]["QuizId"];
+                            /** @description ユーザーの解答 */
+                            answer?: string;
+                            /** @description クイズを解いた時間(タイムアタックの場合・秒) */
+                            answerTime?: number | null;
+                        }[];
+                    };
                 };
             };
             responses: {

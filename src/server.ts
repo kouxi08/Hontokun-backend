@@ -16,7 +16,7 @@ import { quiz } from './database/cms/types/response';
 import * as CostumeUsecase from './usecase/costume';
 import * as EnemyUsecase from './usecase/enemy';
 import { paths } from './openapi/schema';
-import { quizResultSchema } from './core/validator/quizResultValidators';
+import { quizModeSchema, quizResultSchema } from './core/validator/quizResultValidators';
 import * as QuizLogUsecase from './usecase/quizLog';
 import * as UserUsecase from './usecase/user';
 import { createUserSchema } from './core/validator/createUserValidator';
@@ -31,6 +31,7 @@ app.use(logger());
 app.use(prettyJSON());
 app.use('/webhook/quiz', corsMiddleware());
 app.use('/sign-up', authMiddleware);
+app.use('/quiz/result', authMiddleware);
 // app.use('/quiz/:tier', authMiddleware);
 
 app.onError((error, c) => {
@@ -61,12 +62,13 @@ app.post('sign-up', async (c: Context) => {
 app.post('/quiz/result', async (c: Context) => {
   const userId = c.get('firebaseUid');
   const body: paths['/quiz/result']['post']['requestBody']['content']['application/json'] = await c.req.json();
-  const answers = body.map((data) => quizResultSchema.parse(data));
+  const quizMode = quizModeSchema.parse(body.quizMode);
+  const answers = body.answers!.map((data) => quizResultSchema.parse(data));
   const quizData = answers.map((data) => {
     const { quizId, answer, answerTime } = data;
     return { quizId, answer, answerTime };
   })
-  const quizList = QuizLogUsecase.createQuizLog(db, userId, quizData);
+  const quizList = QuizLogUsecase.createQuizLog(db, userId, quizMode, quizData);
   const costume = await CostumeUsecase.getCostume(db, userId);
 
   return c.json({
