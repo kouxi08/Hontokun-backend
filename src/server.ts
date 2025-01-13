@@ -69,7 +69,7 @@ app.post('/quiz/result', async (c: Context) => {
     const { quizId, answer, answerTime } = data;
     return { quizId, answer, answerTime };
   })
-  const { quizSetId, accuracy, quizList } = await QuizLogUsecase.createQuizLog(db, user.id, quizMode, quizData);
+  const { quizSetId, accuracy, quizList } = await QuizLogUsecase.createQuizLog(db, user, quizMode, quizData);
   const costume = await CostumeUsecase.getCostume(db, user.id);
 
   // TODO: 指名手配猫画像返却

@@ -42,3 +42,24 @@ export const getUserByFirebaseUid = async (
 
   return user ?? null;
 };
+
+/**
+ * 経験値とレベルを更新する
+ * @param db データベースのインスタンス
+ * @param userId ユーザID
+ * @param experience 経験値
+ * @param level レベル
+ * @returns void
+ */
+export const updateUserExperience = async (
+  db: MySql2Database,
+  userId: string,
+  experience: number,
+  level: number
+): Promise<void> => {
+  await db
+    .update(usersTable)
+    .set({ experience, level })
+    .where(eq(usersTable.id, userId));
+  return;
+}

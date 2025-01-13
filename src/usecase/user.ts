@@ -4,7 +4,7 @@ import * as UserRepository from "../repository/user";
 import { fetchMicroCMSData } from "../core/converter/api/microcms";
 import { characters } from "../database/cms/types/response";
 import { APIError } from "../core/error";
-import { defaultCostumeName } from "../core/constants";
+import { defaultCostumeName, MAX_EXPERIENCE } from "../core/constants";
 
 export const createUser = async (
   db: MySql2Database,
@@ -45,4 +45,29 @@ export const getUserByFirebaseUid = async (
   }
 
   return user;
+}
+
+/**
+ * ユーザの経験値とレベルを更新する
+ * @param db データベースのインスタンス
+ * @param user ユーザーデータ
+ * @param tier 問題の難易度
+ * @returns void
+ */
+export const updateUserExp = async (
+  db: MySql2Database,
+  user: User,
+  tier: number,
+): Promise<void> => {
+  let newExp = user.experience + tier;
+
+  // レベルアップ判定
+  let levelUpCount = 0;
+  if (newExp >= MAX_EXPERIENCE) {
+    levelUpCount = Math.floor(newExp / MAX_EXPERIENCE);
+    newExp = newExp % MAX_EXPERIENCE
+  }
+  const newLevel = user.level + levelUpCount;
+  await UserRepository.updateUserExperience(db, user.id, newExp, newLevel);
+  return;
 }
