@@ -1,23 +1,26 @@
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 import { quizLogTable } from '../schema/schema';
+import { idRegex } from '../../../core/regex';
+
+const quizLogSchema = {
+  id: z.string().regex(idRegex),
+  quizId: z.string().regex(idRegex),
+  quizSetLogId: z.string().regex(idRegex),
+  userAnswer: z.string(),
+  isCorrect: z.boolean(),
+  time: z.number().int().min(0).optional(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+}
 
 export const insertQuizLogSchema = createInsertSchema(quizLogTable, {
-  id: z.string().uuid(),
-  quiz_id: z.string().uuid(),
-  quiz_set_log_id: z.string().uuid(),
-  user_answer: z.string(),
-  is_correct: z.boolean(),
-  time: z.number().int().min(0),
-});
+  ...quizLogSchema
+}).omit({ createdAt: true, updatedAt: true });
 
 export const selectQuizLogSchema = createSelectSchema(quizLogTable, {
-  id: z.string().uuid(),
-  quiz_id: z.string().uuid(),
-  quiz_set_log_id: z.string().uuid(),
-  user_answer: z.string(),
-  is_correct: z.boolean(),
-  time: z.number().int().min(0),
-  created_at: z.date(),
-  updated_at: z.date(),
+  ...quizLogSchema
 });
+
+export type InsertQuizLogType = z.infer<typeof insertQuizLogSchema>;
+export type SelectQuizLogType = z.infer<typeof selectQuizLogSchema>;
