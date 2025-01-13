@@ -73,6 +73,7 @@ app.post('/quiz/result', async (c: Context) => {
   const costume = await CostumeUsecase.getCostume(db, user.id);
 
   // TODO: 指名手配猫画像返却
+  const enemy = quizList[0] ? await EnemyUsecase.getQuizEnemy(db, quizList[0].tier) : null;
 
   return c.json({
     quizSetId,
@@ -83,6 +84,11 @@ app.post('/quiz/result', async (c: Context) => {
       name: costume.name,
       url: costume.image.url,
     },
+    enemy: enemy ? {
+      id: enemy.id,
+      name: enemy.name,
+      url: enemy.image.url,
+    } : null,
   }, 200);
 });
 
