@@ -23,14 +23,14 @@ export const updateQuiz = async (
 
 // 共通のデータ変換関数
 const mapQuizData = (quiz: quiz<'get'>): Quiz => {
-  const choices = quiz.choices.split('\n').map((choice) => {
+  const choices = quiz.choices ? quiz.choices!.split('\n').map((choice) => {
     return Choice.create({
       id: null,
       name: choice,
       createdAt: new Date(quiz.createdAt),
       updatedAt: new Date(quiz.updatedAt),
     });
-  });
+  }) : [];
 
   return Quiz.create({
     id: quiz.id,
