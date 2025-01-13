@@ -9,7 +9,8 @@
     "drizzle:generate": "npx drizzle-kit generate",
     "drizzle:push": "npx drizzle-kit push",
     "drizzle:migrate": "npx drizzle-kit migrate",
-    "drizzle:studio": "npx drizzle-kit studio"
+    "drizzle:studio": "npx drizzle-kit studio",
+    "drizzle:seed": "tsx src/database/mysql/seed.ts"
   },
   "dependencies": {
     "@hono/eslint-config": "^1.0.2",
