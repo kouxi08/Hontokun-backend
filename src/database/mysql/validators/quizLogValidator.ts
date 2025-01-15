@@ -4,9 +4,9 @@ import { quizLogTable } from '../schema/schema';
 import { idRegex } from '../../../core/regex';
 
 const quizLogSchema = {
-  id: z.string().regex(idRegex),
+  id: z.string().uuid(),
   quizId: z.string().regex(idRegex),
-  quizSetLogId: z.string().regex(idRegex),
+  quizSetLogId: z.string().uuid(),
   userAnswer: z.string(),
   isCorrect: z.boolean(),
   time: z.number().int().min(0).optional(),

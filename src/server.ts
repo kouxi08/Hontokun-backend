@@ -60,7 +60,8 @@ app.post('sign-up', async (c: Context) => {
 })
 
 app.post('/quiz/result', async (c: Context) => {
-  const userId = c.get('firebaseUid');
+  const firebaseUid = c.get('firebaseUid');
+  const user = await UserUsecase.getUserByFirebaseUid(db, firebaseUid);
   const body: paths['/quiz/result']['post']['requestBody']['content']['application/json'] = await c.req.json();
   const quizMode = quizModeSchema.parse(body.quizMode);
   const answers = body.answers!.map((data) => quizResultSchema.parse(data));
@@ -68,15 +69,26 @@ app.post('/quiz/result', async (c: Context) => {
     const { quizId, answer, answerTime } = data;
     return { quizId, answer, answerTime };
   })
-  const quizList = QuizLogUsecase.createQuizLog(db, userId, quizMode, quizData);
-  const costume = await CostumeUsecase.getCostume(db, userId);
+  const { quizSetId, accuracy, quizList } = await QuizLogUsecase.createQuizLog(db, user, quizMode, quizData);
+  const costume = await CostumeUsecase.getCostume(db, user.id);
+
+  // TODO: 指名手配猫画像返却
+  const enemy = quizList[0] ? await EnemyUsecase.getQuizEnemy(db, quizList[0].tier) : null;
 
   return c.json({
+    quizSetId,
+    accuracy,
+    quizList,
     costume: {
       id: costume.id,
       name: costume.name,
       url: costume.image.url,
-    }, quizList
+    },
+    enemy: enemy ? {
+      id: enemy.id,
+      name: enemy.name,
+      url: enemy.image.url,
+    } : null,
   }, 200);
 });
 
