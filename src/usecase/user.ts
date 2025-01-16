@@ -4,7 +4,7 @@ import * as UserRepository from "../repository/user";
 import { fetchMicroCMSData } from "../core/converter/api/microcms";
 import { characters } from "../database/cms/types/response";
 import { APIError } from "../core/error";
-import { defaultCostumeName, MAX_EXPERIENCE } from "../core/constants";
+import { DEFAULT_COSTUME_NAME, MAX_EXPERIENCE } from "../core/constants";
 
 export const createUser = async (
   db: MySql2Database,
@@ -13,7 +13,7 @@ export const createUser = async (
   birthday: string,
 ): Promise<User> => {
   const uid = crypto.randomUUID();
-  const defaultCostume = await fetchMicroCMSData<characters<'get'>[]>('characters', { filters: `name[equals]${defaultCostumeName}` });
+  const defaultCostume = await fetchMicroCMSData<characters<'get'>[]>('characters', { filters: `name[equals]${DEFAULT_COSTUME_NAME}` });
   if (!defaultCostume || defaultCostume.length === 0) {
     throw new APIError('costume data is not found');
   }
@@ -24,7 +24,7 @@ export const createUser = async (
     birthday: new Date(birthday),
     level: 1,
     experience: 0,
-    costumeId: defaultCostume.find((c) => c.name === defaultCostumeName)!.id,
+    costumeId: defaultCostume.find((c) => c.name === DEFAULT_COSTUME_NAME)!.id,
   }
   return await UserRepository.createUser(db, user);
 }
