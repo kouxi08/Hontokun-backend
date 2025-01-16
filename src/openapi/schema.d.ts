@@ -787,11 +787,8 @@ export interface components {
             id?: components["schemas"]["QuizSetId"];
             /** @description クイズセットの正答率 */
             accuracy?: components["schemas"]["Accuracy"];
-            /**
-             * @description クイズの出題形式（バトルかタイムアタックか）
-             * @enum {string}
-             */
-            mode?: "battle" | "time_attack";
+            /** @description クイズの出題形式 */
+            mode?: string;
             /**
              * Format: date-time
              * @description クイズセットを解いた日時
