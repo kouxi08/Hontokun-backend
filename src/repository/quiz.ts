@@ -116,3 +116,21 @@ export const getQuizById = async (
   const convertedData = convertDatabaseToQuiz([quiz]);
   return convertedData[0];
 }
+
+/**
+ * クイズIDから難易度を取得
+ * @param db データベースのインスタンス
+ * @param id クイズID
+ * @returns 難易度
+ */
+export const getQuizByTier = async (
+  db: MySql2Database,
+  id: string
+): Promise<number | undefined> => {
+  const data = await db
+    .select({ tier: quizTable.tier })
+    .from(quizTable)
+    .where(eq(quizTable.id, id));
+
+  return data[0]?.tier ?? undefined;
+}

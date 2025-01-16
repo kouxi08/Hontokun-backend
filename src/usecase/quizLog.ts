@@ -5,6 +5,8 @@ import * as QuizModeRepository from "../repository/quizMode";
 import * as UserUsecase from "./user";
 import { Quiz, QuizParams } from "../model/quiz/quiz";
 import { User } from "../model/user/user";
+import { MAX_TIER } from "../core/constants";
+import { formatDate } from "../core/formatDate";
 
 export type Answer = {
   quizId: string,
@@ -65,3 +67,63 @@ export const createQuizLog = async (
 
   return { quizSetId: quizSetLog.id, accuracy, quizList };
 }
+
+/**
+ * ユーザIDからクイズログ・クイズ情報を全て取得する
+ * @param db データベースのインスタンス
+ * @param userId ユーザID
+ * @returns quizSetLogのリスト
+ */
+export const getAllQuizLog = async (
+  db: MySql2Database,
+  userId: string,
+) => {
+  type QuizSetLog = {
+    id: string,
+    accuracy: number,
+    mode: string,
+    answeredAt: string,
+  };
+
+  type TierList = {
+    tier: number,
+    accuracy: number,
+    quizSetList: QuizSetLog[]
+  }
+
+  // クイズセットを取得
+  const quizSetLogs = await QuizLogRepository.getQuizSet(db, userId);
+
+  // 難易度別にまとめる
+  const response: TierList[] = new Array(MAX_TIER).fill(1).map((_, i) => {
+    return {
+      tier: i + 1,
+      accuracy: 0,
+      quizSetList: [],
+    };
+  });
+
+  for (const quizSetLog of quizSetLogs) {
+    const quizLogs = await QuizLogRepository.getQuizLogBySetId(db, quizSetLog.id);
+
+    const tier = await QuizRepository.getQuizByTier(db, quizLogs[0]?.quizId!);
+    if (!tier) { throw new Error('Quiz not found'); }
+
+    const mode = await QuizModeRepository.getQuizModeName(db, quizSetLog.quizModeId);
+
+    // responseのtierに対応する配列に追加
+    let data = response.find((res) => res.tier === tier);
+    if (!data) {
+      throw new Error('Tier not found');
+    }
+    data.quizSetList.push({
+      id: quizSetLog.id,
+      accuracy: quizLogs.filter((log) => log.isCorrect).length / quizLogs.length * 100,
+      mode,
+      // yyyy-mm-dd hh:mm:ssに変換
+      answeredAt: formatDate(quizSetLog.createdAt),
+    })
+
+  }
+  return response;
+};
