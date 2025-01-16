@@ -32,6 +32,7 @@ app.use(logger());
 app.use(prettyJSON());
 app.use('/webhook/quiz', corsMiddleware());
 app.use('/sign-up', authMiddleware);
+app.use('/main', authMiddleware);
 app.use('/quiz/result', authMiddleware);
 app.use('/history', authMiddleware);
 // app.use('/quiz/:tier', authMiddleware);
@@ -59,6 +60,29 @@ app.post('sign-up', async (c: Context) => {
   const user = await UserUsecase.createUser(db, userId, nickname, birthday);
 
   return c.json(user, 200);
+})
+
+app.get('/main', async (c: Context) => {
+  const firebaseUid = c.get('firebaseUid');
+  console.log(firebaseUid);
+  const user = await UserUsecase.getUserByFirebaseUid(db, firebaseUid);
+  const costume = await CostumeUsecase.getCostume(db, user.id);
+
+  return c.json({
+    user: {
+      id: user.id,
+      nickname: user.nickname,
+      birthday: user.birthday,
+      level: user.level,
+      experience: user.experience,
+    },
+    costume: {
+      id: costume.id,
+      name: costume.name,
+      url: costume.image.url,
+      dialogue: costume.lines,
+    }
+  })
 })
 
 app.post('/quiz/result', async (c: Context) => {
