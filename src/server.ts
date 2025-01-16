@@ -131,8 +131,10 @@ app.get('/history', async (c: Context) => {
 
   const history: History = {};
   const logs = await QuizLogUsecase.getAllQuizLog(db, user.id);
+  let totalAccuracy = 0;
   history.tierList = await Promise.all(logs.map(async (log) => {
     const enemy = await EnemyUsecase.getQuizEnemy(db, log.tier);
+    totalAccuracy += log.accuracy;
     return {
       ...log,
       enemy: {
@@ -142,6 +144,7 @@ app.get('/history', async (c: Context) => {
       }
     }
   }));
+  history.totalAccuracy = totalAccuracy / logs.length;
 
   return c.json({
     user: {
@@ -154,7 +157,7 @@ app.get('/history', async (c: Context) => {
         url: costume.image.url,
       }
     },
-    quizLogs: logs,
+    history,
   }, 200);
 })
 
