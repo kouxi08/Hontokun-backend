@@ -21,6 +21,7 @@ import * as QuizLogUsecase from './usecase/quizLog';
 import * as UserUsecase from './usecase/user';
 import { createUserSchema } from './core/validator/createUserValidator';
 import { AuthError } from './core/error';
+import { History } from './types/api/history';
 
 export const app = new Hono();
 export const db = drizzle({ connection: DATABASE_URL, casing: 'snake_case' });
@@ -33,6 +34,7 @@ app.use('/webhook/quiz', corsMiddleware());
 app.use('/sign-up', authMiddleware);
 app.use('/main', authMiddleware);
 app.use('/quiz/result', authMiddleware);
+app.use('/history', authMiddleware);
 // app.use('/quiz/:tier', authMiddleware);
 
 app.onError((error, c) => {
@@ -145,6 +147,43 @@ app.get('/quiz/:tier', async (c: Context) => {
 
   return c.json(response, 200);
 });
+
+app.get('/history', async (c: Context) => {
+  const firebaseUid = c.get('firebaseUid');
+  const user = await UserUsecase.getUserByFirebaseUid(db, firebaseUid);
+  const costume = await CostumeUsecase.getCostume(db, user.id);
+
+  const history: History = {};
+  const logs = await QuizLogUsecase.getAllQuizLog(db, user.id);
+  let totalAccuracy = 0;
+  history.tierList = await Promise.all(logs.map(async (log) => {
+    const enemy = await EnemyUsecase.getQuizEnemy(db, log.tier);
+    totalAccuracy += log.accuracy;
+    return {
+      ...log,
+      enemy: {
+        id: enemy.id,
+        name: enemy.name,
+        url: enemy.image.url,
+      }
+    }
+  }));
+  history.totalAccuracy = totalAccuracy / logs.length;
+
+  return c.json({
+    user: {
+      id: user.id,
+      nickname: user.nickname,
+      birthday: user.birthday,
+      costume: {
+        id: costume.id,
+        name: costume.name,
+        url: costume.image.url,
+      }
+    },
+    history,
+  }, 200);
+})
 
 app.post('/webhook/quiz', async (c: Context) => {
   const req = await c.req.json();

@@ -64,3 +64,38 @@ export const createQuizLog = async (
     quizLogs
   };
 }
+
+/**
+ * ユーザのクイズセットログを全て取得する関数
+ * @param db データベースのインスタンス
+ * @param userId ユーザーID
+ * @returns クイズセットログ
+ */
+export const getQuizSet = async (
+  db: MySql2Database,
+  userId: string,
+) => {
+  const quizSetLog = await db
+    .select()
+    .from(quizSetLogTable)
+    .where(eq(quizSetLogTable.userId, userId));
+
+  return quizSetLog;
+}
+
+/**
+ * クイズセットログIDからクイズログを取得する関数
+ * @param db データベースのインスタンス
+ * @param id クイズログID
+ * @returns クイズログ
+ */
+export const getQuizLogBySetId = async (
+  db: MySql2Database,
+  quizSetId: string,
+) => {
+  const quizLogs = await db
+    .select()
+    .from(quizLogTable)
+    .where(eq(quizLogTable.quizSetLogId, quizSetId));
+  return quizLogs;
+}

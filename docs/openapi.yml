@@ -159,10 +159,7 @@ components:
           description: クイズセットの正答率
         mode:
           type: string
-          enum:
-            - 'battle'
-            - 'time_attack'
-          description: クイズの出題形式（バトルかタイムアタックか）
+          description: クイズの出題形式
         answeredAt:
           type: string
           format: date-time
