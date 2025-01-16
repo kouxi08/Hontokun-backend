@@ -6,14 +6,14 @@ export const insertQuizModeSchema = createInsertSchema(quizModeTable, {
   id: z.string().uuid(),
   name: z.string().min(1).max(20),
   description: z.string().min(1).max(100),
-  is_public: z.boolean(),
+  isPublic: z.boolean(),
 });
 
 export const selectQuizModeSchema = createSelectSchema(quizModeTable, {
   id: z.string().uuid(),
   name: z.string().min(1).max(20),
   description: z.string().min(1).max(100),
-  is_public: z.boolean(),
-  created_at: z.date(),
-  updated_at: z.date(),
+  isPublic: z.boolean(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
 });
