@@ -38,7 +38,7 @@ app.use('/sign-up', authMiddleware);
 app.use('/main', authMiddleware);
 app.use('/quiz/result', authMiddleware);
 app.use('/history', authMiddleware);
-// app.use('/quiz/:tier', authMiddleware);
+app.use('/quiz/:tier', authMiddleware);
 
 app.onError((error, c) => {
   console.error(error);
@@ -75,7 +75,6 @@ app.post('sign-up', async (c: Context) => {
 
 app.get('/main', async (c: Context) => {
   const firebaseUid = c.get('firebaseUid');
-  console.log(firebaseUid);
   const user = await UserUsecase.getUserByFirebaseUid(db, firebaseUid);
   const costume = await CostumeUsecase.getCostume(db, user.id);
 
@@ -132,10 +131,10 @@ app.post('/quiz/result', async (c: Context) => {
       },
       enemy: enemy
         ? {
-            id: enemy.id,
-            name: enemy.name,
-            url: enemy.image.url,
-          }
+          id: enemy.id,
+          name: enemy.name,
+          url: enemy.image.url,
+        }
         : null,
     },
     200
@@ -144,31 +143,32 @@ app.post('/quiz/result', async (c: Context) => {
 
 app.get('/quiz/:tier', async (c: Context) => {
   const tier = Number(c.req.param('tier'));
-  const userId = c.get('firebaseUid');
+  const firebaseUid = c.get('firebaseUid');
+  const user = await UserUsecase.getUserByFirebaseUid(db, firebaseUid);
 
   // 着せ替え取得
-  const costume = await CostumeUsecase.getCostume(db, userId);
+  const costume = await CostumeUsecase.getCostume(db, user.id);
   // 指名手配猫画像取得
   const enemy = await EnemyUsecase.getQuizEnemy(db, tier);
 
   // クイズ取得
-  const quizzes: Quiz[] = await QuizUsecase.getQuizzes(db, userId, tier);
+  const quizzes: Quiz[] = await QuizUsecase.getQuizzes(db, user.id, tier);
   const quizList = quizzes.map((quiz) => convertQuizToAPI(quiz));
 
   const response: paths['/quiz/{tier}']['get']['responses']['200']['content']['application/json'] =
-    {
-      enemy: {
-        id: enemy.id,
-        name: enemy.name,
-        url: enemy.image.url,
-      },
-      costume: {
-        id: costume.id,
-        name: costume.name,
-        url: costume.image.url,
-      },
-      quizList,
-    };
+  {
+    enemy: {
+      id: enemy.id,
+      name: enemy.name,
+      url: enemy.image.url,
+    },
+    costume: {
+      id: costume.id,
+      name: costume.name,
+      url: costume.image.url,
+    },
+    quizList,
+  };
 
   return c.json(response, 200);
 });
