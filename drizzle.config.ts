@@ -4,7 +4,7 @@ import { DATABASE_URL } from './src/config/env.js';
 
 export default defineConfig({
   out: './drizzle',
-  schema: './src/database/mysql/schema/schema.ts',
+  schema: './src/database/mysql/schema/schema.js',
   casing: 'snake_case',
   dialect: 'mysql',
   dbCredentials: {

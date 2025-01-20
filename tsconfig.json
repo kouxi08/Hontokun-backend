@@ -15,7 +15,7 @@
     "allowSyntheticDefaultImports": true
   },
   "exclude": ["node_modules"],
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "drizzle.config.ts"],
   "plugins": [
     {
       "transform": "typescript-transform-extensions",
