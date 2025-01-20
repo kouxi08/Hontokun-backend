@@ -1,7 +1,7 @@
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
-import { quizLogTable } from '../schema/schema';
-import { idRegex } from '../../../core/regex';
+import { idRegex } from '../../../core/regex.js';
+import { quizLogTable } from '../schema/schema.js';
 
 const quizLogSchema = {
   id: z.string().uuid(),
@@ -12,14 +12,14 @@ const quizLogSchema = {
   time: z.number().int().min(0).optional(),
   createdAt: z.date(),
   updatedAt: z.date(),
-}
+};
 
 export const insertQuizLogSchema = createInsertSchema(quizLogTable, {
-  ...quizLogSchema
+  ...quizLogSchema,
 }).omit({ createdAt: true, updatedAt: true });
 
 export const selectQuizLogSchema = createSelectSchema(quizLogTable, {
-  ...quizLogSchema
+  ...quizLogSchema,
 });
 
 export type InsertQuizLogType = z.infer<typeof insertQuizLogSchema>;

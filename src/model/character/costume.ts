@@ -1,4 +1,5 @@
-import { Character, CharacterParams } from "./character";
+import type { CharacterParams } from './character';
+import { Character } from './character.js';
 
 type CostumeParams = CharacterParams & {
   lines: string;

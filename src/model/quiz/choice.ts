@@ -6,7 +6,7 @@ type ChoiceParams = {
 };
 
 export class Choice {
-  private constructor(private params: ChoiceParams) { }
+  private constructor(private params: ChoiceParams) {}
 
   public static create(params: ChoiceParams): Choice {
     return new Choice(params);

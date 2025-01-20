@@ -1,9 +1,9 @@
-import { MySql2Database } from 'drizzle-orm/mysql2';
-import { quiz } from '../database/cms/types/response';
-import * as QuizRepository from '../repository/quiz';
-import * as QuizLogRepository from '../repository/quizLog';
-import { Choice } from '../model/quiz/choice';
-import { Quiz } from '../model/quiz/quiz';
+import type { MySql2Database } from 'drizzle-orm/mysql2';
+import type { quiz } from '../database/cms/types/response';
+import { Choice } from '../model/quiz/choice.js';
+import { Quiz } from '../model/quiz/quiz.js';
+import * as QuizRepository from '../repository/quiz.js';
+import * as QuizLogRepository from '../repository/quizLog.js';
 
 export const createQuiz = async (
   db: MySql2Database,
@@ -23,14 +23,16 @@ export const updateQuiz = async (
 
 // 共通のデータ変換関数
 const mapQuizData = (quiz: quiz<'get'>): Quiz => {
-  const choices = quiz.choices ? quiz.choices!.split('\n').map((choice) => {
-    return Choice.create({
-      id: null,
-      name: choice,
-      createdAt: new Date(quiz.createdAt),
-      updatedAt: new Date(quiz.updatedAt),
-    });
-  }) : [];
+  const choices = quiz.choices
+    ? quiz.choices!.split('\n').map((choice) => {
+        return Choice.create({
+          id: null,
+          name: choice,
+          createdAt: new Date(quiz.createdAt),
+          updatedAt: new Date(quiz.updatedAt),
+        });
+      })
+    : [];
 
   return Quiz.create({
     id: quiz.id,
@@ -63,6 +65,10 @@ export const getQuizzes = async (
 ): Promise<Quiz[]> => {
   // クイズを取得
   const solvedQuizIds = await QuizLogRepository.getSolvedQuizIds(db, userId);
-  const quizzes = await QuizRepository.getQuizzesByTier(db, tier, solvedQuizIds);
+  const quizzes = await QuizRepository.getQuizzesByTier(
+    db,
+    tier,
+    solvedQuizIds
+  );
   return quizzes;
 };

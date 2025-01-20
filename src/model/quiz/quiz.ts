@@ -1,4 +1,4 @@
-import { Choice } from './choice';
+import { Choice } from './choice.js';
 
 export type QuizParams = {
   id: string;
@@ -24,7 +24,7 @@ export type QuizParams = {
 };
 
 export class Quiz {
-  private constructor(private params: QuizParams) { }
+  private constructor(private params: QuizParams) {}
 
   public static create(params: QuizParams): Quiz {
     return new Quiz({
@@ -117,4 +117,3 @@ export class Quiz {
     return this.params;
   }
 }
-

@@ -1,5 +1,8 @@
-import { InferInsertModel, InferSelectModel } from "drizzle-orm";
-import { quizChoiceTable, quizTable } from "../database/mysql/schema/schema";
+import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
+import type {
+  quizChoiceTable,
+  quizTable,
+} from '../database/mysql/schema/schema';
 
 export type SelectQuizType = InferSelectModel<typeof quizTable>;
 export type SelectChoiceType = InferSelectModel<typeof quizChoiceTable>;

@@ -12,4 +12,4 @@ export const formatDate = (date: Date): string => {
   const seconds = String(date.getSeconds()).padStart(2, '0');
 
   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-}
+};

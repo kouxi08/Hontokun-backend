@@ -8,4 +8,4 @@ export type User = {
   costumeId: string;
   createdAt?: Date;
   updatedAt?: Date;
-}
+};

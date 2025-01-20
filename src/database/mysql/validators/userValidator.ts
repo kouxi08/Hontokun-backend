@@ -1,7 +1,7 @@
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
-import { usersTable } from '../schema/schema';
-import { idRegex } from '../../../core/regex';
+import { idRegex } from '../../../core/regex.js';
+import { usersTable } from '../schema/schema.js';
 
 const userSchema = {
   id: z.string().uuid(),
@@ -13,11 +13,19 @@ const userSchema = {
   costumeId: z.string().regex(idRegex),
   createdAt: z.date(),
   updatedAt: z.date(),
-}
+};
 
-export const insertUserSchema = createInsertSchema(usersTable, { ...userSchema })
+export const insertUserSchema = createInsertSchema(usersTable, {
+  ...userSchema,
+})
   .omit({ createdAt: true, updatedAt: true })
-  .required({ firebaseUid: true, nickname: true, level: true, experience: true, costumeId: true });
+  .required({
+    firebaseUid: true,
+    nickname: true,
+    level: true,
+    experience: true,
+    costumeId: true,
+  });
 
 export const selectUserSchema = createSelectSchema(usersTable, {
   ...userSchema,
