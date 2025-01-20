@@ -1,6 +1,6 @@
 import type { app } from 'firebase-admin';
 import { createMiddleware } from 'hono/factory';
-import { AuthError } from '../core/error';
+import { AuthError } from '../core/error.js';
 import type { Variables } from '../core/variables';
 
 const createAuthMiddleware = (firebaseApp: app.App) => {

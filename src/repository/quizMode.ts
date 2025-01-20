@@ -1,16 +1,16 @@
-import { MySql2Database } from "drizzle-orm/mysql2";
-import { quizModeTable } from "../database/mysql/schema/schema";
-import { eq } from "drizzle-orm";
+import { eq } from 'drizzle-orm';
+import type { MySql2Database } from 'drizzle-orm/mysql2';
+import { quizModeTable } from '../database/mysql/schema/schema.js';
 
 /**
- * 
+ *
  * @param db データベースのインスタンス
  * @param mode クイズモードの名前
  * @returns quizModeId クイズモードID
  */
 export const getQuizModeId = async (
   db: MySql2Database,
-  mode: string,
+  mode: string
 ): Promise<string> => {
   const data = await db
     .select({ id: quizModeTable.id })
@@ -22,7 +22,7 @@ export const getQuizModeId = async (
   }
 
   return data[0].id;
-}
+};
 
 /**
  * クイズモードIDからクイズモード名を取得する
@@ -32,7 +32,7 @@ export const getQuizModeId = async (
  */
 export const getQuizModeName = async (
   db: MySql2Database,
-  id: string,
+  id: string
 ): Promise<string> => {
   const data = await db
     .select({ name: quizModeTable.name })
@@ -43,4 +43,4 @@ export const getQuizModeName = async (
     throw new Error('Quiz mode not found');
   }
   return data[0].name;
-}
+};

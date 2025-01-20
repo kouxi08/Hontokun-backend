@@ -1,4 +1,4 @@
-import { Quiz } from '../../../model/quiz/quiz';
+import type { Quiz } from '../../../model/quiz/quiz';
 import type { components as OpenapiComponents } from '../../../openapi/schema';
 
 type OpenAPIQuiz = OpenapiComponents['schemas']['Quiz'];

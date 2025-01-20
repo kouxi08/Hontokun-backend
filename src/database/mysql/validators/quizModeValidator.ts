@@ -1,6 +1,6 @@
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
-import { quizModeTable } from '../schema/schema';
+import { quizModeTable } from '../schema/schema.js';
 
 export const insertQuizModeSchema = createInsertSchema(quizModeTable, {
   id: z.string().uuid(),

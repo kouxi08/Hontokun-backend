@@ -10,7 +10,7 @@ import {
   text,
   varchar,
 } from 'drizzle-orm/mysql-core';
-import { timestamps } from './columns.helpers';
+import { timestamps } from './columns.helpers.js';
 
 /**
  * テーブル

@@ -1,9 +1,12 @@
 import { createClient } from 'microcms-js-sdk';
-import { MICROCMS_API_KEY, MICROCMS_SERVICE_DOMAIN } from '../../../config/env';
+import {
+  MICROCMS_API_KEY,
+  MICROCMS_SERVICE_DOMAIN,
+} from '../../../config/env.js';
 
 const client = createClient({
   serviceDomain: MICROCMS_SERVICE_DOMAIN,
-  apiKey: MICROCMS_API_KEY
+  apiKey: MICROCMS_API_KEY,
 });
 
 /**
@@ -12,7 +15,7 @@ const client = createClient({
  * @param queries - クエリパラメータ (オプション)
  * @returns フェッチしたデータ
  */
-export const fetchMicroCMSData = async<T>(
+export const fetchMicroCMSData = async <T>(
   endpoint: string,
   queries?: Record<string, unknown>
 ): Promise<T> => {

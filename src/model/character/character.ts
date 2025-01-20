@@ -14,7 +14,7 @@ export type CharacterParams = {
 };
 
 export abstract class Character {
-  protected constructor(protected params: CharacterParams) { }
+  protected constructor(protected params: CharacterParams) {}
 
   get id(): string {
     return this.params.id;

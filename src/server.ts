@@ -3,25 +3,28 @@ import { drizzle } from 'drizzle-orm/mysql2';
 import type { Context } from 'hono';
 import { Hono } from 'hono';
 import { logger } from 'hono/logger';
-import { DATABASE_URL } from './config/env';
-import { firebaseApp } from './config/firebase';
-import { createAuthMiddleware } from './middleware/auth';
-import { corsMiddleware } from './middleware/cors';
-import * as QuizUsecase from './usecase/quiz';
 import { prettyJSON } from 'hono/pretty-json';
 import { ZodError } from 'zod';
-import { Quiz } from './model/quiz/quiz';
-import { convertQuizToAPI } from './core/converter/api/quiz';
-import { quiz } from './database/cms/types/response';
-import * as CostumeUsecase from './usecase/costume';
-import * as EnemyUsecase from './usecase/enemy';
-import { paths } from './openapi/schema';
-import { quizModeSchema, quizResultSchema } from './core/validator/quizResultValidators';
-import * as QuizLogUsecase from './usecase/quizLog';
-import * as UserUsecase from './usecase/user';
-import { createUserSchema } from './core/validator/createUserValidator';
-import { AuthError } from './core/error';
-import { History } from './types/api/history';
+import { DATABASE_URL } from './config/env.js';
+import { firebaseApp } from './config/firebase.js';
+import { convertQuizToAPI } from './core/converter/api/quiz.js';
+import { AuthError } from './core/error.js';
+import { createUserSchema } from './core/validator/createUserValidator.js';
+import {
+  quizModeSchema,
+  quizResultSchema,
+} from './core/validator/quizResultValidators.js';
+import type { quiz } from './database/cms/types/response';
+import { createAuthMiddleware } from './middleware/auth.js';
+import { corsMiddleware } from './middleware/cors.js';
+import type { Quiz } from './model/quiz/quiz';
+import type { paths } from './openapi/schema';
+import * as CostumeUsecase from './usecase/costume.js';
+import * as QuizUsecase from './usecase/quiz.js';
+import * as EnemyUsecase from './usecase/enemy.js';
+import * as QuizLogUsecase from './usecase/quizLog.js';
+import * as UserUsecase from './usecase/user.js';
+import type { History } from './types/api/history';
 
 export const app = new Hono();
 export const db = drizzle({ connection: DATABASE_URL, casing: 'snake_case' });
@@ -40,10 +43,17 @@ app.use('/history', authMiddleware);
 app.onError((error, c) => {
   console.error(error);
   const errorResponse = (status: number, message: string) => {
-    return c.json({ error: { name: error.name, message: error.message } }, { status });
+    return c.json(
+      { error: { name: error.name, message: error.message } },
+      { status }
+    );
+  };
+  if (error instanceof AuthError) {
+    return errorResponse(401, error.message);
   }
-  if (error instanceof AuthError) return errorResponse(401, error.message);
-  if (error instanceof ZodError) return errorResponse(500, error.message);
+  if (error instanceof ZodError) {
+    return errorResponse(500, error.message);
+  }
 
   return errorResponse(500, 'Something unexpected happened');
 });
@@ -55,12 +65,13 @@ app.get('/health-check', (c: Context) => {
 
 app.post('sign-up', async (c: Context) => {
   const userId = c.get('firebaseUid');
-  const body: paths['/sign-up']['post']['requestBody']['content']['application/json'] = await c.req.json();
+  const body: paths['/sign-up']['post']['requestBody']['content']['application/json'] =
+    await c.req.json();
   const { nickname, birthday } = createUserSchema.parse(body);
   const user = await UserUsecase.createUser(db, userId, nickname, birthday);
 
   return c.json(user, 200);
-})
+});
 
 app.get('/main', async (c: Context) => {
   const firebaseUid = c.get('firebaseUid');
@@ -81,41 +92,54 @@ app.get('/main', async (c: Context) => {
       name: costume.name,
       url: costume.image.url,
       dialogue: costume.lines,
-    }
-  })
-})
+    },
+  });
+});
 
 app.post('/quiz/result', async (c: Context) => {
   const firebaseUid = c.get('firebaseUid');
   const user = await UserUsecase.getUserByFirebaseUid(db, firebaseUid);
-  const body: paths['/quiz/result']['post']['requestBody']['content']['application/json'] = await c.req.json();
+  const body: paths['/quiz/result']['post']['requestBody']['content']['application/json'] =
+    await c.req.json();
   const quizMode = quizModeSchema.parse(body.quizMode);
   const answers = body.answers!.map((data) => quizResultSchema.parse(data));
   const quizData = answers.map((data) => {
     const { quizId, answer, answerTime } = data;
     return { quizId, answer, answerTime };
-  })
-  const { quizSetId, accuracy, quizList } = await QuizLogUsecase.createQuizLog(db, user, quizMode, quizData);
+  });
+  const { quizSetId, accuracy, quizList } = await QuizLogUsecase.createQuizLog(
+    db,
+    user,
+    quizMode,
+    quizData
+  );
   const costume = await CostumeUsecase.getCostume(db, user.id);
 
   // TODO: 指名手配猫画像返却
-  const enemy = quizList[0] ? await EnemyUsecase.getQuizEnemy(db, quizList[0].tier) : null;
+  const enemy = quizList[0]
+    ? await EnemyUsecase.getQuizEnemy(db, quizList[0].tier)
+    : null;
 
-  return c.json({
-    quizSetId,
-    accuracy,
-    quizList,
-    costume: {
-      id: costume.id,
-      name: costume.name,
-      url: costume.image.url,
+  return c.json(
+    {
+      quizSetId,
+      accuracy,
+      quizList,
+      costume: {
+        id: costume.id,
+        name: costume.name,
+        url: costume.image.url,
+      },
+      enemy: enemy
+        ? {
+            id: enemy.id,
+            name: enemy.name,
+            url: enemy.image.url,
+          }
+        : null,
     },
-    enemy: enemy ? {
-      id: enemy.id,
-      name: enemy.name,
-      url: enemy.image.url,
-    } : null,
-  }, 200);
+    200
+  );
 });
 
 app.get('/quiz/:tier', async (c: Context) => {
@@ -131,19 +155,20 @@ app.get('/quiz/:tier', async (c: Context) => {
   const quizzes: Quiz[] = await QuizUsecase.getQuizzes(db, userId, tier);
   const quizList = quizzes.map((quiz) => convertQuizToAPI(quiz));
 
-  const response: paths['/quiz/{tier}']['get']['responses']['200']['content']['application/json'] = {
-    enemy: {
-      id: enemy.id,
-      name: enemy.name,
-      url: enemy.image.url,
-    },
-    costume: {
-      id: costume.id,
-      name: costume.name,
-      url: costume.image.url,
-    },
-    quizList,
-  }
+  const response: paths['/quiz/{tier}']['get']['responses']['200']['content']['application/json'] =
+    {
+      enemy: {
+        id: enemy.id,
+        name: enemy.name,
+        url: enemy.image.url,
+      },
+      costume: {
+        id: costume.id,
+        name: costume.name,
+        url: costume.image.url,
+      },
+      quizList,
+    };
 
   return c.json(response, 200);
 });
@@ -156,34 +181,39 @@ app.get('/history', async (c: Context) => {
   const history: History = {};
   const logs = await QuizLogUsecase.getAllQuizLog(db, user.id);
   let totalAccuracy = 0;
-  history.tierList = await Promise.all(logs.map(async (log) => {
-    const enemy = await EnemyUsecase.getQuizEnemy(db, log.tier);
-    totalAccuracy += log.accuracy;
-    return {
-      ...log,
-      enemy: {
-        id: enemy.id,
-        name: enemy.name,
-        url: enemy.image.url,
-      }
-    }
-  }));
+  history.tierList = await Promise.all(
+    logs.map(async (log) => {
+      const enemy = await EnemyUsecase.getQuizEnemy(db, log.tier);
+      totalAccuracy += log.accuracy;
+      return {
+        ...log,
+        enemy: {
+          id: enemy.id,
+          name: enemy.name,
+          url: enemy.image.url,
+        },
+      };
+    })
+  );
   history.totalAccuracy = totalAccuracy / logs.length;
 
-  return c.json({
-    user: {
-      id: user.id,
-      nickname: user.nickname,
-      birthday: user.birthday,
-      costume: {
-        id: costume.id,
-        name: costume.name,
-        url: costume.image.url,
-      }
+  return c.json(
+    {
+      user: {
+        id: user.id,
+        nickname: user.nickname,
+        birthday: user.birthday,
+        costume: {
+          id: costume.id,
+          name: costume.name,
+          url: costume.image.url,
+        },
+      },
+      history,
     },
-    history,
-  }, 200);
-})
+    200
+  );
+});
 
 app.post('/webhook/quiz', async (c: Context) => {
   const req = await c.req.json();

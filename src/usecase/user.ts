@@ -1,19 +1,22 @@
-import { MySql2Database } from "drizzle-orm/mysql2";
-import { User } from "../model/user/user";
-import * as UserRepository from "../repository/user";
-import { fetchMicroCMSData } from "../core/converter/api/microcms";
-import { characters } from "../database/cms/types/response";
-import { APIError } from "../core/error";
-import { DEFAULT_COSTUME_NAME, MAX_EXPERIENCE } from "../core/constants";
+import type { MySql2Database } from 'drizzle-orm/mysql2';
+import { DEFAULT_COSTUME_NAME, MAX_EXPERIENCE } from '../core/constants.js';
+import { fetchMicroCMSData } from '../core/converter/api/microcms.js';
+import { APIError } from '../core/error.js';
+import type { characters } from '../database/cms/types/response';
+import type { User } from '../model/user/user';
+import * as UserRepository from '../repository/user.js';
 
 export const createUser = async (
   db: MySql2Database,
   firebaseUid: string,
   nickname: string,
-  birthday: string,
+  birthday: string
 ): Promise<User> => {
   const uid = crypto.randomUUID();
-  const defaultCostume = await fetchMicroCMSData<characters<'get'>[]>('characters', { filters: `name[equals]${DEFAULT_COSTUME_NAME}` });
+  const defaultCostume = await fetchMicroCMSData<characters<'get'>[]>(
+    'characters',
+    { filters: `name[equals]${DEFAULT_COSTUME_NAME}` }
+  );
   if (!defaultCostume || defaultCostume.length === 0) {
     throw new APIError('costume data is not found');
   }
@@ -25,9 +28,9 @@ export const createUser = async (
     level: 1,
     experience: 0,
     costumeId: defaultCostume.find((c) => c.name === DEFAULT_COSTUME_NAME)!.id,
-  }
+  };
   return await UserRepository.createUser(db, user);
-}
+};
 
 /**
  * FirebaseUidからユーザを取得する
@@ -37,7 +40,7 @@ export const createUser = async (
  */
 export const getUserByFirebaseUid = async (
   db: MySql2Database,
-  firebaseUid: string,
+  firebaseUid: string
 ): Promise<User> => {
   const user = await UserRepository.getUserByFirebaseUid(db, firebaseUid);
   if (!user) {
@@ -45,7 +48,7 @@ export const getUserByFirebaseUid = async (
   }
 
   return user;
-}
+};
 
 /**
  * ユーザの経験値とレベルを更新する
@@ -57,7 +60,7 @@ export const getUserByFirebaseUid = async (
 export const updateUserExp = async (
   db: MySql2Database,
   user: User,
-  tier: number,
+  tier: number
 ): Promise<void> => {
   let newExp = user.experience + tier;
 
@@ -65,9 +68,9 @@ export const updateUserExp = async (
   let levelUpCount = 0;
   if (newExp >= MAX_EXPERIENCE) {
     levelUpCount = Math.floor(newExp / MAX_EXPERIENCE);
-    newExp = newExp % MAX_EXPERIENCE
+    newExp = newExp % MAX_EXPERIENCE;
   }
   const newLevel = user.level + levelUpCount;
   await UserRepository.updateUserExperience(db, user.id, newExp, newLevel);
   return;
-}
+};
