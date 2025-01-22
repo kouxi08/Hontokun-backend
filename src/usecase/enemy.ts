@@ -16,7 +16,6 @@ export const getQuizEnemy = async (
   const data = await fetchMicroCMSData<characters<'get'>[]>('characters', {
     filters: `tier[equals]${tier}`,
   });
-  console.log(data);
   if (!data || data.length === 0) {
     throw new Error('enemy data is not found');
   }
