@@ -16,7 +16,7 @@ import {
 } from './core/validator/quizResultValidators.js';
 import type { quiz } from './database/cms/types/response';
 import { createAuthMiddleware } from './middleware/auth.js';
-import { corsMiddleware } from './middleware/cors.js';
+import { corsMiddleware, corsMiddlewareForMicroCMS } from './middleware/cors.js';
 import type { Quiz } from './model/quiz/quiz';
 import type { paths } from './openapi/schema';
 import * as CostumeUsecase from './usecase/costume.js';
@@ -36,7 +36,8 @@ const authMiddleware = createAuthMiddleware(firebaseApp);
 
 app.use(logger());
 app.use(prettyJSON());
-app.use('/webhook/quiz', corsMiddleware());
+app.use('/webhook/quiz', corsMiddlewareForMicroCMS());
+app.use(corsMiddleware());
 app.use('/sign-up', authMiddleware);
 app.use('/main', authMiddleware);
 app.use('/quiz/result', authMiddleware);
