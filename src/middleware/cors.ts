@@ -3,7 +3,7 @@ import { APP_BASE_URL } from '../config/env.js';
 
 export const corsMiddleware = () => {
   return cors({
-    origin: [APP_BASE_URL, 'http://localhost:3000'],
+    origin: [APP_BASE_URL, 'http://localhost:8080'],
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'Content-Type'],
     allowHeaders: ['Content-Type'],
     exposeHeaders: ['Content-Length', 'X-Kuma-Revision'],
