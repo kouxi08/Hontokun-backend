@@ -159,12 +159,16 @@ export const getQuizSetDetail = async (
     throw new Error('Quiz set not found');
   }
   // クイズモード名を取得
-  const quizMode = await QuizModeRepository.getQuizModeName(db, quizSet.quizModeId);
+  const quizMode = await QuizModeRepository.getQuizModeName(
+    db,
+    quizSet.quizModeId
+  );
 
   // クイズログ取得
   const quizLogs = await QuizLogRepository.getQuizLogBySetId(db, quizSetId);
   // 正答率計算
-  const accuracy = quizLogs.filter((log) => log.isCorrect).length / quizLogs.length * 100;
+  const accuracy =
+    (quizLogs.filter((log) => log.isCorrect).length / quizLogs.length) * 100;
 
   // クイズ取得
   const quizList = await Promise.all(
@@ -182,4 +186,4 @@ export const getQuizSetDetail = async (
   );
 
   return { ...quizSet, mode: quizMode, accuracy: accuracy, quizList };
-}
+};

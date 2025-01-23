@@ -25,7 +25,7 @@ import * as EnemyUsecase from './usecase/enemy.js';
 import * as QuizLogUsecase from './usecase/quizLog.js';
 import * as UserUsecase from './usecase/user.js';
 import type { History } from './types/api/history';
-import { zValidator } from '@hono/zod-validator'
+import { zValidator } from '@hono/zod-validator';
 import { Variables } from './core/variables.js';
 import { formatDate } from './core/formatDate.js';
 
@@ -135,10 +135,10 @@ app.post('/quiz/result', async (c: Context) => {
       },
       enemy: enemy
         ? {
-          id: enemy.id,
-          name: enemy.name,
-          url: enemy.image.url,
-        }
+            id: enemy.id,
+            name: enemy.name,
+            url: enemy.image.url,
+          }
         : null,
     },
     200
@@ -160,19 +160,19 @@ app.get('/quiz/:tier', async (c: Context) => {
   const quizList = quizzes.map((quiz) => convertQuizToAPI(quiz));
 
   const response: paths['/quiz/{tier}']['get']['responses']['200']['content']['application/json'] =
-  {
-    enemy: {
-      id: enemy.id,
-      name: enemy.name,
-      url: enemy.image.url,
-    },
-    costume: {
-      id: costume.id,
-      name: costume.name,
-      url: costume.image.url,
-    },
-    quizList,
-  };
+    {
+      enemy: {
+        id: enemy.id,
+        name: enemy.name,
+        url: enemy.image.url,
+      },
+      costume: {
+        id: costume.id,
+        name: costume.name,
+        url: costume.image.url,
+      },
+      quizList,
+    };
 
   return c.json(response, 200);
 });
@@ -219,23 +219,37 @@ app.get('/history', async (c: Context) => {
   );
 });
 
-app.get('/history/quiz-set/:quizSetId', zValidator('param', z.object({
-  quizSetId: z.string(),
-})), async (c) => {
-  const quizSetId = c.req.valid('param').quizSetId;
-  const firebaseUid = c.get('firebaseUid');
-  const user = await UserUsecase.getUserByFirebaseUid(db, firebaseUid);
-  const quizSet = await QuizLogUsecase.getQuizSetDetail(db, user.id, quizSetId);
-  return c.json({
-    quizSet: {
-      id: quizSet.id,
-      accuracy: quizSet.accuracy,
-      mode: quizSet.mode,
-      answeredAt: formatDate(quizSet.createdAt),
-    },
-    quizList: quizSet.quizList,
-  }, 200);
-})
+app.get(
+  '/history/quiz-set/:quizSetId',
+  zValidator(
+    'param',
+    z.object({
+      quizSetId: z.string(),
+    })
+  ),
+  async (c) => {
+    const quizSetId = c.req.valid('param').quizSetId;
+    const firebaseUid = c.get('firebaseUid');
+    const user = await UserUsecase.getUserByFirebaseUid(db, firebaseUid);
+    const quizSet = await QuizLogUsecase.getQuizSetDetail(
+      db,
+      user.id,
+      quizSetId
+    );
+    return c.json(
+      {
+        quizSet: {
+          id: quizSet.id,
+          accuracy: quizSet.accuracy,
+          mode: quizSet.mode,
+          answeredAt: formatDate(quizSet.createdAt),
+        },
+        quizList: quizSet.quizList,
+      },
+      200
+    );
+  }
+);
 
 app.post('/webhook/quiz', async (c: Context) => {
   const req = await c.req.json();

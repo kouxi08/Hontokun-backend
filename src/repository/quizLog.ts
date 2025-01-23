@@ -113,11 +113,11 @@ export const getQuizLogBySetId = async (
  */
 export const getQuizSetLogById = async (
   db: MySql2Database,
-  quizSetId: string,
+  quizSetId: string
 ) => {
   const quizSetLog = await db
     .select()
     .from(quizSetLogTable)
     .where(eq(quizSetLogTable.id, quizSetId));
   return quizSetLog[0];
-}
+};
