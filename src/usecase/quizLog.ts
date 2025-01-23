@@ -140,3 +140,32 @@ export const getAllQuizLog = async (db: MySql2Database, userId: string) => {
   }
   return response;
 };
+
+/**
+ * クイズセットIDからクイズセットの詳細を取得する
+ * @param db データベースのインスタンス
+ * @param quizSetId クイズセットのID
+ */
+export const getQuizSetDetail = async (
+  db: MySql2Database,
+  userId: string,
+  quizSetId: string
+) => {
+  // TODO: ユーザがクイズセットを解いたか確認
+
+  // クイズセット内容を取得
+  const quizSet = await QuizLogRepository.getQuizSetLogById(db, quizSetId);
+  if (!quizSet) {
+    throw new Error('Quiz set not found');
+  }
+  // クイズモード名を取得
+  const quizMode = await QuizModeRepository.getQuizModeName(db, quizSet.quizModeId);
+
+  // クイズログ取得
+  const quizLogs = await QuizLogRepository.getQuizLogBySetId(db, quizSetId);
+  // 正答率計算
+  const accuracy = quizLogs.filter((log) => log.isCorrect).length / quizLogs.length * 100;
+
+
+  return { ...quizSet, mode: quizMode, accuracy: accuracy };
+}

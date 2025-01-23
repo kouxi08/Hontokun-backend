@@ -104,3 +104,20 @@ export const getQuizLogBySetId = async (
     .where(eq(quizLogTable.quizSetLogId, quizSetId));
   return quizLogs;
 };
+
+/**
+ * クイズセットログIDからクイズセットの詳細を取得する関数
+ * @param db データベースのインスタンス
+ * @param quizSetId クイズセットID
+ * @returns クイズセットの詳細
+ */
+export const getQuizSetLogById = async (
+  db: MySql2Database,
+  quizSetId: string,
+) => {
+  const quizSetLog = await db
+    .select()
+    .from(quizSetLogTable)
+    .where(eq(quizSetLogTable.id, quizSetId));
+  return quizSetLog[0];
+}
