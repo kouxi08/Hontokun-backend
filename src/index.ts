@@ -7,11 +7,11 @@ export type Client = typeof client;
 export const hcWithType = (...args: Parameters<typeof hc>): Client => hc<typeof app>(...args)
 
 async function main() {
-  serve(app)
-    .listen(3000)
-    .once('listening', () => {
-      console.log('🚀 Server started on port 3000');
-    });
+  serve({
+    fetch: app.fetch,
+    port: 3000,
+  })
+  console.log('🚀 Server started on port 3000');
 }
 
 main().catch((err) => {
