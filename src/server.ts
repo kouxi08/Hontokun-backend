@@ -226,14 +226,14 @@ app.get('/history/quiz-set/:quizSetId', zValidator('param', z.object({
   const firebaseUid = c.get('firebaseUid');
   const user = await UserUsecase.getUserByFirebaseUid(db, firebaseUid);
   const quizSet = await QuizLogUsecase.getQuizSetDetail(db, user.id, quizSetId);
-  // const quizList = await QuizLogUsecase.getQuizBySetLogId(db, quizSetId);
   return c.json({
     quizSet: {
       id: quizSet.id,
       accuracy: quizSet.accuracy,
       mode: quizSet.mode,
       answeredAt: formatDate(quizSet.createdAt),
-    }
+    },
+    quizList: quizSet.quizList,
   }, 200);
 })
 

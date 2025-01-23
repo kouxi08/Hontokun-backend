@@ -166,6 +166,19 @@ export const getQuizSetDetail = async (
   // 正答率計算
   const accuracy = quizLogs.filter((log) => log.isCorrect).length / quizLogs.length * 100;
 
+  // クイズ取得
+  const quizList = await Promise.all(
+    quizLogs.map(async (log) => {
+      const quiz = await QuizRepository.getQuizById(db, log.quizId);
+      if (!quiz) {
+        throw new Error('Quiz not found');
+      }
+      return {
+        ...quiz.toJSON(),
+        isCorrect: quiz.answer === log.userAnswer,
+      };
+    })
+  );
 
-  return { ...quizSet, mode: quizMode, accuracy: accuracy };
+  return { ...quizSet, mode: quizMode, accuracy: accuracy, quizList };
 }
