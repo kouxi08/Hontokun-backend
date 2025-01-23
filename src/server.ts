@@ -4,7 +4,7 @@ import type { Context } from 'hono';
 import { Hono } from 'hono';
 import { logger } from 'hono/logger';
 import { prettyJSON } from 'hono/pretty-json';
-import { ZodError } from 'zod';
+import { z, ZodError } from 'zod';
 import { DATABASE_URL } from './config/env.js';
 import { firebaseApp } from './config/firebase.js';
 import { convertQuizToAPI } from './core/converter/api/quiz.js';
@@ -25,8 +25,11 @@ import * as EnemyUsecase from './usecase/enemy.js';
 import * as QuizLogUsecase from './usecase/quizLog.js';
 import * as UserUsecase from './usecase/user.js';
 import type { History } from './types/api/history';
+import { zValidator } from '@hono/zod-validator';
+import { Variables } from './core/variables.js';
+import { formatDate } from './core/formatDate.js';
 
-export const app = new Hono();
+export const app = new Hono<{ Variables: Variables }>();
 export const db = drizzle({ connection: DATABASE_URL, casing: 'snake_case' });
 
 const authMiddleware = createAuthMiddleware(firebaseApp);
@@ -40,6 +43,7 @@ app.use('/main', authMiddleware);
 app.use('/quiz/result', authMiddleware);
 app.use('/history', authMiddleware);
 app.use('/quiz/:tier', authMiddleware);
+app.use('/history/quiz-set/:quizSetId', authMiddleware);
 
 app.onError((error, c) => {
   console.error(error);
@@ -132,10 +136,10 @@ app.post('/quiz/result', async (c: Context) => {
       },
       enemy: enemy
         ? {
-          id: enemy.id,
-          name: enemy.name,
-          url: enemy.image.url,
-        }
+            id: enemy.id,
+            name: enemy.name,
+            url: enemy.image.url,
+          }
         : null,
     },
     200
@@ -157,19 +161,19 @@ app.get('/quiz/:tier', async (c: Context) => {
   const quizList = quizzes.map((quiz) => convertQuizToAPI(quiz));
 
   const response: paths['/quiz/{tier}']['get']['responses']['200']['content']['application/json'] =
-  {
-    enemy: {
-      id: enemy.id,
-      name: enemy.name,
-      url: enemy.image.url,
-    },
-    costume: {
-      id: costume.id,
-      name: costume.name,
-      url: costume.image.url,
-    },
-    quizList,
-  };
+    {
+      enemy: {
+        id: enemy.id,
+        name: enemy.name,
+        url: enemy.image.url,
+      },
+      costume: {
+        id: costume.id,
+        name: costume.name,
+        url: costume.image.url,
+      },
+      quizList,
+    };
 
   return c.json(response, 200);
 });
@@ -215,6 +219,38 @@ app.get('/history', async (c: Context) => {
     200
   );
 });
+
+app.get(
+  '/history/quiz-set/:quizSetId',
+  zValidator(
+    'param',
+    z.object({
+      quizSetId: z.string(),
+    })
+  ),
+  async (c) => {
+    const quizSetId = c.req.valid('param').quizSetId;
+    const firebaseUid = c.get('firebaseUid');
+    const user = await UserUsecase.getUserByFirebaseUid(db, firebaseUid);
+    const quizSet = await QuizLogUsecase.getQuizSetDetail(
+      db,
+      user.id,
+      quizSetId
+    );
+    return c.json(
+      {
+        quizSet: {
+          id: quizSet.id,
+          accuracy: quizSet.accuracy,
+          mode: quizSet.mode,
+          answeredAt: formatDate(quizSet.createdAt),
+        },
+        quizList: quizSet.quizList,
+      },
+      200
+    );
+  }
+);
 
 app.post('/webhook/quiz', async (c: Context) => {
   const req = await c.req.json();
