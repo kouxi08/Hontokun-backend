@@ -4,7 +4,7 @@ import type { Context } from 'hono';
 import { Hono } from 'hono';
 import { logger } from 'hono/logger';
 import { prettyJSON } from 'hono/pretty-json';
-import { ZodError } from 'zod';
+import { z, ZodError } from 'zod';
 import { DATABASE_URL } from './config/env.js';
 import { firebaseApp } from './config/firebase.js';
 import { convertQuizToAPI } from './core/converter/api/quiz.js';
@@ -16,7 +16,7 @@ import {
 } from './core/validator/quizResultValidators.js';
 import type { quiz } from './database/cms/types/response';
 import { createAuthMiddleware } from './middleware/auth.js';
-import { corsMiddleware } from './middleware/cors.js';
+import { corsMiddleware, corsMiddlewareForMicroCMS } from './middleware/cors.js';
 import type { Quiz } from './model/quiz/quiz';
 import type { paths } from './openapi/schema';
 import * as CostumeUsecase from './usecase/costume.js';
@@ -25,20 +25,25 @@ import * as EnemyUsecase from './usecase/enemy.js';
 import * as QuizLogUsecase from './usecase/quizLog.js';
 import * as UserUsecase from './usecase/user.js';
 import type { History } from './types/api/history';
+import { zValidator } from '@hono/zod-validator';
+import { Variables } from './core/variables.js';
+import { formatDate } from './core/formatDate.js';
 
-export const app = new Hono();
+export const app = new Hono<{ Variables: Variables }>();
 export const db = drizzle({ connection: DATABASE_URL, casing: 'snake_case' });
 
 const authMiddleware = createAuthMiddleware(firebaseApp);
 
 app.use(logger());
 app.use(prettyJSON());
-app.use('/webhook/quiz', corsMiddleware());
+app.use('/webhook/quiz', corsMiddlewareForMicroCMS());
+app.use(corsMiddleware());
 app.use('/sign-up', authMiddleware);
 app.use('/main', authMiddleware);
 app.use('/quiz/result', authMiddleware);
 app.use('/history', authMiddleware);
-// app.use('/quiz/:tier', authMiddleware);
+app.use('/quiz/:tier', authMiddleware);
+app.use('/history/quiz-set/:quizSetId', authMiddleware);
 
 app.onError((error, c) => {
   console.error(error);
@@ -75,7 +80,6 @@ app.post('sign-up', async (c: Context) => {
 
 app.get('/main', async (c: Context) => {
   const firebaseUid = c.get('firebaseUid');
-  console.log(firebaseUid);
   const user = await UserUsecase.getUserByFirebaseUid(db, firebaseUid);
   const costume = await CostumeUsecase.getCostume(db, user.id);
 
@@ -144,15 +148,16 @@ app.post('/quiz/result', async (c: Context) => {
 
 app.get('/quiz/:tier', async (c: Context) => {
   const tier = Number(c.req.param('tier'));
-  const userId = c.get('firebaseUid');
+  const firebaseUid = c.get('firebaseUid');
+  const user = await UserUsecase.getUserByFirebaseUid(db, firebaseUid);
 
   // 着せ替え取得
-  const costume = await CostumeUsecase.getCostume(db, userId);
+  const costume = await CostumeUsecase.getCostume(db, user.id);
   // 指名手配猫画像取得
   const enemy = await EnemyUsecase.getQuizEnemy(db, tier);
 
   // クイズ取得
-  const quizzes: Quiz[] = await QuizUsecase.getQuizzes(db, userId, tier);
+  const quizzes: Quiz[] = await QuizUsecase.getQuizzes(db, user.id, tier);
   const quizList = quizzes.map((quiz) => convertQuizToAPI(quiz));
 
   const response: paths['/quiz/{tier}']['get']['responses']['200']['content']['application/json'] =
@@ -214,6 +219,38 @@ app.get('/history', async (c: Context) => {
     200
   );
 });
+
+app.get(
+  '/history/quiz-set/:quizSetId',
+  zValidator(
+    'param',
+    z.object({
+      quizSetId: z.string(),
+    })
+  ),
+  async (c) => {
+    const quizSetId = c.req.valid('param').quizSetId;
+    const firebaseUid = c.get('firebaseUid');
+    const user = await UserUsecase.getUserByFirebaseUid(db, firebaseUid);
+    const quizSet = await QuizLogUsecase.getQuizSetDetail(
+      db,
+      user.id,
+      quizSetId
+    );
+    return c.json(
+      {
+        quizSet: {
+          id: quizSet.id,
+          accuracy: quizSet.accuracy,
+          mode: quizSet.mode,
+          answeredAt: formatDate(quizSet.createdAt),
+        },
+        quizList: quizSet.quizList,
+      },
+      200
+    );
+  }
+);
 
 app.post('/webhook/quiz', async (c: Context) => {
   const req = await c.req.json();

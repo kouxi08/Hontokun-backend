@@ -140,3 +140,50 @@ export const getAllQuizLog = async (db: MySql2Database, userId: string) => {
   }
   return response;
 };
+
+/**
+ * クイズセットIDからクイズセットの詳細を取得する
+ * @param db データベースのインスタンス
+ * @param quizSetId クイズセットのID
+ */
+export const getQuizSetDetail = async (
+  db: MySql2Database,
+  userId: string,
+  quizSetId: string
+) => {
+  // TODO: ユーザがクイズセットを解いたか確認
+
+  // クイズセット内容を取得
+  const quizSet = await QuizLogRepository.getQuizSetLogById(db, quizSetId);
+  if (!quizSet) {
+    throw new Error('Quiz set not found');
+  }
+  // クイズモード名を取得
+  const quizMode = await QuizModeRepository.getQuizModeName(
+    db,
+    quizSet.quizModeId
+  );
+
+  // クイズログ取得
+  const quizLogs = await QuizLogRepository.getQuizLogBySetId(db, quizSetId);
+  // 正答率計算
+  const accuracy =
+    (quizLogs.filter((log) => log.isCorrect).length / quizLogs.length) * 100;
+
+  // クイズ取得
+  const quizList = await Promise.all(
+    quizLogs.map(async (log) => {
+      const quiz = await QuizRepository.getQuizById(db, log.quizId);
+      if (!quiz) {
+        throw new Error('Quiz not found');
+      }
+      return {
+        ...quiz.toJSON(),
+        isCorrect: quiz.answer === log.userAnswer,
+        userAnswer: log.userAnswer,
+      };
+    })
+  );
+
+  return { ...quizSet, mode: quizMode, accuracy: accuracy, quizList };
+};
