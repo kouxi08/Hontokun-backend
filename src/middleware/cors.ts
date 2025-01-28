@@ -1,9 +1,8 @@
 import { cors } from 'hono/cors';
-import { APP_BASE_URL } from '../config/env.js';
 
 export const corsMiddleware = () => {
   return cors({
-    origin: [APP_BASE_URL, 'http://localhost:8080'],
+    origin: [process.env.APP_BASE_URL!, 'http://localhost:8080'],
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'Content-Type'],
     allowHeaders: ['Content-Type', 'authorization'],
     exposeHeaders: ['Content-Length', 'X-Kuma-Revision'],
