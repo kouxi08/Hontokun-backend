@@ -46,9 +46,11 @@ export const getQuizzesByTier = async (
   solvedQuizIds: string[]
 ): Promise<Quiz[]> => {
   let whereCondition = eq(quizTable.tier, tier);
-  if (solvedQuizIds.length > 0) {
-    whereCondition = sql`${quizTable.id} NOT IN (${sql.join(solvedQuizIds)})`;
-  }
+  // if (solvedQuizIds.length > 0) {
+  //   whereCondition = sql`${eq(quizTable.tier, tier)} AND ${quizTable.id} NOT IN (${sql.join(
+  //     solvedQuizIds.map((id) => sql`${id}`)
+  //   )})`;
+  // }
 
   // ランダムで３件のクイズのquiz_id取得
   const quizzes = await db
