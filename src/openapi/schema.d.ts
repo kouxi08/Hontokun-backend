@@ -502,6 +502,55 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/quiz/mode': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * クイズモード取得
+     * @description クイズの出題形式を取得する
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description クイズモード取得成功 */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              /** @description クイズの出題形式一覧 */
+              mode?: {
+                /** @description クイズの出題形式ID */
+                id?: string;
+                /** @description クイズの出題形式名 */
+                name?: string;
+                /** @description クイズの出題形式の説明 */
+                description?: string;
+              }[];
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/quiz/{tier}': {
     parameters: {
       query?: never;

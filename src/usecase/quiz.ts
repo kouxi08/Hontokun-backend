@@ -4,6 +4,7 @@ import { Choice } from '../model/quiz/choice.js';
 import { Quiz } from '../model/quiz/quiz.js';
 import * as QuizRepository from '../repository/quiz.js';
 import * as QuizLogRepository from '../repository/quizLog.js';
+import * as QuizModeRepository from '../repository/quizMode.js';
 
 export const createQuiz = async (
   db: MySql2Database,
@@ -71,4 +72,8 @@ export const getQuizzes = async (
     solvedQuizIds
   );
   return quizzes;
+};
+
+export const getAllQuizMode = async (db: MySql2Database) => {
+  return await QuizModeRepository.getAllQuizMode(db);
 };

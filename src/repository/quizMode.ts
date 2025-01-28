@@ -44,3 +44,24 @@ export const getQuizModeName = async (
   }
   return data[0].name;
 };
+
+/**
+ * クイズモードをすべて取得する
+ * @param db データベースのインスタンス
+ * @returns クイズモードIDとクイズモード名のリスト
+ */
+export const getAllQuizMode = async (db: MySql2Database) => {
+  const data = await db
+    .select({
+      id: quizModeTable.id,
+      name: quizModeTable.name,
+      description: quizModeTable.description,
+    })
+    .from(quizModeTable)
+    .where(eq(quizModeTable.isPublic, true));
+  if (data.length === 0 || !data[0]) {
+    throw new Error('Quiz mode not found');
+  }
+
+  return data;
+};
