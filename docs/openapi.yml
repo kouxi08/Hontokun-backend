@@ -563,6 +563,35 @@ paths:
                 $ref: '#/components/schemas/InternalServerError'
       security:
         - bearerAuth: []
+  /quiz/mode:
+    get:
+      tags:
+        - quiz
+      summary: クイズモード取得
+      description: クイズの出題形式を取得する
+      responses:
+        '200':
+          description: クイズモード取得成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mode:
+                    type: array
+                    description: クイズの出題形式一覧
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: クイズの出題形式ID
+                        name:
+                          type: string
+                          description: クイズの出題形式名
+                        description:
+                          type: string
+                          description: クイズの出題形式の説明
   /quiz/{tier}:
     get:
       tags:
