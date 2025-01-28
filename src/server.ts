@@ -5,7 +5,6 @@ import { Hono } from 'hono';
 import { logger } from 'hono/logger';
 import { prettyJSON } from 'hono/pretty-json';
 import { z, ZodError } from 'zod';
-import { DATABASE_URL } from './config/env.js';
 import { firebaseApp } from './config/firebase.js';
 import { convertQuizToAPI } from './core/converter/api/quiz.js';
 import { AuthError } from './core/error.js';
@@ -33,7 +32,7 @@ import { Variables } from './core/variables.js';
 import { formatDate } from './core/formatDate.js';
 
 export const app = new Hono<{ Variables: Variables }>();
-export const db = drizzle({ connection: DATABASE_URL, casing: 'snake_case' });
+export const db = drizzle({ connection: process.env.DATABASE_URL!, casing: 'snake_case' });
 
 const authMiddleware = createAuthMiddleware(firebaseApp);
 
@@ -148,10 +147,10 @@ app.post('/quiz/result', async (c: Context) => {
       },
       enemy: enemy
         ? {
-            id: enemy.id,
-            name: enemy.name,
-            url: enemy.image.url,
-          }
+          id: enemy.id,
+          name: enemy.name,
+          url: enemy.image.url,
+        }
         : null,
     },
     200
@@ -173,19 +172,19 @@ app.get('/quiz/:tier', async (c: Context) => {
   const quizList = quizzes.map((quiz) => convertQuizToAPI(quiz));
 
   const response: paths['/quiz/{tier}']['get']['responses']['200']['content']['application/json'] =
-    {
-      enemy: {
-        id: enemy.id,
-        name: enemy.name,
-        url: enemy.image.url,
-      },
-      costume: {
-        id: costume.id,
-        name: costume.name,
-        url: costume.image.url,
-      },
-      quizList,
-    };
+  {
+    enemy: {
+      id: enemy.id,
+      name: enemy.name,
+      url: enemy.image.url,
+    },
+    costume: {
+      id: costume.id,
+      name: costume.name,
+      url: costume.image.url,
+    },
+    quizList,
+  };
 
   return c.json(response, 200);
 });
