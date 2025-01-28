@@ -57,7 +57,8 @@ export const getAllQuizMode = async (db: MySql2Database) => {
       name: quizModeTable.name,
       description: quizModeTable.description,
     })
-    .from(quizModeTable);
+    .from(quizModeTable)
+    .where(eq(quizModeTable.isPublic, true));
   if (data.length === 0 || !data[0]) {
     throw new Error('Quiz mode not found');
   }
