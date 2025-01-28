@@ -8,9 +8,20 @@ import {
   int,
   mysqlTable,
   text,
+  timestamp,
   varchar,
 } from 'drizzle-orm/mysql-core';
-import { timestamps } from './columns.helpers.js';
+
+/**
+ * timestamp
+ */
+const timestamps = {
+  createdAt: timestamp().defaultNow().notNull(),
+  updatedAt: timestamp()
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
+};
 
 /**
  * テーブル
