@@ -16,4 +16,3 @@ export const { MICROCMS_API_KEY } = parseEnv(process.env, {
 export const { APP_BASE_URL } = parseEnv(process.env, {
   APP_BASE_URL: z.string().min(1),
 });
-

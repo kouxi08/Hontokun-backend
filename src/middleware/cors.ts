@@ -15,10 +15,10 @@ export const corsMiddleware = () => {
 export const corsMiddlewareForMicroCMS = () => {
   return cors({
     origin: '*',
-    allowMethods: ['POST', 'OPTIONS',],
+    allowMethods: ['POST', 'OPTIONS'],
     allowHeaders: ['Content-Type'],
     exposeHeaders: ['Content-Length', 'X-Kuma-Revision'],
     maxAge: 600,
     credentials: true,
-  })
-}
+  });
+};
