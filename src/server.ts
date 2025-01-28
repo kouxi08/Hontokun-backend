@@ -16,7 +16,10 @@ import {
 } from './core/validator/quizResultValidators.js';
 import type { quiz } from './database/cms/types/response';
 import { createAuthMiddleware } from './middleware/auth.js';
-import { corsMiddleware, corsMiddlewareForMicroCMS } from './middleware/cors.js';
+import {
+  corsMiddleware,
+  corsMiddlewareForMicroCMS,
+} from './middleware/cors.js';
 import type { Quiz } from './model/quiz/quiz';
 import type { paths } from './openapi/schema';
 import * as CostumeUsecase from './usecase/costume.js';
@@ -38,6 +41,20 @@ app.use(logger());
 app.use(prettyJSON());
 app.use('/webhook/quiz', corsMiddlewareForMicroCMS());
 app.use(corsMiddleware());
+
+/**
+ * authのmiddlewareを通さないエンドポイント
+ */
+app.get('/health-check', (c: Context) => {
+  console.info('Health-check endpoint is called.');
+  return c.json('🌱 Hello Hontokun!', 200);
+});
+
+app.get('/quiz/mode', async (c: Context) => {
+  const quizMode = await QuizUsecase.getAllQuizMode(db);
+  return c.json(quizMode, 200);
+});
+
 app.use('/sign-up', authMiddleware);
 app.use('/main', authMiddleware);
 app.use('/quiz/result', authMiddleware);
@@ -61,11 +78,6 @@ app.onError((error, c) => {
   }
 
   return errorResponse(500, 'Something unexpected happened');
-});
-
-app.get('/health-check', (c: Context) => {
-  console.info('Health-check endpoint is called.');
-  return c.json('🌱 Hello Hontokun!', 200);
 });
 
 app.post('sign-up', async (c: Context) => {
