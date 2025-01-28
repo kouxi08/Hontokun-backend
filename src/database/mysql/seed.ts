@@ -4,27 +4,27 @@ import { quizModeTable } from './schema/schema.js';
 const seedQuizModeTable = async (): Promise<void> => {
   const modes = [
     {
-      name: 'battle',
+      name: 'バトル',
       description: '指名手配猫を捕まえよう！',
       isPublic: true,
     },
     {
-      name: 'speed',
+      name: 'スピード',
       description: '3分で何問解ける？',
       isPublic: true,
     },
     {
-      name: 'survival',
+      name: 'ランク',
       description: '最強の探偵に！',
       isPublic: true,
     },
     {
-      name: 'infinite',
+      name: 'ムゲン',
       description: '練習に最適',
       isPublic: true,
     },
     {
-      name: 'practice',
+      name: 'トリセツ',
       description: '初めて遊ぶ人向け',
       isPublic: true,
     },
