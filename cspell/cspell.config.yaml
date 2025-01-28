@@ -12,6 +12,6 @@ ignorePaths:
   - "../README.md"
   - "../package.json"
   - "../tsconfig.json"
-  - "../Dockerfile*"
-  - "../docker-compose.yaml"
+  - "../docker"
   - "../docs/db.drawio.svg"
+  - "../charts"

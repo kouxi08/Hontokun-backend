@@ -1,14 +1,25 @@
 {
   "compilerOptions": {
+    "outDir": "./dist",
     "target": "ESNext",
     "module": "ESNext",
-    "moduleResolution": "Bundler",
+    "moduleResolution": "bundler",
     "strict": true,
     "skipLibCheck": true,
-    "types": [
-      "node"
-    ],
+    "types": ["node"],
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx",
-  }
+    "noUncheckedIndexedAccess": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true
+  },
+  "exclude": ["node_modules"],
+  "include": ["src/**/*", "drizzle.config.ts"],
+  "plugins": [
+    {
+      "transform": "typescript-transform-extensions",
+      "extensions": { ".ts": ".js" }
+    }
+  ]
 }

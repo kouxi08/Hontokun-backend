@@ -1,0 +1,33 @@
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.dev
+    volumes:
+       - ../:/app
+       - back_node_modules:/app/node_modules
+    networks:
+      - hontokun
+
+  db:
+    image: mysql:8.0
+    container_name: hontokun-db
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql
+      MYSQL_DATABASE: hontokun
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - 3306:3306
+    volumes:
+      - ../my.cnf:/etc/mysql/conf.d/my.cnf
+      - ../db-data:/var/lib/mysql
+    networks:
+        - hontokun
+
+networks:
+  hontokun:
+    external: true
+
+volumes:
+  back_node_modules:

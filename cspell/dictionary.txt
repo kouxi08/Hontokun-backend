@@ -5,3 +5,6 @@ Avenir
 hono
 VARCHAR
 autoincrement
+usecase
+mysqld
+microcms

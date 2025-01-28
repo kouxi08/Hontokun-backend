@@ -1,29 +1,51 @@
 {
   "name": "hontokun",
+  "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts"
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "lint": "eslint . --fix",
+    "lint-fix": "eslint --fix './src/**/*.{js,ts}' && prettier --write './src/**/*.{js,ts}'",
+    "gen:openapi": "npx openapi-typescript docs/openapi.yml --output src/openapi/schema.d.ts",
+    "gen:cms": "npx microcms-typescript ./src/database/cms/schema ./src/database/cms/types/response.ts",
+    "drizzle:generate": "npx drizzle-kit generate",
+    "drizzle:push": "npx drizzle-kit push",
+    "drizzle:migrate": "npx drizzle-kit migrate",
+    "drizzle:studio": "npx drizzle-kit studio",
+    "drizzle:seed": "tsx src/database/mysql/seed.ts"
   },
   "dependencies": {
     "@hono/eslint-config": "^1.0.2",
     "@hono/node-server": "^1.13.1",
     "@hono/swagger-ui": "^0.4.1",
     "@hono/zod-openapi": "^0.16.4",
+    "@hono/zod-validator": "^0.4.2",
+    "@typescript-eslint/parser": "^8.20.0",
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.36.1",
     "drizzle-zod": "^0.5.1",
-    "eslint": "^9.14.0",
     "firebase-admin": "^13.0.0",
     "hono": "^4.6.3",
+    "microcms-js-sdk": "^3.1.2",
     "mysql2": "^3.11.4",
     "znv": "^0.4.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@eslint/js": "^9.18.0",
     "@types/node": "^20.11.17",
     "drizzle-kit": "^0.28.0",
+    "eslint": "^9.18.0",
     "eslint-config-prettier": "^8.10.0",
+    "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-prettier": "^5.2.1",
+    "globals": "^15.14.0",
+    "microcms-typescript": "^1.0.14",
+    "openapi-typescript": "^7.4.3",
     "prettier": "^3.3.3",
-    "tsx": "^4.19.2"
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.20.0",
+    "typescript-transform-extensions": "^1.0.1"
   }
 }
