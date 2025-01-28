@@ -5,7 +5,6 @@ import { Hono } from 'hono';
 import { logger } from 'hono/logger';
 import { prettyJSON } from 'hono/pretty-json';
 import { z, ZodError } from 'zod';
-import { DATABASE_URL } from './config/env.js';
 import { firebaseApp } from './config/firebase.js';
 import { convertQuizToAPI } from './core/converter/api/quiz.js';
 import { AuthError } from './core/error.js';
@@ -33,7 +32,10 @@ import { Variables } from './core/variables.js';
 import { formatDate } from './core/formatDate.js';
 
 export const app = new Hono<{ Variables: Variables }>();
-export const db = drizzle({ connection: DATABASE_URL, casing: 'snake_case' });
+export const db = drizzle({
+  connection: process.env.DATABASE_URL!,
+  casing: 'snake_case',
+});
 
 const authMiddleware = createAuthMiddleware(firebaseApp);
 
