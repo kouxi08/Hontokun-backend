@@ -38,4 +38,4 @@ db-shell:
 		docker exec -it $(DB_NAME) mysql -u$(MYSQL_USER) -p$(MYSQL_PASSWORD) $(MYSQL_DATABASE)
 
 app-shell:
-		docker exec -it $(APP_NAME) /bin/sh
+		docker exec -it $(APP_NAME) /bin/bash
