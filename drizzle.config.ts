@@ -1,6 +1,5 @@
 import 'dotenv/config';
 import { defineConfig } from 'drizzle-kit';
-import { DATABASE_URL } from './src/config/env';
 
 export default defineConfig({
   out: './drizzle',
@@ -8,7 +7,7 @@ export default defineConfig({
   casing: 'snake_case',
   dialect: 'mysql',
   dbCredentials: {
-    url: DATABASE_URL,
+    url: process.env.DATABASE_URL!,
   },
   migrations: {
     table: 'migrations',
