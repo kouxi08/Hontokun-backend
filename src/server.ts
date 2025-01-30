@@ -112,51 +112,59 @@ app.get('/main', async (c: Context) => {
   });
 });
 
-app.post('/quiz/result', async (c: Context) => {
-  const firebaseUid = c.get('firebaseUid');
-  const user = await UserUsecase.getUserByFirebaseUid(db, firebaseUid);
-  const body: paths['/quiz/result']['post']['requestBody']['content']['application/json'] =
-    await c.req.json();
-  const quizMode = quizModeSchema.parse(body.quizMode);
-  const answers = body.answers!.map((data) => quizResultSchema.parse(data));
-  const quizData = answers.map((data) => {
-    const { quizId, answer, answerTime } = data;
-    return { quizId, answer, answerTime };
-  });
-  const { quizSetId, accuracy, quizList } = await QuizLogUsecase.createQuizLog(
-    db,
-    user,
-    quizMode,
-    quizData
-  );
-  const costume = await CostumeUsecase.getCostume(db, user.id);
+app.post('/quiz/result',
+  zValidator('json', z.object({
+    quizMode: z.string(),
+    answers: z.array(z.object({
+      quizId: z.string(),
+      answer: z.string(),
+      answerTime: z.number(),
+    })),
+  })),
+  async (c) => {
+    const firebaseUid = c.get('firebaseUid');
+    const user = await UserUsecase.getUserByFirebaseUid(db, firebaseUid);
+    const body = await c.req.valid('json');
+    const quizMode = quizModeSchema.parse(body.quizMode);
+    const answers = body.answers!.map((data) => quizResultSchema.parse(data));
+    const quizData = answers.map((data) => {
+      const { quizId, answer, answerTime } = data;
+      return { quizId, answer, answerTime };
+    });
+    const { quizSetId, accuracy, quizList } = await QuizLogUsecase.createQuizLog(
+      db,
+      user,
+      quizMode,
+      quizData
+    );
+    const costume = await CostumeUsecase.getCostume(db, user.id);
 
-  // TODO: 指名手配猫画像返却
-  const enemy = quizList[0]
-    ? await EnemyUsecase.getQuizEnemy(db, quizList[0].tier)
-    : null;
+    // TODO: 指名手配猫画像返却
+    const enemy = quizList[0]
+      ? await EnemyUsecase.getQuizEnemy(db, quizList[0].tier)
+      : null;
 
-  return c.json(
-    {
-      quizSetId,
-      accuracy,
-      quizList,
-      costume: {
-        id: costume.id,
-        name: costume.name,
-        url: costume.image.url,
+    return c.json(
+      {
+        quizSetId,
+        accuracy,
+        quizList,
+        costume: {
+          id: costume.id,
+          name: costume.name,
+          url: costume.image.url,
+        },
+        enemy: enemy
+          ? {
+            id: enemy.id,
+            name: enemy.name,
+            url: enemy.image.url,
+          }
+          : null,
       },
-      enemy: enemy
-        ? {
-          id: enemy.id,
-          name: enemy.name,
-          url: enemy.image.url,
-        }
-        : null,
-    },
-    200
-  );
-});
+      200
+    );
+  });
 
 app.get('/quiz/:tier', zValidator('param', z.object({
   tier: z.string(),
