@@ -158,11 +158,9 @@ app.post('/quiz/result', async (c: Context) => {
   );
 });
 
-const schema = z.object({
+app.get('/quiz/:tier', zValidator('param', z.object({
   tier: z.string(),
-});
-
-app.get('/quiz/:tier', zValidator('param', schema), async (c) => {
+})), async (c) => {
   const tier = Number(c.req.valid('param').tier);
   const firebaseUid = c.get('firebaseUid');
   const user = await UserUsecase.getUserByFirebaseUid(db, firebaseUid);
