@@ -12,7 +12,7 @@
       "idx": 1,
       "version": "5",
       "when": 1738060608560,
-      "tag": "0001_add_quizlog_order",
+      "tag": "0001_add_quiz_log_order",
       "breakpoints": true
     }
   ]
