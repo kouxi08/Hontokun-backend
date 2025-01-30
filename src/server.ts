@@ -8,10 +8,7 @@ import { z, ZodError } from 'zod';
 import { firebaseApp } from './config/firebase.js';
 import { AuthError } from './core/error.js';
 import { createUserSchema } from './core/validator/createUserValidator.js';
-import {
-  quizModeSchema,
-  quizResultSchema,
-} from './core/validator/quizResultValidators.js';
+import { quizResultSchema } from './core/validator/quizResultValidators.js';
 import type { quiz } from './database/cms/types/response';
 import { createAuthMiddleware } from './middleware/auth.js';
 import {
@@ -112,26 +109,19 @@ app.get('/main', async (c: Context) => {
   });
 });
 
-app.post('/quiz/result', async (c: Context) => {
+app.post('/quiz/result', zValidator('json', quizResultSchema), async (c) => {
   const firebaseUid = c.get('firebaseUid');
   const user = await UserUsecase.getUserByFirebaseUid(db, firebaseUid);
-  const body: paths['/quiz/result']['post']['requestBody']['content']['application/json'] =
-    await c.req.json();
-  const quizMode = quizModeSchema.parse(body.quizMode);
-  const answers = body.answers!.map((data) => quizResultSchema.parse(data));
-  const quizData = answers.map((data) => {
-    const { quizId, answer, answerTime } = data;
-    return { quizId, answer, answerTime };
-  });
+  const body = await c.req.valid('json');
   const { quizSetId, accuracy, quizList } = await QuizLogUsecase.createQuizLog(
     db,
     user,
-    quizMode,
-    quizData
+    body.quizMode,
+    body.answers
   );
   const costume = await CostumeUsecase.getCostume(db, user.id);
 
-  // TODO: 指名手配猫画像返却
+  // 指名手配猫画像返却
   const enemy = quizList[0]
     ? await EnemyUsecase.getQuizEnemy(db, quizList[0].tier)
     : null;
@@ -148,47 +138,54 @@ app.post('/quiz/result', async (c: Context) => {
       },
       enemy: enemy
         ? {
-          id: enemy.id,
-          name: enemy.name,
-          url: enemy.image.url,
-        }
+            id: enemy.id,
+            name: enemy.name,
+            url: enemy.image.url,
+          }
         : null,
     },
     200
   );
 });
 
-app.get('/quiz/:tier', zValidator('param', z.object({
-  tier: z.string(),
-})), async (c) => {
-  const tier = Number(c.req.valid('param').tier);
-  const firebaseUid = c.get('firebaseUid');
-  const user = await UserUsecase.getUserByFirebaseUid(db, firebaseUid);
+app.get(
+  '/quiz/:tier',
+  zValidator(
+    'param',
+    z.object({
+      tier: z.string(),
+    })
+  ),
+  async (c) => {
+    const tier = Number(c.req.valid('param').tier);
+    const firebaseUid = c.get('firebaseUid');
+    const user = await UserUsecase.getUserByFirebaseUid(db, firebaseUid);
 
-  // 着せ替え取得
-  const costume = await CostumeUsecase.getCostume(db, user.id);
-  // 指名手配猫画像取得
-  const enemy = await EnemyUsecase.getQuizEnemy(db, tier);
+    // 着せ替え取得
+    const costume = await CostumeUsecase.getCostume(db, user.id);
+    // 指名手配猫画像取得
+    const enemy = await EnemyUsecase.getQuizEnemy(db, tier);
 
-  // クイズ取得
-  const quizzes = await QuizUsecase.getQuizzes(db, user.id, tier);
+    // クイズ取得
+    const quizzes = await QuizUsecase.getQuizzes(db, user.id, tier);
 
-  const response = {
-    enemy: {
-      id: enemy.id,
-      name: enemy.name,
-      url: enemy.image.url,
-    },
-    costume: {
-      id: costume.id,
-      name: costume.name,
-      url: costume.image.url,
-    },
-    quizzes,
-  };
+    const response = {
+      enemy: {
+        id: enemy.id,
+        name: enemy.name,
+        url: enemy.image.url,
+      },
+      costume: {
+        id: costume.id,
+        name: costume.name,
+        url: costume.image.url,
+      },
+      quizzes,
+    };
 
-  return c.json(response, 200);
-});
+    return c.json(response, 200);
+  }
+);
 
 app.get('/history', async (c: Context) => {
   const firebaseUid = c.get('firebaseUid');

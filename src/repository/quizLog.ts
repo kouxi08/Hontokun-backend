@@ -52,6 +52,7 @@ export const createQuizLog = async (
     const id = crypto.randomUUID();
     return insertQuizLogSchema.parse({
       id,
+      order: answer.order,
       quizSetLogId,
       quizId: answer.quizId,
       userAnswer: answer.answer,
