@@ -86,6 +86,9 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/QuizId'
+        order:
+          type: integer
+          description: クイズの問題番号
         news:
           type: object
           properties:
@@ -679,6 +682,9 @@ paths:
                     properties:
                       quizId:
                         $ref: '#/components/schemas/QuizId'
+                      order:
+                        type: integer
+                        description: クイズの問題番号
                       answer:
                         type: string
                         description: ユーザーの解答

@@ -78,9 +78,10 @@ export const quizSetLogTable = mysqlTable('quiz_set_log', {
 });
 
 export const quizLogTable = mysqlTable(
-  'quizLog',
+  'quiz_log',
   {
     id: char({ length: 36 }).primaryKey(),
+    order: int().notNull(),
     quizId: char({ length: 36 })
       .notNull()
       .references(() => quizTable.id),

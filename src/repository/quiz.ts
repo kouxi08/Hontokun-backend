@@ -44,8 +44,8 @@ export const getQuizzesByTier = async (
   db: MySql2Database,
   tier: number,
   solvedQuizIds: string[]
-): Promise<Quiz[]> => {
-  let whereCondition = eq(quizTable.tier, tier);
+) => {
+  const whereCondition = eq(quizTable.tier, tier);
   // if (solvedQuizIds.length > 0) {
   //   whereCondition = sql`${eq(quizTable.tier, tier)} AND ${quizTable.id} NOT IN (${sql.join(
   //     solvedQuizIds.map((id) => sql`${id}`)
@@ -61,17 +61,11 @@ export const getQuizzesByTier = async (
     .limit(3);
 
   // クイズの詳細取得
-  const quizList = await Promise.all(
+  return await Promise.all(
     quizzes.map(async (quiz) => {
-      return await db
-        .select({ quiz: quizTable, choice: quizChoiceTable })
-        .from(quizTable)
-        .leftJoin(quizChoiceTable, eq(quizTable.id, quizChoiceTable.quizId))
-        .where(eq(quizTable.id, quiz.id));
+      return await getQuizById(db, quiz.id);
     })
   );
-  const result = convertDatabaseToQuiz(quizList);
-  return result;
 };
 
 export const updateQuiz = async (
