@@ -672,6 +672,8 @@ export interface paths {
             quizMode?: string;
             answers?: {
               quizId?: components['schemas']['QuizId'];
+              /** @description クイズの問題番号 */
+              order?: number;
               /** @description ユーザーの解答 */
               answer?: string;
               /** @description クイズを解いた時間(タイムアタックの場合・秒) */
@@ -806,6 +808,8 @@ export interface components {
     QuizSetId: string;
     Quiz: {
       id: components['schemas']['QuizId'];
+      /** @description クイズの問題番号 */
+      order?: number;
       news: {
         /** @description クイズのニュースのタイトル */
         title?: string;
