@@ -9,7 +9,6 @@ import { firebaseApp } from './config/firebase.js';
 import { AuthError } from './core/error.js';
 import { createUserSchema } from './core/validator/createUserValidator.js';
 import {
-  quizModeSchema,
   quizResultSchema,
 } from './core/validator/quizResultValidators.js';
 import type { quiz } from './database/cms/types/response';
@@ -113,28 +112,20 @@ app.get('/main', async (c: Context) => {
 });
 
 app.post('/quiz/result',
-  zValidator('json', z.object({
-    quizMode: z.string(),
-    answers: z.array(z.object({
-      quizId: z.string(),
-      answer: z.string(),
-      answerTime: z.number(),
-    })),
-  })),
+  zValidator('json', quizResultSchema),
   async (c) => {
     const firebaseUid = c.get('firebaseUid');
     const user = await UserUsecase.getUserByFirebaseUid(db, firebaseUid);
     const body = await c.req.valid('json');
-    const answers = body.answers!.map((data) => quizResultSchema.parse(data));
     const { quizSetId, accuracy, quizList } = await QuizLogUsecase.createQuizLog(
       db,
       user,
       body.quizMode,
-      answers
+      body.answers
     );
     const costume = await CostumeUsecase.getCostume(db, user.id);
 
-    // TODO: 指名手配猫画像返却
+    // 指名手配猫画像返却
     const enemy = quizList[0]
       ? await EnemyUsecase.getQuizEnemy(db, quizList[0].tier)
       : null;
