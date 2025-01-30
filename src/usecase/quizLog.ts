@@ -10,6 +10,7 @@ import * as UserUsecase from './user.js';
 
 export type Answer = {
   quizId: string;
+  order: number;
   answer: string;
   answerTime: number;
   isCorrect?: boolean;
@@ -31,11 +32,7 @@ export const createQuizLog = async (
   user: User,
   quizModeId: string,
   answers: Answer[]
-): Promise<{
-  quizSetId: string;
-  accuracy: number;
-  quizList: QuizParams[];
-}> => {
+) => {
   const quizList: QuizParams[] = [];
   for (const answer of answers) {
     // クイズデータをDBから取得
@@ -62,6 +59,7 @@ export const createQuizLog = async (
     const quiz = quizList.find((quiz) => quiz.id === log.quizId);
     if (quiz) {
       Object.assign(quiz, {
+        order: log.order,
         isCorrect: log.isCorrect,
         userAnswer: log.userAnswer,
         answerTime: log.time,
