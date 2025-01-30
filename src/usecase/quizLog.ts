@@ -22,14 +22,14 @@ export type QuizData = Quiz &
  * クイズの回答を受け取り、ログを作成する
  * @param db データベースのインスタンス
  * @param user ユーザデータ
- * @param quizMode クイズモード名
+ * @param quizModeId クイズモード名
  * @param answers 解答データ
  * @returns クイズセットID, 正答率, クイズデータのリスト
  */
 export const createQuizLog = async (
   db: MySql2Database,
   user: User,
-  quizMode: string,
+  quizModeId: string,
   answers: Answer[]
 ): Promise<{
   quizSetId: string;
@@ -52,11 +52,10 @@ export const createQuizLog = async (
     }
   }
   // DBにログを保存
-  const modeId = await QuizModeRepository.getQuizModeId(db, quizMode);
   const { quizSetLog, quizLogs } = await QuizLogRepository.createQuizLog(
     db,
     user.id,
-    modeId,
+    quizModeId,
     answers
   );
   quizLogs.map((log) => {

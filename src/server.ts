@@ -125,17 +125,12 @@ app.post('/quiz/result',
     const firebaseUid = c.get('firebaseUid');
     const user = await UserUsecase.getUserByFirebaseUid(db, firebaseUid);
     const body = await c.req.valid('json');
-    const quizMode = quizModeSchema.parse(body.quizMode);
     const answers = body.answers!.map((data) => quizResultSchema.parse(data));
-    const quizData = answers.map((data) => {
-      const { quizId, answer, answerTime } = data;
-      return { quizId, answer, answerTime };
-    });
     const { quizSetId, accuracy, quizList } = await QuizLogUsecase.createQuizLog(
       db,
       user,
-      quizMode,
-      quizData
+      body.quizMode,
+      answers
     );
     const costume = await CostumeUsecase.getCostume(db, user.id);
 
