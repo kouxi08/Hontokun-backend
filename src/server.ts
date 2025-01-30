@@ -6,7 +6,6 @@ import { logger } from 'hono/logger';
 import { prettyJSON } from 'hono/pretty-json';
 import { z, ZodError } from 'zod';
 import { firebaseApp } from './config/firebase.js';
-import { convertQuizToAPI } from './core/converter/api/quiz.js';
 import { AuthError } from './core/error.js';
 import { createUserSchema } from './core/validator/createUserValidator.js';
 import {
@@ -19,7 +18,6 @@ import {
   corsMiddleware,
   corsMiddlewareForMicroCMS,
 } from './middleware/cors.js';
-import type { Quiz } from './model/quiz/quiz';
 import type { paths } from './openapi/schema';
 import * as CostumeUsecase from './usecase/costume.js';
 import * as QuizUsecase from './usecase/quiz.js';
@@ -150,18 +148,22 @@ app.post('/quiz/result', async (c: Context) => {
       },
       enemy: enemy
         ? {
-            id: enemy.id,
-            name: enemy.name,
-            url: enemy.image.url,
-          }
+          id: enemy.id,
+          name: enemy.name,
+          url: enemy.image.url,
+        }
         : null,
     },
     200
   );
 });
 
-app.get('/quiz/:tier', async (c: Context) => {
-  const tier = Number(c.req.param('tier'));
+const schema = z.object({
+  tier: z.string(),
+});
+
+app.get('/quiz/:tier', zValidator('param', schema), async (c) => {
+  const tier = Number(c.req.valid('param').tier);
   const firebaseUid = c.get('firebaseUid');
   const user = await UserUsecase.getUserByFirebaseUid(db, firebaseUid);
 
@@ -171,23 +173,21 @@ app.get('/quiz/:tier', async (c: Context) => {
   const enemy = await EnemyUsecase.getQuizEnemy(db, tier);
 
   // クイズ取得
-  const quizzes: Quiz[] = await QuizUsecase.getQuizzes(db, user.id, tier);
-  const quizList = quizzes.map((quiz) => convertQuizToAPI(quiz));
+  const quizzes = await QuizUsecase.getQuizzes(db, user.id, tier);
 
-  const response: paths['/quiz/{tier}']['get']['responses']['200']['content']['application/json'] =
-    {
-      enemy: {
-        id: enemy.id,
-        name: enemy.name,
-        url: enemy.image.url,
-      },
-      costume: {
-        id: costume.id,
-        name: costume.name,
-        url: costume.image.url,
-      },
-      quizList,
-    };
+  const response = {
+    enemy: {
+      id: enemy.id,
+      name: enemy.name,
+      url: enemy.image.url,
+    },
+    costume: {
+      id: costume.id,
+      name: costume.name,
+      url: costume.image.url,
+    },
+    quizzes,
+  };
 
   return c.json(response, 200);
 });

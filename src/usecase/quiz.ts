@@ -5,6 +5,7 @@ import { Quiz } from '../model/quiz/quiz.js';
 import * as QuizRepository from '../repository/quiz.js';
 import * as QuizLogRepository from '../repository/quizLog.js';
 import * as QuizModeRepository from '../repository/quizMode.js';
+import { convertQuizToAPI } from '../core/converter/api/quiz';
 
 export const createQuiz = async (
   db: MySql2Database,
@@ -36,22 +37,12 @@ const mapQuizData = (quiz: quiz<'get'>): Quiz => {
     : [];
 
   return Quiz.create({
-    id: quiz.id,
-    title: quiz.title,
-    content: quiz.content,
-    tier: quiz.tier,
+    ...quiz,
     imageUrl: quiz.image?.url ?? null,
     imageHeight: quiz.image?.height ?? null,
     imageWidth: quiz.image?.width ?? null,
-    question: quiz.question,
-    newsUrl: quiz.newsUrl,
     type: quiz.type[0],
     choices,
-    answer: quiz.answer,
-    explanation: quiz.explanation,
-    hint: quiz.hint,
-    keyword: quiz.keyword,
-    isDeleted: quiz.isDeleted,
     createdAt: new Date(quiz.createdAt),
     updatedAt: new Date(quiz.updatedAt),
     publishedAt: new Date(quiz.publishedAt),
@@ -59,19 +50,37 @@ const mapQuizData = (quiz: quiz<'get'>): Quiz => {
   });
 };
 
+/**
+ * 出題するクイズを取得する
+ * @param db
+ * @param userId ユーザID
+ * @param tier 難易度
+ * @returns 出題クイズリスト
+ */
 export const getQuizzes = async (
   db: MySql2Database,
   userId: string,
   tier: number
-): Promise<Quiz[]> => {
-  // クイズを取得
+) => {
+  // 出題済みクイズを取得
   const solvedQuizIds = await QuizLogRepository.getSolvedQuizIds(db, userId);
+  // クイズを作成
   const quizzes = await QuizRepository.getQuizzesByTier(
     db,
     tier,
     solvedQuizIds
   );
-  return quizzes;
+
+  return quizzes.map((quiz, index) => {
+    if (!quiz) {
+      return null;
+    }
+    const detail = convertQuizToAPI(quiz);
+    return {
+      ...detail,
+      order: index + 1,
+    };
+  });
 };
 
 export const getAllQuizMode = async (db: MySql2Database) => {
