@@ -18,6 +18,7 @@ data:
   cms-service-domain: <microCMS-service-domain base64 encode>
   cms-api-key: <microCMS-api-key base64 encode>
   database-url: <databaseurl base64 encode>
+  service-account-file.json: <service-account-file base64 encode>
 ```
 apply secret
 ```
