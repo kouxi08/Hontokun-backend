@@ -1,6 +1,6 @@
 services:
   backend:
-    image: kouxi00/hontokun-backend:1.0.0
+    image: kouxi00/hontokun-backend:1.0.1
     container_name: hontokun-backend
     ports:
       - "3000:3000"
