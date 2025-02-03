@@ -5,7 +5,7 @@ import { Quiz } from '../model/quiz/quiz.js';
 import * as QuizRepository from '../repository/quiz.js';
 import * as QuizLogRepository from '../repository/quizLog.js';
 import * as QuizModeRepository from '../repository/quizMode.js';
-import { convertQuizToAPI } from '../core/converter/api/quiz';
+import { convertQuizToAPI } from '../core/converter/api/quiz.js';
 
 export const createQuiz = async (
   db: MySql2Database,
