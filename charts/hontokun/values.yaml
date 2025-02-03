@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: kouxi00/hontokun-backend
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
 
@@ -14,15 +14,15 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
-secretName: hontokun-backend-sercret
+secretName: hontokun-secret
 
 env:
   - name: MICROCMS_SERVICE_DOMAIN
-    key: service_domain
+    key: cms-service-domain
   - name: MICROCMS_API_KEY
-    key: api_key
+    key: cms-api-key
   - name: DATABASE_URL
-    key: database_url
+    key: database-url
 
 podAnnotations: {}
 podLabels: {}
@@ -70,7 +70,7 @@ resources:
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  
+
 
 livenessProbe:
   httpGet:
@@ -93,12 +93,20 @@ volumes:
   - name: firebase-volume
     secret:
       secretName: hontokun-secret
+  - name: config
+    configMap:
+       name: hontokun
 
 # Additional volumeMounts on the output Deployment definition.
 volumeMounts:
-  - name: firebase-volume
-    mountPath: /app/service-account-file.json
+  - mountPath: /app/service-account-file.json
+    name: firebase-volume
     subPath: service-account-file.json
+  - mountPath: /app/drizzle
+    name: config
+
+
+
 
 nodeSelector: {}
 

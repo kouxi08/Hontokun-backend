@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hontokun
+data:
+  0000_init.sql: "CREATE TABLE `quiz_choice` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`quiz_id`
+    char(36) NOT NULL,\n\t`name` varchar(50) NOT NULL,\n\t`created_at` timestamp NOT
+    NULL DEFAULT (now()),\n\t`updated_at` timestamp NOT NULL DEFAULT (now()),\n\tCONSTRAINT
+    `quiz_choice_id` PRIMARY KEY(`id`)\n);\n--> statement-breakpoint\nCREATE TABLE
+    `quizLog` (\n\t`id` char(36) NOT NULL,\n\t`quiz_id` char(36) NOT NULL,\n\t`quiz_set_log_id`
+    char(36) NOT NULL,\n\t`user_answer` text NOT NULL,\n\t`time` int,\n\t`is_correct`
+    boolean NOT NULL,\n\t`created_at` timestamp NOT NULL DEFAULT (now()),\n\t`updated_at`
+    timestamp NOT NULL DEFAULT (now()),\n\tCONSTRAINT `quizLog_id` PRIMARY KEY(`id`),\n\tCONSTRAINT
+    `timeCheck` CHECK(`quizLog`.`time` >= 0)\n);\n--> statement-breakpoint\nCREATE
+    TABLE `quiz_mode` (\n\t`id` char(36) NOT NULL,\n\t`name` varchar(20) NOT NULL,\n\t`description`
+    varchar(100) NOT NULL,\n\t`is_public` boolean NOT NULL,\n\t`created_at` timestamp
+    NOT NULL DEFAULT (now()),\n\t`updated_at` timestamp NOT NULL DEFAULT (now()),\n\tCONSTRAINT
+    `quiz_mode_id` PRIMARY KEY(`id`)\n);\n--> statement-breakpoint\nCREATE TABLE `quiz_set_log`
+    (\n\t`id` char(36) NOT NULL,\n\t`user_id` char(36) NOT NULL,\n\t`quiz_mode_id`
+    char(36) NOT NULL,\n\t`created_at` timestamp NOT NULL DEFAULT (now()),\n\t`updated_at`
+    timestamp NOT NULL DEFAULT (now()),\n\tCONSTRAINT `quiz_set_log_id` PRIMARY KEY(`id`)\n);\n-->
+    statement-breakpoint\nCREATE TABLE `quiz` (\n\t`id` char(36) NOT NULL,\n\t`title`
+    varchar(50) NOT NULL,\n\t`content` text NOT NULL,\n\t`tier` int NOT NULL,\n\t`image_url`
+    varchar(500),\n\t`image_height` int,\n\t`image_width` int,\n\t`question` text
+    NOT NULL,\n\t`news_url` text NOT NULL,\n\t`type` varchar(20) NOT NULL,\n\t`answer`
+    text NOT NULL,\n\t`explanation` text NOT NULL,\n\t`hint` text NOT NULL,\n\t`keyword`
+    text NOT NULL,\n\t`is_deleted` boolean NOT NULL DEFAULT false,\n\t`created_at`
+    timestamp NOT NULL DEFAULT (now()),\n\t`updated_at` timestamp NOT NULL DEFAULT
+    (now()),\n\t`published_at` date NOT NULL,\n\t`revised_at` date NOT NULL,\n\tCONSTRAINT
+    `quiz_id` PRIMARY KEY(`id`)\n);\n--> statement-breakpoint\nCREATE TABLE `user_costumes`
+    (\n\t`user_id` char(36) NOT NULL,\n\t`costume_id` char(36) NOT NULL,\n\t`created_at`
+    timestamp NOT NULL DEFAULT (now()),\n\t`updated_at` timestamp NOT NULL DEFAULT
+    (now())\n);\n--> statement-breakpoint\nCREATE TABLE `users` (\n\t`id` char(36)
+    NOT NULL,\n\t`firebase_uid` varchar(128) NOT NULL,\n\t`nickname` varchar(20) NOT
+    NULL,\n\t`birthday` date,\n\t`level` int NOT NULL DEFAULT 1,\n\t`experience` int
+    NOT NULL DEFAULT 0,\n\t`costume_id` char(36) NOT NULL,\n\t`created_at` timestamp
+    NOT NULL DEFAULT (now()),\n\t`updated_at` timestamp NOT NULL DEFAULT (now()),\n\tCONSTRAINT
+    `users_id` PRIMARY KEY(`id`),\n\tCONSTRAINT `users_firebaseUid_unique` UNIQUE(`firebase_uid`)\n);\n-->
+    statement-breakpoint\nALTER TABLE `quiz_choice` ADD CONSTRAINT `quiz_choice_quiz_id_quiz_id_fk`
+    FOREIGN KEY (`quiz_id`) REFERENCES `quiz`(`id`) ON DELETE no action ON UPDATE
+    no action;--> statement-breakpoint\nALTER TABLE `quizLog` ADD CONSTRAINT `quizLog_quiz_id_quiz_id_fk`
+    FOREIGN KEY (`quiz_id`) REFERENCES `quiz`(`id`) ON DELETE no action ON UPDATE
+    no action;--> statement-breakpoint\nALTER TABLE `quizLog` ADD CONSTRAINT `quizLog_quiz_set_log_id_quiz_set_log_id_fk`
+    FOREIGN KEY (`quiz_set_log_id`) REFERENCES `quiz_set_log`(`id`) ON DELETE no action
+    ON UPDATE no action;--> statement-breakpoint\nALTER TABLE `quiz_set_log` ADD CONSTRAINT
+    `quiz_set_log_user_id_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`)
+    ON DELETE no action ON UPDATE no action;--> statement-breakpoint\nALTER TABLE
+    `quiz_set_log` ADD CONSTRAINT `quiz_set_log_quiz_mode_id_quiz_mode_id_fk` FOREIGN
+    KEY (`quiz_mode_id`) REFERENCES `quiz_mode`(`id`) ON DELETE no action ON UPDATE
+    no action;--> statement-breakpoint\nALTER TABLE `user_costumes` ADD CONSTRAINT
+    `user_costumes_user_id_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`)
+    ON DELETE no action ON UPDATE no action;--> statement-breakpoint\nCREATE INDEX
+    `firebase_uid` ON `users` (`firebase_uid`);"
+  0001_add_quiz_log_order.sql: |-
+    RENAME TABLE `quizLog` TO `quiz_log`;--> statement-breakpoint
+    ALTER TABLE `quiz_log` DROP CONSTRAINT `timeCheck`;--> statement-breakpoint
+    ALTER TABLE `quiz_log` DROP FOREIGN KEY `quizLog_quiz_id_quiz_id_fk`;
+    --> statement-breakpoint
+    ALTER TABLE `quiz_log` DROP FOREIGN KEY `quizLog_quiz_set_log_id_quiz_set_log_id_fk`;
+    --> statement-breakpoint
+    ALTER TABLE `quiz_log` DROP PRIMARY KEY;--> statement-breakpoint
+    ALTER TABLE `quiz_log` ADD PRIMARY KEY(`id`);--> statement-breakpoint
+    ALTER TABLE `quiz_log` ADD `order` int NOT NULL;--> statement-breakpoint
+    ALTER TABLE `quiz_log` ADD CONSTRAINT `timeCheck` CHECK (`quiz_log`.`time` >= 0);--> statement-breakpoint
+    ALTER TABLE `quiz_log` ADD CONSTRAINT `quiz_log_quiz_id_quiz_id_fk` FOREIGN KEY (`quiz_id`) REFERENCES `quiz`(`id`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+    ALTER TABLE `quiz_log` ADD CONSTRAINT `quiz_log_quiz_set_log_id_quiz_set_log_id_fk` FOREIGN KEY (`quiz_set_log_id`) REFERENCES `quiz_set_log`(`id`) ON DELETE no action ON UPDATE no action;
