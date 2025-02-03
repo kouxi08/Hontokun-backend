@@ -23,6 +23,8 @@ env:
     key: cms-api-key
   - name: DATABASE_URL
     key: database-url
+  - name: VUE_APP_API_BASE_URL
+    key: base-url
 
 podAnnotations: {}
 podLabels: {}
