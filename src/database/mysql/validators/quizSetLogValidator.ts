@@ -5,7 +5,7 @@ import { quizSetLogTable } from '../schema/schema.js';
 const quizSetLogSchema = {
   id: z.string().uuid(),
   userId: z.string().uuid(),
-  quizModeId: z.string(),
+  quizModeId: z.number(),
   createdAt: z.date(),
   updatedAt: z.date(),
 };

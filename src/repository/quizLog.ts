@@ -34,7 +34,7 @@ export const getSolvedQuizIds = async (
 export const createQuizLog = async (
   db: MySql2Database,
   userId: string,
-  quizModeId: string,
+  quizModeId: number,
   answers: Answer[]
 ): Promise<{
   quizSetLog: InsertQuizSetLogType;

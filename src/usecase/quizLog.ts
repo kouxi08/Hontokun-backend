@@ -30,7 +30,7 @@ export type QuizData = Quiz &
 export const createQuizLog = async (
   db: MySql2Database,
   user: User,
-  quizModeId: string,
+  quizModeId: number,
   answers: Answer[]
 ) => {
   const quizList: QuizParams[] = [];
