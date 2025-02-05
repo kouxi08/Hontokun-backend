@@ -71,9 +71,9 @@ export const quizSetLogTable = mysqlTable('quiz_set_log', {
   userId: char({ length: 36 })
     .notNull()
     .references(() => usersTable.id),
-  quizModeId: char({ length: 36 })
+  quizModeId: int()
     .notNull()
-    .references(() => quizModeTable.id),
+    .references(() => quizModeTable.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
   ...timestamps,
 });
 
@@ -99,7 +99,7 @@ export const quizLogTable = mysqlTable(
 );
 
 export const quizModeTable = mysqlTable('quiz_mode', {
-  id: char({ length: 36 }).primaryKey(),
+  id: int().primaryKey().autoincrement(),
   name: varchar({ length: 20 }).notNull(),
   description: varchar({ length: 100 }).notNull(),
   isPublic: boolean().notNull(),

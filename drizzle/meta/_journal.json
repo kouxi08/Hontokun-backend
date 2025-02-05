@@ -14,6 +14,13 @@
       "when": 1738060608560,
       "tag": "0001_add_quiz_log_order",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1738660602414,
+      "tag": "0002_change_mode_id",
+      "breakpoints": true
     }
   ]
 }
