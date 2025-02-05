@@ -11,7 +11,7 @@ import { quizModeTable } from '../database/mysql/schema/schema.js';
 export const getQuizModeId = async (
   db: MySql2Database,
   mode: string
-): Promise<string> => {
+): Promise<number> => {
   const data = await db
     .select({ id: quizModeTable.id })
     .from(quizModeTable)
@@ -32,7 +32,7 @@ export const getQuizModeId = async (
  */
 export const getQuizModeName = async (
   db: MySql2Database,
-  id: string
+  id: number
 ): Promise<string> => {
   const data = await db
     .select({ name: quizModeTable.name })

@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 // クイズ結果のバリデーションスキーマ
 export const quizResultSchema = z.object({
-  quizMode: z.string().min(1, { message: 'quizMode is required' }),
+  quizMode: z.number(),
   answers: z.array(
     z.object({
       quizId: z.string().min(1, { message: 'quizId is required' }),
