@@ -33,11 +33,11 @@ const seedQuizModeTable = async (): Promise<void> => {
   for (const mode of modes) {
     try {
       await db.insert(quizModeTable).values(mode);
-      console.log('Success: inserted initial mode values');
     } catch (error) {
       console.error(`Error inserting mode: ${mode.name}`, error);
     }
   }
+  console.log('Success: inserted mode values');
 
 };
 
