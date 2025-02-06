@@ -38,7 +38,6 @@ const seedQuizModeTable = async (): Promise<void> => {
     }
   }
   console.log('Success: inserted mode values');
-
 };
 
 seedQuizModeTable()
