@@ -6,4 +6,12 @@ const firebaseApp = admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 
-export { firebaseApp };
+const deleteFirebaseUser = async (uid: string) => {
+  try {
+    await firebaseApp.auth().deleteUser(uid);
+  } catch (error) {
+    console.error('Error deleting user:', error);
+  }
+};
+
+export { firebaseApp, deleteFirebaseUser };

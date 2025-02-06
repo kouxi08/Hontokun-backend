@@ -1,7 +1,11 @@
 import { eq } from 'drizzle-orm';
 import type { MySql2Database } from 'drizzle-orm/mysql2';
 import { AuthError } from '../core/error.js';
-import { usersTable } from '../database/mysql/schema/schema.js';
+import {
+  quizLogTable,
+  quizSetLogTable,
+  usersTable,
+} from '../database/mysql/schema/schema.js';
 import { insertUserSchema } from '../database/mysql/validators/userValidator.js';
 import type { User } from '../model/user/user';
 
@@ -61,5 +65,32 @@ export const updateUserExperience = async (
     .update(usersTable)
     .set({ experience, level })
     .where(eq(usersTable.id, userId));
+  return;
+};
+
+/**
+ * ユーザを削除する
+ * @param db データベースのインスタンス
+ * @param userId ユーザID
+ * @returns
+ */
+export const deleteUser = async (db: MySql2Database, userId: string) => {
+  await db.transaction(async (trx) => {
+    const setLogs = await trx
+      .select({ id: quizSetLogTable.id })
+      .from(quizSetLogTable)
+      .where(eq(quizSetLogTable.userId, userId));
+    if (setLogs.length > 0) {
+      for (const setLog of setLogs) {
+        await trx
+          .delete(quizLogTable)
+          .where(eq(quizLogTable.quizSetLogId, setLog.id));
+      }
+      await trx
+        .delete(quizSetLogTable)
+        .where(eq(quizSetLogTable.userId, userId));
+    }
+    await trx.delete(usersTable).where(eq(usersTable.id, userId));
+  });
   return;
 };
