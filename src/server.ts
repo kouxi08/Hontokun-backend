@@ -56,6 +56,7 @@ app.use('/sign-up', authMiddleware);
 app.use('/main', authMiddleware);
 app.use('/quiz/result', authMiddleware);
 app.use('/history', authMiddleware);
+app.use('/profile', authMiddleware);
 app.use('/quiz/:tier', authMiddleware);
 app.use('/history/quiz-set/:quizSetId', authMiddleware);
 
@@ -138,10 +139,10 @@ app.post('/quiz/result', zValidator('json', quizResultSchema), async (c) => {
       },
       enemy: enemy
         ? {
-            id: enemy.id,
-            name: enemy.name,
-            url: enemy.image.url,
-          }
+          id: enemy.id,
+          name: enemy.name,
+          url: enemy.image.url,
+        }
         : null,
     },
     200
@@ -278,4 +279,17 @@ app.post('/webhook/quiz', async (c: Context) => {
   }
 
   return c.json({ message: 'Success' }, 200);
+});
+
+app.get('/profile', async (c) => {
+  const firebaseUid = c.get('firebaseUid');
+  const user = await UserUsecase.getUserByFirebaseUid(db, firebaseUid);
+
+  return c.json({
+    profile: {
+      id: user.id,
+      nickname: user.nickname,
+      birthday: user.birthday,
+    }
+  }, 200);
 });
