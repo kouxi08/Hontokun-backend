@@ -5,7 +5,7 @@ import { Hono } from 'hono';
 import { logger } from 'hono/logger';
 import { prettyJSON } from 'hono/pretty-json';
 import { z, ZodError } from 'zod';
-import { firebaseApp } from './config/firebase.js';
+import { deleteFirebaseUser, firebaseApp } from './config/firebase.js';
 import { AuthError } from './core/error.js';
 import { createUserSchema } from './core/validator/createUserValidator.js';
 import { quizResultSchema } from './core/validator/quizResultValidators.js';
@@ -54,6 +54,7 @@ app.get('/quiz/mode', async (c: Context) => {
 
 app.use('/sign-up', authMiddleware);
 app.use('/main', authMiddleware);
+app.use('/user', authMiddleware);
 app.use('/quiz/result', authMiddleware);
 app.use('/history', authMiddleware);
 app.use('/quiz/:tier', authMiddleware);
@@ -138,10 +139,10 @@ app.post('/quiz/result', zValidator('json', quizResultSchema), async (c) => {
       },
       enemy: enemy
         ? {
-            id: enemy.id,
-            name: enemy.name,
-            url: enemy.image.url,
-          }
+          id: enemy.id,
+          name: enemy.name,
+          url: enemy.image.url,
+        }
         : null,
     },
     200
@@ -260,6 +261,15 @@ app.get(
     );
   }
 );
+
+app.delete('/user', async (c) => {
+  const firebaseUid = c.get('firebaseUid');
+  const user = await UserUsecase.getUserByFirebaseUid(db, firebaseUid);
+  // ユーザをfirebaseとDB両方から削除
+  await deleteFirebaseUser(firebaseUid);
+  await UserUsecase.deleteUser(db, user.id);
+  return c.json({ message: 'Success' }, 200);
+});
 
 app.post('/webhook/quiz', async (c: Context) => {
   const req = await c.req.json();
