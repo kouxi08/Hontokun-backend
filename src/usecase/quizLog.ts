@@ -1,6 +1,6 @@
 import type { MySql2Database } from 'drizzle-orm/mysql2';
 import { MAX_TIER } from '../core/constants.js';
-import { formatDate } from '../core/formatDate.js';
+import { formatTimeAgo } from '../core/formatDate.js';
 import type { Quiz, QuizParams } from '../model/quiz/quiz';
 import type { User } from '../model/user/user';
 import * as QuizRepository from '../repository/quiz.js';
@@ -125,15 +125,22 @@ export const getAllQuizLog = async (db: MySql2Database, userId: string) => {
     if (!data) {
       throw new Error('Tier not found');
     }
+
+    const answeredAt = formatTimeAgo(quizSetLog.createdAt);
+    if (!answeredAt) {
+      throw new Error('Invalid date: answeredAt');
+    }
+
     data.quizSetList.push({
       id: quizSetLog.id,
       accuracy:
         (quizLogs.filter((log) => log.isCorrect).length / quizLogs.length) *
         100,
       mode,
-      // yyyy-mm-dd hh:mm:ssに変換
-      answeredAt: formatDate(quizSetLog.createdAt),
+      answeredAt: answeredAt,
     });
+
+    response.push(data);
   }
   return response;
 };
