@@ -137,13 +137,7 @@ app.post('/quiz/result', zValidator('json', quizResultSchema), async (c) => {
         name: costume.name,
         url: costume.image.url,
       },
-      enemy: enemy
-        ? {
-          id: enemy.id,
-          name: enemy.name,
-          url: enemy.image.url,
-        }
-        : null,
+      enemy,
     },
     200
   );
@@ -171,11 +165,7 @@ app.get(
     const quizzes = await QuizUsecase.getQuizzes(db, user.id, tier);
 
     const response = {
-      enemy: {
-        id: enemy.id,
-        name: enemy.name,
-        url: enemy.image.url,
-      },
+      enemy,
       costume: {
         id: costume.id,
         name: costume.name,
@@ -202,11 +192,7 @@ app.get('/history', async (c: Context) => {
       totalAccuracy += log.accuracy;
       return {
         ...log,
-        enemy: {
-          id: enemy.id,
-          name: enemy.name,
-          url: enemy.image.url,
-        },
+        enemy,
       };
     })
   );
@@ -247,6 +233,7 @@ app.get(
       user.id,
       quizSetId
     );
+    const enemy = await EnemyUsecase.getQuizEnemy(db, quizSet.quizList[0]!.tier);
     return c.json(
       {
         quizSet: {
@@ -256,6 +243,7 @@ app.get(
           answeredAt: formatDate(quizSet.createdAt),
         },
         quizList: quizSet.quizList,
+        enemy,
       },
       200
     );
