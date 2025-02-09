@@ -11,7 +11,8 @@ export const quizResultSchema = z.object({
       answerTime: z
         .number()
         .int()
-        .nonnegative({ message: 'answerTime must be a non-negative integer' }),
+        .nonnegative({ message: 'answerTime must be a non-negative integer' })
+        .optional(),
     })
   ),
 });
