@@ -216,7 +216,10 @@ app.get(
       user.id,
       quizSetId
     );
-    const enemy = await EnemyUsecase.getQuizEnemy(db, quizSet.quizList[0]!.tier);
+    const enemy = await EnemyUsecase.getQuizEnemy(
+      db,
+      quizSet.quizList[0]!.tier
+    );
     return c.json(
       {
         quizSet: {

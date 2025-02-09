@@ -114,7 +114,7 @@ export const updateUser = async (
   db: MySql2Database,
   userId: string,
   nickname: string,
-  birthday: string,
+  birthday: string
 ) => {
   return db.transaction(async (trx) => {
     await trx
