@@ -188,6 +188,9 @@ export const getQuizSetDetail = async (
       };
     })
   );
+  if (!quizList) {
+    throw new Error('Quiz list not found');
+  }
 
   return { ...quizSet, mode: quizMode, accuracy: accuracy, quizList };
 };
