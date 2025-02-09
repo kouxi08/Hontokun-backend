@@ -4,6 +4,7 @@ import { AuthError } from '../core/error.js';
 import {
   quizLogTable,
   quizSetLogTable,
+  userCostumesTable,
   usersTable,
 } from '../database/mysql/schema/schema.js';
 import { insertUserSchema } from '../database/mysql/validators/userValidator.js';
@@ -24,7 +25,13 @@ export const createUser = async (
     throw new AuthError('User already exists');
   }
 
-  await db.insert(usersTable).values(validatedUser);
+  db.transaction(async (db) => {
+    await db.insert(usersTable).values(validatedUser);
+    await db.insert(userCostumesTable).values({
+      userId: validatedUser.id,
+      costumeId: validatedUser.costumeId,
+    });
+  });
 
   return validatedUser;
 };

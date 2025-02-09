@@ -56,6 +56,7 @@ app.use('/main', authMiddleware);
 app.use('/user', authMiddleware);
 app.use('/quiz/result', authMiddleware);
 app.use('/history', authMiddleware);
+app.use('/profile', authMiddleware);
 app.use('/quiz/:tier', authMiddleware);
 app.use('/history/quiz-set/:quizSetId', authMiddleware);
 
@@ -261,4 +262,22 @@ app.post('/webhook/quiz', async (c: Context) => {
   }
 
   return c.json({ message: 'Success' }, 200);
+});
+
+app.get('/profile', async (c) => {
+  const firebaseUid = c.get('firebaseUid');
+  const user = await UserUsecase.getUserByFirebaseUid(db, firebaseUid);
+  const costumeList = await CostumeUsecase.getAllCostume(db, user);
+
+  return c.json(
+    {
+      profile: {
+        id: user.id,
+        nickname: user.nickname,
+        birthday: user.birthday,
+      },
+      costumeList,
+    },
+    200
+  );
 });
