@@ -13,7 +13,7 @@ export type Answer = {
   quizId: string;
   order: number;
   answer: string;
-  answerTime: number;
+  answerTime?: number;
   isCorrect?: boolean;
 };
 
