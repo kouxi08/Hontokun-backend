@@ -5,7 +5,7 @@ import { Hono } from 'hono';
 import { logger } from 'hono/logger';
 import { prettyJSON } from 'hono/pretty-json';
 import { z, ZodError } from 'zod';
-import { firebaseApp } from './config/firebase.js';
+import { deleteFirebaseUser, firebaseApp } from './config/firebase.js';
 import { AuthError } from './core/error.js';
 import { createUserSchema } from './core/validator/createUserValidator.js';
 import { quizResultSchema } from './core/validator/quizResultValidators.js';
@@ -21,7 +21,6 @@ import * as QuizUsecase from './usecase/quiz.js';
 import * as EnemyUsecase from './usecase/enemy.js';
 import * as QuizLogUsecase from './usecase/quizLog.js';
 import * as UserUsecase from './usecase/user.js';
-import type { History } from './types/api/history';
 import { zValidator } from '@hono/zod-validator';
 import { Variables } from './core/variables.js';
 import { formatDate } from './core/formatDate.js';
@@ -54,8 +53,10 @@ app.get('/quiz/mode', async (c: Context) => {
 
 app.use('/sign-up', authMiddleware);
 app.use('/main', authMiddleware);
+app.use('/user', authMiddleware);
 app.use('/quiz/result', authMiddleware);
 app.use('/history', authMiddleware);
+app.use('/profile', authMiddleware);
 app.use('/quiz/:tier', authMiddleware);
 app.use('/history/quiz-set/:quizSetId', authMiddleware);
 
@@ -136,13 +137,7 @@ app.post('/quiz/result', zValidator('json', quizResultSchema), async (c) => {
         name: costume.name,
         url: costume.image.url,
       },
-      enemy: enemy
-        ? {
-            id: enemy.id,
-            name: enemy.name,
-            url: enemy.image.url,
-          }
-        : null,
+      enemy,
     },
     200
   );
@@ -170,11 +165,7 @@ app.get(
     const quizzes = await QuizUsecase.getQuizzes(db, user.id, tier);
 
     const response = {
-      enemy: {
-        id: enemy.id,
-        name: enemy.name,
-        url: enemy.image.url,
-      },
+      enemy,
       costume: {
         id: costume.id,
         name: costume.name,
@@ -191,25 +182,7 @@ app.get('/history', async (c: Context) => {
   const firebaseUid = c.get('firebaseUid');
   const user = await UserUsecase.getUserByFirebaseUid(db, firebaseUid);
   const costume = await CostumeUsecase.getCostume(db, user.id);
-
-  const history: History = {};
-  const logs = await QuizLogUsecase.getAllQuizLog(db, user.id);
-  let totalAccuracy = 0;
-  history.tierList = await Promise.all(
-    logs.map(async (log) => {
-      const enemy = await EnemyUsecase.getQuizEnemy(db, log.tier);
-      totalAccuracy += log.accuracy;
-      return {
-        ...log,
-        enemy: {
-          id: enemy.id,
-          name: enemy.name,
-          url: enemy.image.url,
-        },
-      };
-    })
-  );
-  history.totalAccuracy = totalAccuracy / logs.length;
+  const history = await QuizLogUsecase.getAllQuizLog(db, user.id);
 
   return c.json(
     {
@@ -223,7 +196,7 @@ app.get('/history', async (c: Context) => {
           url: costume.image.url,
         },
       },
-      history,
+      ...history,
     },
     200
   );
@@ -246,6 +219,7 @@ app.get(
       user.id,
       quizSetId
     );
+    const enemy = await EnemyUsecase.getQuizEnemy(db, quizSet.quizList[0]!.tier);
     return c.json(
       {
         quizSet: {
@@ -255,11 +229,21 @@ app.get(
           answeredAt: formatDate(quizSet.createdAt),
         },
         quizList: quizSet.quizList,
+        enemy,
       },
       200
     );
   }
 );
+
+app.delete('/user', async (c) => {
+  const firebaseUid = c.get('firebaseUid');
+  const user = await UserUsecase.getUserByFirebaseUid(db, firebaseUid);
+  // ユーザをfirebaseとDB両方から削除
+  await deleteFirebaseUser(firebaseUid);
+  await UserUsecase.deleteUser(db, user.id);
+  return c.json({ message: 'Success' }, 200);
+});
 
 app.post('/webhook/quiz', async (c: Context) => {
   const req = await c.req.json();
@@ -278,4 +262,22 @@ app.post('/webhook/quiz', async (c: Context) => {
   }
 
   return c.json({ message: 'Success' }, 200);
+});
+
+app.get('/profile', async (c) => {
+  const firebaseUid = c.get('firebaseUid');
+  const user = await UserUsecase.getUserByFirebaseUid(db, firebaseUid);
+  const costumeList = await CostumeUsecase.getAllCostume(db, user);
+
+  return c.json(
+    {
+      profile: {
+        id: user.id,
+        nickname: user.nickname,
+        birthday: user.birthday,
+      },
+      costumeList,
+    },
+    200
+  );
 });

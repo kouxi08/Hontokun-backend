@@ -74,3 +74,13 @@ export const updateUserExp = async (
   await UserRepository.updateUserExperience(db, user.id, newExp, newLevel);
   return;
 };
+
+/**
+ * ユーザを削除する
+ * @param db データベースのインスタンス
+ * @param userId ユーザID
+ * @returns void
+ */
+export const deleteUser = async (db: MySql2Database, userId: string) => {
+  return await UserRepository.deleteUser(db, userId);
+};

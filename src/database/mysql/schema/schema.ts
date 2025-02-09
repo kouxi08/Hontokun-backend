@@ -73,7 +73,10 @@ export const quizSetLogTable = mysqlTable('quiz_set_log', {
     .references(() => usersTable.id),
   quizModeId: int()
     .notNull()
-    .references(() => quizModeTable.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
+    .references(() => quizModeTable.id, {
+      onDelete: 'cascade',
+      onUpdate: 'cascade',
+    }),
   ...timestamps,
 });
 
