@@ -7,6 +7,7 @@ import * as QuizRepository from '../repository/quiz.js';
 import * as QuizLogRepository from '../repository/quizLog.js';
 import * as QuizModeRepository from '../repository/quizMode.js';
 import * as UserUsecase from './user.js';
+import * as EnemyUsecase from './enemy.js';
 
 export type Answer = {
   quizId: string;
@@ -90,31 +91,48 @@ export const getAllQuizLog = async (db: MySql2Database, userId: string) => {
     tier: number;
     accuracy: number;
     quizSetList: QuizSetLog[];
+    enemy: {
+      id: string;
+      name: string;
+      url: string;
+    }
   };
 
   // クイズセットを取得
   const quizSetLogs = await QuizLogRepository.getQuizSet(db, userId);
 
+  if (!quizSetLogs) {
+    return { totalAccuracy: 0, tierList: [] };
+  }
+
   // 難易度別にまとめる
-  const response: TierList[] = new Array(MAX_TIER).fill(1).map((_, i) => {
-    return {
-      tier: i + 1,
-      accuracy: 0,
-      quizSetList: [],
-    };
-  });
+  const response: TierList[] = await Promise.all(
+    new Array(MAX_TIER).fill(1).map(async (_, i) => {
+      return {
+        tier: i + 1,
+        accuracy: 0,
+        quizSetList: [],
+        enemy: await EnemyUsecase.getQuizEnemy(db, i + 1),
+      };
+    })
+  );
+
+  let totalAccuracy = 0;
 
   for (const quizSetLog of quizSetLogs) {
+    // クイズセットごとのログ取得
     const quizLogs = await QuizLogRepository.getQuizLogBySetId(
       db,
       quizSetLog.id
     );
 
+    // クイズセットの難易度を取得
     const tier = await QuizRepository.getQuizByTier(db, quizLogs[0]?.quizId!);
     if (!tier) {
       throw new Error('Quiz not found');
     }
 
+    // クイズモード名を取得
     const mode = await QuizModeRepository.getQuizModeName(
       db,
       quizSetLog.quizModeId
@@ -122,27 +140,37 @@ export const getAllQuizLog = async (db: MySql2Database, userId: string) => {
 
     // responseのtierに対応する配列に追加
     const data = response.find((res) => res.tier === tier);
-    if (!data) {
-      throw new Error('Tier not found');
-    }
+    if (!data) { throw new Error('Tier not found'); }
 
+    // 正答率計算
+    const accuracy = (quizLogs.filter((log) => log.isCorrect).length / quizLogs.length) * 100;
+    totalAccuracy += accuracy;
+
+    // 回答日時をフォーマット
     const answeredAt = formatTimeAgo(quizSetLog.createdAt);
-    if (!answeredAt) {
-      throw new Error('Invalid date: answeredAt');
-    }
+    if (!answeredAt) { throw new Error('Invalid date: answeredAt'); }
 
+    // 難易度グループにクイズセットの情報を追加
     data.quizSetList.push({
       id: quizSetLog.id,
-      accuracy:
-        (quizLogs.filter((log) => log.isCorrect).length / quizLogs.length) *
-        100,
+      accuracy: accuracy,
       mode,
       answeredAt: answeredAt,
     });
-
-    response.push(data);
   }
-  return response;
+
+  // 難易度ごとの正答率を計算
+  for (const tierData of response) {
+    if (tierData.quizSetList.length > 0) {
+      const totalTierAccuracy = tierData.quizSetList.reduce((sum, quizSet) => sum + quizSet.accuracy, 0);
+      tierData.accuracy = totalTierAccuracy / tierData.quizSetList.length;
+    }
+  }
+
+  // 全体の正答率を計算
+  totalAccuracy /= quizSetLogs.length;
+
+  return { totalAccuracy, tierList: response };
 };
 
 /**

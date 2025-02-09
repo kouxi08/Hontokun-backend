@@ -21,7 +21,6 @@ import * as QuizUsecase from './usecase/quiz.js';
 import * as EnemyUsecase from './usecase/enemy.js';
 import * as QuizLogUsecase from './usecase/quizLog.js';
 import * as UserUsecase from './usecase/user.js';
-import type { History } from './types/api/history';
 import { zValidator } from '@hono/zod-validator';
 import { Variables } from './core/variables.js';
 import { formatDate } from './core/formatDate.js';
@@ -182,21 +181,7 @@ app.get('/history', async (c: Context) => {
   const firebaseUid = c.get('firebaseUid');
   const user = await UserUsecase.getUserByFirebaseUid(db, firebaseUid);
   const costume = await CostumeUsecase.getCostume(db, user.id);
-
-  const history: History = {};
-  const logs = await QuizLogUsecase.getAllQuizLog(db, user.id);
-  let totalAccuracy = 0;
-  history.tierList = await Promise.all(
-    logs.map(async (log) => {
-      const enemy = await EnemyUsecase.getQuizEnemy(db, log.tier);
-      totalAccuracy += log.accuracy;
-      return {
-        ...log,
-        enemy,
-      };
-    })
-  );
-  history.totalAccuracy = totalAccuracy / logs.length;
+  const history = await QuizLogUsecase.getAllQuizLog(db, user.id);
 
   return c.json(
     {
@@ -210,7 +195,7 @@ app.get('/history', async (c: Context) => {
           url: costume.image.url,
         },
       },
-      history,
+      ...history,
     },
     200
   );
