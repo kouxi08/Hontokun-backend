@@ -26,4 +26,4 @@ jobs:
         context: .
         file: ./docker/Dockerfile.prod
         push: true
-        tags:  kouxi00/hontokun-backend:1.0.0
+        tags:  kouxi00/hontokun-backend:1.0.3

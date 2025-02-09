@@ -24,4 +24,4 @@ COPY --from=builder --chown=hono:nodejs /app/package.json /app/package.json
 USER hono
 EXPOSE 3000
 
-CMD ["sh", "-c", "npx drizzle-kit migrate && node src/database/mysql/seed.js && node /app/src/index.js"]
+CMD ["sh", "-c", "npx drizzle-kit push && node /app/src/index.js"]
