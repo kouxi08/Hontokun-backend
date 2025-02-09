@@ -280,6 +280,17 @@ app.get('/profile', async (c) => {
   );
 });
 
-app.put('/profile', async (c) => {
+app.put('/profile', zValidator('json', userSchema), async (c) => {
+  const firebaseUid = c.get('firebaseUid');
+  const { nickname, birthday, costumeId } = await c.req.valid('json');
+  const user = await UserUsecase.getUserByFirebaseUid(db, firebaseUid);
+  const updateUser = await UserUsecase.updateUser(
+    db,
+    user.id,
+    nickname,
+    birthday,
+    costumeId
+  );
 
+  return c.json(updateUser, 200);
 });

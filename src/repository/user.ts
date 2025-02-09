@@ -101,3 +101,38 @@ export const deleteUser = async (db: MySql2Database, userId: string) => {
   });
   return;
 };
+
+/**
+ * ユーザのデータを更新する
+ * @param db データベースのインスタンス
+ * @param userId ユーザID
+ * @param nickname ニックネーム
+ * @param birthday 誕生日
+ * @returns ユーザデータ
+ */
+export const updateUser = async (
+  db: MySql2Database,
+  userId: string,
+  nickname: string,
+  birthday: string,
+) => {
+  return db.transaction(async (trx) => {
+    await trx
+      .update(usersTable)
+      .set({ nickname, birthday: new Date(birthday) })
+      .where(eq(usersTable.id, userId));
+
+    // 更新後のデータを取得
+    const result = await trx
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.id, userId))
+      .limit(1);
+
+    if (result.length === 0) {
+      throw new Error('Updated user not found');
+    }
+
+    return result[0];
+  });
+};

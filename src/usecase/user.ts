@@ -5,6 +5,7 @@ import { APIError } from '../core/error.js';
 import type { characters } from '../database/cms/types/response';
 import type { User } from '../model/user/user';
 import * as UserRepository from '../repository/user.js';
+import * as CostumeRepository from '../repository/costume.js';
 
 export const createUser = async (
   db: MySql2Database,
@@ -84,3 +85,43 @@ export const updateUserExp = async (
 export const deleteUser = async (db: MySql2Database, userId: string) => {
   return await UserRepository.deleteUser(db, userId);
 };
+
+/**
+ * ユーザのデータ・きせかえデータを更新する
+ * @param db データベースのインスタンス
+ * @param userId ユーザID
+ * @param nickname ニックネーム
+ * @param birthday 誕生日
+ * @param costumeId きせかえID
+ * @returns ユーザ・きせかえデータ
+ */
+export const updateUser = async (
+  db: MySql2Database,
+  userId: string,
+  nickname: string,
+  birthday: string,
+  costumeId: string | undefined
+) => {
+  let costume;
+  if (costumeId !== undefined) {
+    // 持ってるか確認
+
+    // 更新
+    costume = await CostumeRepository.updateUserCostume(db, userId, costumeId);
+  } else {
+    costume = await CostumeRepository.getUserCostume(db, userId);
+  }
+  const user = await UserRepository.updateUser(db, userId, nickname, birthday);
+  if (!user) { throw new Error('failed: update user'); }
+
+  return {
+    id: user.id,
+    nickname: user.nickname,
+    birthday: user.birthday,
+    costume: {
+      id: costume.id,
+      name: costume.name,
+      url: costume.image.url
+    }
+  }
+}
