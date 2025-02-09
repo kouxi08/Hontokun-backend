@@ -6,6 +6,8 @@ import type { characters } from '../database/cms/types/response';
 import type { User } from '../model/user/user';
 import * as UserRepository from '../repository/user.js';
 import * as CostumeRepository from '../repository/costume.js';
+import * as CostumeUsecase from './costume.js';
+import { Costume } from '../model/character/costume.js';
 
 export const createUser = async (
   db: MySql2Database,
@@ -102,15 +104,17 @@ export const updateUser = async (
   birthday: string,
   costumeId: string | undefined
 ) => {
-  let costume;
   if (costumeId !== undefined) {
-    // 持ってるか確認
-
+    // きせかえを所持しているか確認
+    const ownedCostumeIds = await CostumeRepository.getOwnedCostumeIds(db, userId);
+    if (!ownedCostumeIds.includes(costumeId)) {
+      throw new Error('costume is not owned');
+    }
     // 更新
-    costume = await CostumeRepository.updateUserCostume(db, userId, costumeId);
-  } else {
-    costume = await CostumeRepository.getUserCostume(db, userId);
+    await CostumeRepository.updateCostumeId(db, userId, costumeId);
   }
+  const costume = await CostumeUsecase.getCostume(db, userId);
+
   const user = await UserRepository.updateUser(db, userId, nickname, birthday);
   if (!user) { throw new Error('failed: update user'); }
 

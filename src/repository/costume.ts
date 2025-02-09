@@ -51,7 +51,6 @@ export const updateCostumeId = async (
   await db
     .update(usersTable)
     .set({ costumeId })
-    .where(eq(usersTable.id, userId))
-    .execute();
+    .where(eq(usersTable.id, userId));
   return;
 }

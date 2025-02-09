@@ -15,7 +15,6 @@ import {
   corsMiddleware,
   corsMiddlewareForMicroCMS,
 } from './middleware/cors.js';
-import type { paths } from './openapi/schema';
 import * as CostumeUsecase from './usecase/costume.js';
 import * as QuizUsecase from './usecase/quiz.js';
 import * as EnemyUsecase from './usecase/enemy.js';
