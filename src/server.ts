@@ -139,10 +139,10 @@ app.post('/quiz/result', zValidator('json', quizResultSchema), async (c) => {
       },
       enemy: enemy
         ? {
-          id: enemy.id,
-          name: enemy.name,
-          url: enemy.image.url,
-        }
+            id: enemy.id,
+            name: enemy.name,
+            url: enemy.image.url,
+          }
         : null,
     },
     200
@@ -284,12 +284,17 @@ app.post('/webhook/quiz', async (c: Context) => {
 app.get('/profile', async (c) => {
   const firebaseUid = c.get('firebaseUid');
   const user = await UserUsecase.getUserByFirebaseUid(db, firebaseUid);
+  const costumeList = await CostumeUsecase.getAllCostume(db, user);
 
-  return c.json({
-    profile: {
-      id: user.id,
-      nickname: user.nickname,
-      birthday: user.birthday,
-    }
-  }, 200);
+  return c.json(
+    {
+      profile: {
+        id: user.id,
+        nickname: user.nickname,
+        birthday: user.birthday,
+      },
+      costumeList,
+    },
+    200
+  );
 });
