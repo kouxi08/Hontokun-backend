@@ -158,7 +158,7 @@ export const getAllQuizLog = async (db: MySql2Database, userId: string) => {
     // 難易度グループにクイズセットの情報を追加
     data.quizSetList.push({
       id: quizSetLog.id,
-      accuracy: accuracy,
+      accuracy: Math.floor(accuracy),
       mode,
       answeredAt: answeredAt,
     });
@@ -176,7 +176,7 @@ export const getAllQuizLog = async (db: MySql2Database, userId: string) => {
   }
 
   // 全体の正答率を計算
-  totalAccuracy /= quizSetLogs.length;
+  totalAccuracy = Math.floor(totalAccuracy / quizSetLogs.length);
 
   return { totalAccuracy, tierList: response };
 };
@@ -208,7 +208,7 @@ export const getQuizSetDetail = async (
   const quizLogs = await QuizLogRepository.getQuizLogBySetId(db, quizSetId);
   // 正答率計算
   const accuracy =
-    (quizLogs.filter((log) => log.isCorrect).length / quizLogs.length) * 100;
+    Math.floor((quizLogs.filter((log) => log.isCorrect).length / quizLogs.length) * 100);
 
   // クイズ取得
   const quizList = await Promise.all(
