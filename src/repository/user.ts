@@ -1,7 +1,12 @@
 import { eq } from 'drizzle-orm';
 import type { MySql2Database } from 'drizzle-orm/mysql2';
 import { AuthError } from '../core/error.js';
-import { usersTable } from '../database/mysql/schema/schema.js';
+import {
+  quizLogTable,
+  quizSetLogTable,
+  userCostumesTable,
+  usersTable,
+} from '../database/mysql/schema/schema.js';
 import { insertUserSchema } from '../database/mysql/validators/userValidator.js';
 import type { User } from '../model/user/user';
 
@@ -20,7 +25,13 @@ export const createUser = async (
     throw new AuthError('User already exists');
   }
 
-  await db.insert(usersTable).values(validatedUser);
+  db.transaction(async (db) => {
+    await db.insert(usersTable).values(validatedUser);
+    await db.insert(userCostumesTable).values({
+      userId: validatedUser.id,
+      costumeId: validatedUser.costumeId,
+    });
+  });
 
   return validatedUser;
 };
@@ -62,4 +73,66 @@ export const updateUserExperience = async (
     .set({ experience, level })
     .where(eq(usersTable.id, userId));
   return;
+};
+
+/**
+ * ユーザを削除する
+ * @param db データベースのインスタンス
+ * @param userId ユーザID
+ * @returns
+ */
+export const deleteUser = async (db: MySql2Database, userId: string) => {
+  await db.transaction(async (trx) => {
+    const setLogs = await trx
+      .select({ id: quizSetLogTable.id })
+      .from(quizSetLogTable)
+      .where(eq(quizSetLogTable.userId, userId));
+    if (setLogs.length > 0) {
+      for (const setLog of setLogs) {
+        await trx
+          .delete(quizLogTable)
+          .where(eq(quizLogTable.quizSetLogId, setLog.id));
+      }
+      await trx
+        .delete(quizSetLogTable)
+        .where(eq(quizSetLogTable.userId, userId));
+    }
+    await trx.delete(usersTable).where(eq(usersTable.id, userId));
+  });
+  return;
+};
+
+/**
+ * ユーザのデータを更新する
+ * @param db データベースのインスタンス
+ * @param userId ユーザID
+ * @param nickname ニックネーム
+ * @param birthday 誕生日
+ * @returns ユーザデータ
+ */
+export const updateUser = async (
+  db: MySql2Database,
+  userId: string,
+  nickname: string,
+  birthday: string
+) => {
+  return db.transaction(async (trx) => {
+    await trx
+      .update(usersTable)
+      .set({ nickname, birthday: new Date(birthday) })
+      .where(eq(usersTable.id, userId));
+
+    // 更新後のデータを取得
+    const result = await trx
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.id, userId))
+      .limit(1);
+
+    if (result.length === 0) {
+      throw new Error('Updated user not found');
+    }
+
+    return result[0];
+  });
 };

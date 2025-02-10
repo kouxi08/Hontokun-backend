@@ -27,5 +27,5 @@ $ kubectl apply -f <secret-name>
 add repositry and install
 ```
 $ helm repo add hontokun-backend https://kouxi08.github.io/Hontokun-backend/
-$ helm install hontokun-backend hontokun/hontokun --create-namespace --namespace hontokun
+$ helm install hontokun-backend hontokun-backend/hontokun-backend --create-namespace --namespace hontokun
 ```
