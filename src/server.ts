@@ -193,7 +193,7 @@ app.get('/history', async (c: Context) => {
           url: costume.image.url,
         },
       },
-      ...history,
+      history,
     },
     200
   );
