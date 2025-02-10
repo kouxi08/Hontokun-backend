@@ -7,7 +7,7 @@ import { prettyJSON } from 'hono/pretty-json';
 import { z, ZodError } from 'zod';
 import { deleteFirebaseUser, firebaseApp } from './config/firebase.js';
 import { AuthError } from './core/error.js';
-import { createUserSchema } from './core/validator/createUserValidator.js';
+import { userSchema } from './core/validator/userValidators.js';
 import { quizResultSchema } from './core/validator/quizResultValidators.js';
 import type { quiz } from './database/cms/types/response';
 import { createAuthMiddleware } from './middleware/auth.js';
@@ -15,7 +15,6 @@ import {
   corsMiddleware,
   corsMiddlewareForMicroCMS,
 } from './middleware/cors.js';
-import type { paths } from './openapi/schema';
 import * as CostumeUsecase from './usecase/costume.js';
 import * as QuizUsecase from './usecase/quiz.js';
 import * as EnemyUsecase from './usecase/enemy.js';
@@ -78,11 +77,9 @@ app.onError((error, c) => {
   return errorResponse(500, 'Something unexpected happened');
 });
 
-app.post('sign-up', async (c: Context) => {
+app.post('sign-up', zValidator('json', userSchema), async (c) => {
   const userId = c.get('firebaseUid');
-  const body: paths['/sign-up']['post']['requestBody']['content']['application/json'] =
-    await c.req.json();
-  const { nickname, birthday } = createUserSchema.parse(body);
+  const { nickname, birthday } = await c.req.valid('json');
   const user = await UserUsecase.createUser(db, userId, nickname, birthday);
 
   return c.json(user, 200);
@@ -219,7 +216,10 @@ app.get(
       user.id,
       quizSetId
     );
-    const enemy = await EnemyUsecase.getQuizEnemy(db, quizSet.quizList[0]!.tier);
+    const enemy = await EnemyUsecase.getQuizEnemy(
+      db,
+      quizSet.quizList[0]!.tier
+    );
     return c.json(
       {
         quizSet: {
@@ -280,4 +280,19 @@ app.get('/profile', async (c) => {
     },
     200
   );
+});
+
+app.put('/profile', zValidator('json', userSchema), async (c) => {
+  const firebaseUid = c.get('firebaseUid');
+  const { nickname, birthday, costumeId } = await c.req.valid('json');
+  const user = await UserUsecase.getUserByFirebaseUid(db, firebaseUid);
+  const updateUser = await UserUsecase.updateUser(
+    db,
+    user.id,
+    nickname,
+    birthday,
+    costumeId
+  );
+
+  return c.json(updateUser, 200);
 });

@@ -5,6 +5,8 @@ import { APIError } from '../core/error.js';
 import type { characters } from '../database/cms/types/response';
 import type { User } from '../model/user/user';
 import * as UserRepository from '../repository/user.js';
+import * as CostumeRepository from '../repository/costume.js';
+import * as CostumeUsecase from './costume.js';
 
 export const createUser = async (
   db: MySql2Database,
@@ -83,4 +85,51 @@ export const updateUserExp = async (
  */
 export const deleteUser = async (db: MySql2Database, userId: string) => {
   return await UserRepository.deleteUser(db, userId);
+};
+
+/**
+ * ユーザのデータ・きせかえデータを更新する
+ * @param db データベースのインスタンス
+ * @param userId ユーザID
+ * @param nickname ニックネーム
+ * @param birthday 誕生日
+ * @param costumeId きせかえID
+ * @returns ユーザ・きせかえデータ
+ */
+export const updateUser = async (
+  db: MySql2Database,
+  userId: string,
+  nickname: string,
+  birthday: string,
+  costumeId: string | undefined
+) => {
+  if (costumeId !== undefined) {
+    // きせかえを所持しているか確認
+    const ownedCostumeIds = await CostumeRepository.getOwnedCostumeIds(
+      db,
+      userId
+    );
+    if (!ownedCostumeIds.includes(costumeId)) {
+      throw new Error('costume is not owned');
+    }
+    // 更新
+    await CostumeRepository.updateCostumeId(db, userId, costumeId);
+  }
+  const costume = await CostumeUsecase.getCostume(db, userId);
+
+  const user = await UserRepository.updateUser(db, userId, nickname, birthday);
+  if (!user) {
+    throw new Error('failed: update user');
+  }
+
+  return {
+    id: user.id,
+    nickname: user.nickname,
+    birthday: user.birthday,
+    costume: {
+      id: costume.id,
+      name: costume.name,
+      url: costume.image.url,
+    },
+  };
 };

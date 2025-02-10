@@ -8,10 +8,7 @@ import type { characters } from '../database/cms/types/response';
  * @param tier 難易度
  * @returns 指名手配猫のデータ
  */
-export const getQuizEnemy = async (
-  db: MySql2Database,
-  tier: number
-) => {
+export const getQuizEnemy = async (db: MySql2Database, tier: number) => {
   const data = await fetchMicroCMSData<characters<'get'>[]>('characters', {
     filters: `tier[equals]${tier}`,
   });
@@ -24,5 +21,5 @@ export const getQuizEnemy = async (
     id: enemy.id,
     name: enemy.name,
     url: enemy.image.url,
-  }
+  };
 };

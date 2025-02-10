@@ -35,3 +35,22 @@ export const getOwnedCostumeIds = async (
     .where(eq(userCostumesTable.userId, userId));
   return costumeIds.map((costume) => costume.costumeId!);
 };
+
+/**
+ * ユーザのきせかえIDを更新する
+ * @param db データベースのインスタンス
+ * @param userId ユーザID
+ * @param costumeId きせかえID
+ * @returns void
+ */
+export const updateCostumeId = async (
+  db: MySql2Database,
+  userId: string,
+  costumeId: string
+) => {
+  await db
+    .update(usersTable)
+    .set({ costumeId })
+    .where(eq(usersTable.id, userId));
+  return;
+};

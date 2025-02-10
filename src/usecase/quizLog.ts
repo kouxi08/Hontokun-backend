@@ -95,7 +95,7 @@ export const getAllQuizLog = async (db: MySql2Database, userId: string) => {
       id: string;
       name: string;
       url: string;
-    }
+    };
   };
 
   // クイズセットを取得
@@ -140,15 +140,20 @@ export const getAllQuizLog = async (db: MySql2Database, userId: string) => {
 
     // responseのtierに対応する配列に追加
     const data = response.find((res) => res.tier === tier);
-    if (!data) { throw new Error('Tier not found'); }
+    if (!data) {
+      throw new Error('Tier not found');
+    }
 
     // 正答率計算
-    const accuracy = (quizLogs.filter((log) => log.isCorrect).length / quizLogs.length) * 100;
+    const accuracy =
+      (quizLogs.filter((log) => log.isCorrect).length / quizLogs.length) * 100;
     totalAccuracy += accuracy;
 
     // 回答日時をフォーマット
     const answeredAt = formatTimeAgo(quizSetLog.createdAt);
-    if (!answeredAt) { throw new Error('Invalid date: answeredAt'); }
+    if (!answeredAt) {
+      throw new Error('Invalid date: answeredAt');
+    }
 
     // 難易度グループにクイズセットの情報を追加
     data.quizSetList.push({
@@ -162,7 +167,10 @@ export const getAllQuizLog = async (db: MySql2Database, userId: string) => {
   // 難易度ごとの正答率を計算
   for (const tierData of response) {
     if (tierData.quizSetList.length > 0) {
-      const totalTierAccuracy = tierData.quizSetList.reduce((sum, quizSet) => sum + quizSet.accuracy, 0);
+      const totalTierAccuracy = tierData.quizSetList.reduce(
+        (sum, quizSet) => sum + quizSet.accuracy,
+        0
+      );
       tierData.accuracy = totalTierAccuracy / tierData.quizSetList.length;
     }
   }
