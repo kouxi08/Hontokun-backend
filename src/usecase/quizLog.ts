@@ -233,7 +233,12 @@ export const getQuizSetDetail = async (
       return {
         ...quiz.toJSON(),
         isCorrect: quiz.answer === log.userAnswer,
-        userAnswer: log.userAnswer,
+        userAnswer:
+          log.userAnswer == 'TRUE'
+            ? true
+            : log.userAnswer == 'FALSE'
+              ? false
+              : log.userAnswer,
       };
     })
   );
