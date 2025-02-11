@@ -1,7 +1,7 @@
 import type { MySql2Database } from 'drizzle-orm/mysql2';
 import { MAX_TIER } from '../core/constants.js';
 import { formatTimeAgo } from '../core/formatDate.js';
-import type { Quiz, QuizParams } from '../model/quiz/quiz';
+import type { QuizParams } from '../model/quiz/quiz';
 import type { User } from '../model/user/user';
 import * as QuizRepository from '../repository/quiz.js';
 import * as QuizLogRepository from '../repository/quizLog.js';
@@ -12,13 +12,10 @@ import * as EnemyUsecase from './enemy.js';
 export type Answer = {
   quizId: string;
   order: number;
-  answer: string;
+  answer: string | boolean;
   answerTime?: number;
   isCorrect?: boolean;
 };
-
-export type QuizData = Quiz &
-  Partial<Pick<QuizLog, 'userAnswer' | 'answerTime' | 'isCorrect'>>;
 
 /**
  * クイズの回答を受け取り、ログを作成する
@@ -41,6 +38,13 @@ export const createQuizLog = async (
     if (!quizData) {
       throw new Error('Quiz not found');
     }
+    if (quizData.type === 'TRUE_OR_FALSE') {
+      if (typeof answer.answer !== 'boolean') {
+        throw new Error('Invalid answer type');
+      }
+      answer.answer = answer.answer ? 'TRUE' : 'FALSE';
+    }
+
     quizList.push({ ...quizData.toJSON() });
     answer.isCorrect = quizData.answer === answer.answer;
 
@@ -62,7 +66,12 @@ export const createQuizLog = async (
       Object.assign(quiz, {
         order: log.order,
         isCorrect: log.isCorrect,
-        userAnswer: log.userAnswer,
+        userAnswer:
+          log.userAnswer == 'TRUE'
+            ? true
+            : log.userAnswer == 'FALSE'
+              ? false
+              : log.userAnswer,
         answerTime: log.time,
       });
     }
@@ -125,9 +134,12 @@ export const getAllQuizLog = async (db: MySql2Database, userId: string) => {
       db,
       quizSetLog.id
     );
+    if (!quizLogs?.[0]) {
+      throw new Error('Quiz logs not found');
+    }
 
     // クイズセットの難易度を取得
-    const tier = await QuizRepository.getQuizByTier(db, quizLogs[0]?.quizId!);
+    const tier = await QuizRepository.getQuizByTier(db, quizLogs[0].quizId!);
     if (!tier) {
       throw new Error('Quiz not found');
     }
@@ -207,8 +219,9 @@ export const getQuizSetDetail = async (
   // クイズログ取得
   const quizLogs = await QuizLogRepository.getQuizLogBySetId(db, quizSetId);
   // 正答率計算
-  const accuracy =
-    Math.floor((quizLogs.filter((log) => log.isCorrect).length / quizLogs.length) * 100);
+  const accuracy = Math.floor(
+    (quizLogs.filter((log) => log.isCorrect).length / quizLogs.length) * 100
+  );
 
   // クイズ取得
   const quizList = await Promise.all(
@@ -220,7 +233,12 @@ export const getQuizSetDetail = async (
       return {
         ...quiz.toJSON(),
         isCorrect: quiz.answer === log.userAnswer,
-        userAnswer: log.userAnswer,
+        userAnswer:
+          log.userAnswer == 'TRUE'
+            ? true
+            : log.userAnswer == 'FALSE'
+              ? false
+              : log.userAnswer,
       };
     })
   );
