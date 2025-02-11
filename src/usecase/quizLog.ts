@@ -125,8 +125,9 @@ export const getAllQuizLog = async (db: MySql2Database, userId: string) => {
       db,
       quizSetLog.id
     );
+    if (!quizLogs?.[0]) { throw new Error('Quiz logs not found'); }
 
-    // クイズセットの難易度を取得
+    const tier = await QuizRepository.getQuizByTier(db, quizLogs[0].quizId!);
     const tier = await QuizRepository.getQuizByTier(db, quizLogs[0]?.quizId!);
     if (!tier) {
       throw new Error('Quiz not found');
