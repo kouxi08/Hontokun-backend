@@ -5,7 +5,6 @@ import { Quiz } from '../model/quiz/quiz.js';
 import * as QuizRepository from '../repository/quiz.js';
 import * as QuizLogRepository from '../repository/quizLog.js';
 import * as QuizModeRepository from '../repository/quizMode.js';
-import { convertQuizToAPI } from '../core/converter/api/quiz.js';
 
 export const createQuiz = async (
   db: MySql2Database,
@@ -27,13 +26,13 @@ export const updateQuiz = async (
 const mapQuizData = (quiz: quiz<'get'>): Quiz => {
   const choices = quiz.choices
     ? quiz.choices!.split('\n').map((choice) => {
-        return Choice.create({
-          id: null,
-          name: choice,
-          createdAt: new Date(quiz.createdAt),
-          updatedAt: new Date(quiz.updatedAt),
-        });
-      })
+      return Choice.create({
+        id: null,
+        name: choice,
+        createdAt: new Date(quiz.createdAt),
+        updatedAt: new Date(quiz.updatedAt),
+      });
+    })
     : [];
 
   return Quiz.create({
@@ -75,10 +74,25 @@ export const getQuizzes = async (
     if (!quiz) {
       return null;
     }
-    const detail = convertQuizToAPI(quiz);
     return {
-      ...detail,
+      id: quiz.id,
       order: index + 1,
+      news: {
+        title: quiz.title,
+        content: quiz.content,
+        image: quiz.imageUrl!,
+      },
+      question: quiz.question,
+      type: quiz.type,
+      choices: quiz.choices.map((choice) => {
+        return {
+          id: choice.id,
+          choice: choice.name,
+        };
+      }),
+      correctAnswer: quiz.answer == true ? 'TRUE' : quiz.answer == false ? 'FALSE' : quiz.answer,
+      hint: quiz.hint,
+      keyword: quiz.keyword,
     };
   });
 };
