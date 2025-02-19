@@ -7,7 +7,10 @@ export const quizResultSchema = z.object({
     z.object({
       quizId: z.string().min(1, { message: 'quizId is required' }),
       order: z.number().int().nonnegative({ message: 'order is required' }),
-      answer: z.string().min(1, { message: 'answer is required' }),
+      answer: z.union([
+        z.boolean(),
+        z.string().min(1, { message: 'answer is required' }),
+      ]),
       answerTime: z
         .number()
         .int()

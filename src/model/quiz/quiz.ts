@@ -12,7 +12,7 @@ export type QuizParams = {
   newsUrl: string;
   type: 'TRUE_OR_FALSE' | 'SELECTION';
   choices: Choice[];
-  answer: string;
+  answer: boolean | string;
   explanation: string;
   hint: string;
   keyword: string;
@@ -77,7 +77,10 @@ export class Quiz {
     return this.params.choices;
   }
 
-  get answer(): string {
+  get answer(): string | boolean {
+    if (this.params.type === 'TRUE_OR_FALSE') {
+      return this.params.answer === 'TRUE';
+    }
     return this.params.answer;
   }
 
@@ -114,6 +117,10 @@ export class Quiz {
   }
 
   public toJSON(): QuizParams {
-    return this.params;
+    return {
+      ...this.params,
+      answer: this.answer,
+      choices: this.choices,
+    };
   }
 }
