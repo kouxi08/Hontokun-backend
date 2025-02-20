@@ -90,7 +90,7 @@ export const getQuizzes = async (
           choice: choice.name,
         };
       }),
-      correctAnswer: quiz.answer == true ? 'TRUE' : quiz.answer == false ? 'FALSE' : quiz.answer,
+      correctAnswer: quiz.answer,
       hint: quiz.hint,
       keyword: quiz.keyword,
     };
