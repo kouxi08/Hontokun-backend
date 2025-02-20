@@ -74,6 +74,16 @@ export const updateUserExp = async (
   }
   const newLevel = user.level + levelUpCount;
   await UserRepository.updateUserExperience(db, user.id, newExp, newLevel);
+
+  // レベルが上がっていたら新しいきせかえを追加
+  if (levelUpCount > 0) {
+    const costume = await fetchMicroCMSData<characters<'get'>[]>('characters', {
+      filters: `level[equals]${newLevel}`,
+    });
+    if (costume[0]) {
+      await CostumeRepository.addCostume(db, user.id, costume[0].id);
+    }
+  }
   return;
 };
 

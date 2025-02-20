@@ -54,3 +54,18 @@ export const updateCostumeId = async (
     .where(eq(usersTable.id, userId));
   return;
 };
+
+/**
+ * ユーザが所持する着せ替えを追加する
+ * @param db データベースのインスタンス
+ * @param userId ユーザID
+ * @param costumeId コスチュームID
+ * @returns
+ */
+export const addCostume = async (
+  db: MySql2Database,
+  userId: string,
+  costumeId: string
+) => {
+  return await db.insert(userCostumesTable).values({ userId, costumeId });
+};

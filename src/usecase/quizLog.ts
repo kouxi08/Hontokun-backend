@@ -181,14 +181,20 @@ export const getAllQuizLog = async (db: MySql2Database, userId: string) => {
   // 難易度ごとの正答率を計算
   for (const tierData of response) {
     // answeredAtを降順にソート
-    tierData.quizSetList.sort((a, b) => new Date(b.answeredAtISO).getTime() - new Date(a.answeredAtISO).getTime());
+    tierData.quizSetList.sort(
+      (a, b) =>
+        new Date(b.answeredAtISO).getTime() -
+        new Date(a.answeredAtISO).getTime()
+    );
 
     if (tierData.quizSetList.length > 0) {
       const totalTierAccuracy = tierData.quizSetList.reduce(
         (sum, quizSet) => sum + quizSet.accuracy,
         0
       );
-      tierData.accuracy = Math.floor(totalTierAccuracy / tierData.quizSetList.length);
+      tierData.accuracy = Math.floor(
+        totalTierAccuracy / tierData.quizSetList.length
+      );
     }
   }
 

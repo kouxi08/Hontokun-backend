@@ -28,6 +28,13 @@
       "kind": "number",
       "description": "※敵キャラクターのみ",
       "numberSizeLimitValidation": { "numberSize": { "min": 1, "max": 5 } }
+    },
+    {
+      "fieldId": "level",
+      "name": "獲得レベル",
+      "kind": "number",
+      "description": "きせかえの獲得レベルを入力してください",
+      "numberSizeLimitValidation": { "numberSize": { "min": 1, "max": null } }
     }
   ],
   "customFields": []

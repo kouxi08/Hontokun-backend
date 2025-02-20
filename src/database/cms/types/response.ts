@@ -98,6 +98,10 @@ export type characters<T = 'get'> = Structure<
      * 難易度
      */
     tier?: number;
+    /**
+     * 獲得レベル
+     */
+    level?: number;
   }
 >;
 
