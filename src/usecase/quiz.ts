@@ -5,6 +5,7 @@ import { Quiz } from '../model/quiz/quiz.js';
 import * as QuizRepository from '../repository/quiz.js';
 import * as QuizLogRepository from '../repository/quizLog.js';
 import * as QuizModeRepository from '../repository/quizMode.js';
+import { answerToBoolean } from '../core/converter/api/answer.js';
 
 export const createQuiz = async (
   db: MySql2Database,
@@ -90,7 +91,7 @@ export const getQuizzes = async (
           choice: choice.name,
         };
       }),
-      correctAnswer: quiz.answer,
+      correctAnswer: answerToBoolean(quiz.answer),
       hint: quiz.hint,
       keyword: quiz.keyword,
     };

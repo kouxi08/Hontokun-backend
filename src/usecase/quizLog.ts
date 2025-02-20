@@ -8,6 +8,10 @@ import * as QuizLogRepository from '../repository/quizLog.js';
 import * as QuizModeRepository from '../repository/quizMode.js';
 import * as UserUsecase from './user.js';
 import * as EnemyUsecase from './enemy.js';
+import {
+  answerToString,
+  answerToBoolean,
+} from '../core/converter/api/answer.js';
 
 export type Answer = {
   quizId: string;
@@ -42,10 +46,13 @@ export const createQuizLog = async (
       if (typeof answer.answer !== 'boolean') {
         throw new Error('Invalid answer type');
       }
-      answer.answer = answer.answer ? 'TRUE' : 'FALSE';
+      answer.answer = answerToString(answer.answer);
     }
 
-    quizList.push({ ...quizData.toJSON() });
+    quizList.push({
+      ...quizData.toJSON(),
+      answer: answerToBoolean(quizData.answer),
+    });
     answer.isCorrect = quizData.answer === answer.answer;
 
     // 正解したら経験値ポイント加算
@@ -66,12 +73,7 @@ export const createQuizLog = async (
       Object.assign(quiz, {
         order: log.order,
         isCorrect: log.isCorrect,
-        userAnswer:
-          log.userAnswer == 'TRUE'
-            ? true
-            : log.userAnswer == 'FALSE'
-              ? false
-              : log.userAnswer,
+        userAnswer: answerToBoolean(log.userAnswer),
         answerTime: log.time,
       });
     }
@@ -243,13 +245,9 @@ export const getQuizSetDetail = async (
       }
       return {
         ...quiz.toJSON(),
-        isCorrect: quiz.answer === log.userAnswer,
-        userAnswer:
-          log.userAnswer == 'TRUE'
-            ? true
-            : log.userAnswer == 'FALSE'
-              ? false
-              : log.userAnswer,
+        isCorrect: log.isCorrect,
+        userAnswer: answerToBoolean(log.userAnswer),
+        answer: answerToBoolean(quiz.answer),
       };
     })
   );

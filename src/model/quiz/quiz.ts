@@ -78,9 +78,6 @@ export class Quiz {
   }
 
   get answer(): string | boolean {
-    if (this.params.type === 'TRUE_OR_FALSE') {
-      return this.params.answer === 'TRUE';
-    }
     return this.params.answer;
   }
 
