@@ -60,14 +60,12 @@ export const updateCostumeId = async (
  * @param db データベースのインスタンス
  * @param userId ユーザID
  * @param costumeId コスチュームID
- * @returns 
+ * @returns
  */
 export const addCostume = async (
   db: MySql2Database,
   userId: string,
   costumeId: string
 ) => {
-  return await db
-    .insert(userCostumesTable)
-    .values({ userId, costumeId });
-}
+  return await db.insert(userCostumesTable).values({ userId, costumeId });
+};
