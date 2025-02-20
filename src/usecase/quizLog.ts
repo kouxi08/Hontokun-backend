@@ -94,6 +94,7 @@ export const getAllQuizLog = async (db: MySql2Database, userId: string) => {
     accuracy: number;
     mode: string;
     answeredAt: string;
+    answeredAtISO: Date;
   };
 
   type TierList = {
@@ -173,11 +174,15 @@ export const getAllQuizLog = async (db: MySql2Database, userId: string) => {
       accuracy: Math.floor(accuracy),
       mode,
       answeredAt: answeredAt,
+      answeredAtISO: quizSetLog.createdAt,
     });
   }
 
   // 難易度ごとの正答率を計算
   for (const tierData of response) {
+    // answeredAtを降順にソート
+    tierData.quizSetList.sort((a, b) => new Date(b.answeredAtISO).getTime() - new Date(a.answeredAtISO).getTime());
+
     if (tierData.quizSetList.length > 0) {
       const totalTierAccuracy = tierData.quizSetList.reduce(
         (sum, quizSet) => sum + quizSet.accuracy,
