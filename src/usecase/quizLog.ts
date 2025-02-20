@@ -183,7 +183,7 @@ export const getAllQuizLog = async (db: MySql2Database, userId: string) => {
         (sum, quizSet) => sum + quizSet.accuracy,
         0
       );
-      tierData.accuracy = totalTierAccuracy / tierData.quizSetList.length;
+      tierData.accuracy = Math.floor(totalTierAccuracy / tierData.quizSetList.length);
     }
   }
 
