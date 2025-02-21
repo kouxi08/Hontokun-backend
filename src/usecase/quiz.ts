@@ -5,7 +5,10 @@ import { Quiz } from '../model/quiz/quiz.js';
 import * as QuizRepository from '../repository/quiz.js';
 import * as QuizLogRepository from '../repository/quizLog.js';
 import * as QuizModeRepository from '../repository/quizMode.js';
-import { answerToBoolean } from '../core/converter/api/answer.js';
+import {
+  answerToBoolean,
+  answerToString,
+} from '../core/converter/api/answer.js';
 
 export const createQuiz = async (
   db: MySql2Database,
@@ -38,6 +41,7 @@ const mapQuizData = (quiz: quiz<'get'>): Quiz => {
 
   return Quiz.create({
     ...quiz,
+    answer: answerToString(quiz.answer),
     imageUrl: quiz.image?.url ?? null,
     imageHeight: quiz.image?.height ?? null,
     imageWidth: quiz.image?.width ?? null,
